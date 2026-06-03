@@ -1,0 +1,25 @@
+{
+  "FolderOrderSettings":[
+    {"name":"CommonUtils","order":1,"path":"folders/CommonUtils.yy",},
+    {"name":"Core","order":2,"path":"folders/CommonUtils/Core.yy",},
+    {"name":"Drawing","order":3,"path":"folders/CommonUtils/Drawing.yy",},
+    {"name":"EventBus","order":5,"path":"folders/CommonUtils/EventBus.yy",},
+    {"name":"InGameNotifications","order":6,"path":"folders/CommonUtils/InGameNotifications.yy",},
+    {"name":"Logging","order":4,"path":"folders/CommonUtils/Logging.yy",},
+  ],
+  "ResourceOrderSettings":[
+    {"name":"o_notification_from_top","order":13,"path":"objects/o_notification_from_top/o_notification_from_top.yy",},
+    {"name":"common_macros","order":1,"path":"scripts/common_macros/common_macros.yy",},
+    {"name":"DrawingParameters","order":2,"path":"scripts/DrawingParameters/DrawingParameters.yy",},
+    {"name":"event_bus","order":10,"path":"scripts/event_bus/event_bus.yy",},
+    {"name":"get_log_tags","order":4,"path":"scripts/get_log_tags/get_log_tags.yy",},
+    {"name":"InGameNotificationSettings","order":11,"path":"scripts/InGameNotificationSettings/InGameNotificationSettings.yy",},
+    {"name":"log_config","order":3,"path":"scripts/log_config/log_config.yy",},
+    {"name":"log_debug","order":5,"path":"scripts/log_debug/log_debug.yy",},
+    {"name":"log_error","order":8,"path":"scripts/log_error/log_error.yy",},
+    {"name":"log_exception","order":9,"path":"scripts/log_exception/log_exception.yy",},
+    {"name":"log_info","order":6,"path":"scripts/log_info/log_info.yy",},
+    {"name":"log_warn","order":7,"path":"scripts/log_warn/log_warn.yy",},
+    {"name":"show_notification","order":12,"path":"scripts/show_notification/show_notification.yy",},
+  ],
+}

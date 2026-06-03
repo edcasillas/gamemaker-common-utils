@@ -8,8 +8,10 @@ project, use the resources from inside the submodule, improve the utilities
 from any consuming project, push those changes here, and pull them into other
 projects later.
 
-This is not a full GameMaker project. It is a source library of GameMaker
-resources that consuming projects register in their own `.yyp`.
+This repository includes a lightweight `gamemaker-common-utils.yyp` project so
+GameMaker can resolve the resource files as belonging to a project when using
+the IDE's import tools. Consuming games still register or import the desired
+resources into their own `.yyp`.
 
 ## Current Modules
 
@@ -58,6 +60,10 @@ git submodule update --init --recursive
 Then register the desired `.yy` resources from
 `vendor/gamemaker-common-utils` in the consuming project's `.yyp`. Keep resource
 paths inside the submodule instead of copying files into the project.
+
+If importing through the GameMaker IDE, import from inside the full checked-out
+repository, not from loose copied `.yy` files. GameMaker expects a parent `.yyp`
+project for the resource file.
 
 Open the project in GameMaker after registering resources. GameMaker may
 reserialize `.yy` or `.yyp` files, and runtime behavior cannot be fully
