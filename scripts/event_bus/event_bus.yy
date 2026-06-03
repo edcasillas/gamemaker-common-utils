@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"event_bus",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"event_bus",
+  "parent":{
+    "name":"EventBus",
+    "path":"folders/CommonUtils/EventBus.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
