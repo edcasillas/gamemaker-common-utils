@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"log_exception",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"log_exception",
+  "parent":{
+    "name":"Logging",
+    "path":"folders/CommonUtils/Logging.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
