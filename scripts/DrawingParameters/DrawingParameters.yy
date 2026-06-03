@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"DrawingParameters",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"DrawingParameters",
+  "parent":{
+    "name":"Drawing",
+    "path":"folders/CommonUtils/Drawing.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
