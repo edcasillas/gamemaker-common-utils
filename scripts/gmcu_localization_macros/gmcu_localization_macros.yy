@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_localization_macros",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_localization_macros",
+  "parent":{
+    "name":"Localization",
+    "path":"folders/CommonUtils/Localization.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

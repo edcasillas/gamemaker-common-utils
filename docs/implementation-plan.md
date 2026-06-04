@@ -42,6 +42,12 @@ Import modules in this order:
      `GMCU_EVENT_GAMEPAD_BUTTON_RELEASED`, `GMCU_DIRECTION_ANGLE`, and
      gamepad direction/button helper methods.
    - Depends on `Core`, `Logging`, `EventBus`, and `InGameNotifications`.
+7. `Localization`
+   - Portable CSV-backed localization helper with `gmcu_`-prefixed public API.
+   - Provides `gmcu_localization_init`, `gmcu_localization_t`, and
+     `GMCU_LOCALIZATION_IS_INITIALIZED`.
+   - Depends on `Core` and `Logging`.
+   - Translation CSV file names and content remain consumer-owned.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -116,12 +122,14 @@ git commit -m "Update gamemaker-common-utils pointer"
   - Dev-build errors can show visual notifications.
   - `gmcu_o_input_hub` still drives player movement, menu input, initials
     entry, and gamepad connect/disconnect notifications.
-- Confirm that generated build output under `Builds/` was not touched.
+  - `gmcu_localization_init` loads the consumer `datafiles/localization.csv`
+    and localized labels/buttons still render translated text.
+  - Confirm that generated build output under `Builds/` was not touched.
 
 ## Validation Checklist
 
 - `git diff --check`
-- `rg "Fantasma|objCtrl|GameAnalytics|GlobalStats|JSUtils|NoMobileWeb|localization_t|Builds"`
+- `rg "Fantasma|objCtrl|GameAnalytics|GlobalStats|JSUtils|NoMobileWeb|localization.csv|Builds"`
 - `git status --short`
 - GameMaker IDE smoke test in each consumer project after import.
 
@@ -130,7 +138,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 Do not include these in v1 unless the first module set has been validated:
 
 - buttons and reusable UI objects
-- labels and localization helpers
+- labels
 - transitions
 - timed actions
 - universal cursor

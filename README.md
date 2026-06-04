@@ -62,6 +62,12 @@ Import modules in this order:
    - `objects/gmcu_o_input_hub/gmcu_o_input_hub.yy`
    - Centralized keyboard/gamepad direction state and gamepad button
      press/release events. New shared resources put the `gmcu_` prefix first.
+7. `Localization`
+   - `scripts/gmcu_localization_init/gmcu_localization_init.yy`
+   - `scripts/gmcu_localization_macros/gmcu_localization_macros.yy`
+   - `scripts/gmcu_localization_t/gmcu_localization_t.yy`
+   - CSV-backed translation lookup with `gmcu_`-prefixed API. Translation CSV
+     file names and content remain owned by the consuming project.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -145,7 +151,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 Candidates for later extraction:
 
 - Buttons and reusable UI objects
-- Labels and localization helpers
+- Labels
 - Transitions
 - Timed actions
 - Universal cursor
