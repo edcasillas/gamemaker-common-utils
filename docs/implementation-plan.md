@@ -36,10 +36,19 @@ Import modules in this order:
    - Provides `show_notification`, `InGameNotificationSettings`, and
      `o_notification_from_top`.
    - Depends on `Core` and `Drawing`.
+6. `InputHub`
+   - Portable input helper with `gmcu_`-prefixed public API.
+   - Provides `gmcu_o_input_hub`, `GMCU_EVENT_GAMEPAD_BUTTON_PRESSED`,
+     `GMCU_EVENT_GAMEPAD_BUTTON_RELEASED`, `GMCU_DIRECTION_ANGLE`, and
+     gamepad direction/button helper methods.
+   - Depends on `Core`, `Logging`, `EventBus`, and `InGameNotifications`.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
 present and enabled.
+
+New shared resources use `gmcu_` as the first token in the public resource or
+API name, including objects such as `gmcu_o_input_hub`.
 
 ## Submodule Usage
 
@@ -83,11 +92,12 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Preserve resource paths under the submodule instead of copying files into the
   consumer project.
 - Import modules in dependency order: `Core`, `Drawing`, `Logging`, `EventBus`,
-  then `InGameNotifications` if visual notifications are needed.
+  `InGameNotifications` if visual notifications are needed, then `InputHub`.
 - Check for name conflicts before replacing existing project resources:
   `log_debug`, `log_info`, `log_warn`, `log_error`, `log_exception`,
   `event_bus`, `show_notification`, `InGameNotificationSettings`, and
-  `o_notification_from_top`.
+  `o_notification_from_top`. New modules should use `gmcu_` first in their
+  resource names to reduce collisions.
 - Run `git diff --check`.
 - Open the project in GameMaker and run a smoke test, because GameMaker resource
   behavior cannot be fully validated from the command line.
@@ -104,7 +114,8 @@ git commit -m "Update gamemaker-common-utils pointer"
   - Event dispatch still reaches buttons, menu controllers, and `objCtrl`.
   - Pause/progression events still work.
   - Dev-build errors can show visual notifications.
-  - Gamepad connect/disconnect notifications still appear when enabled.
+  - `gmcu_o_input_hub` still drives player movement, menu input, initials
+    entry, and gamepad connect/disconnect notifications.
 - Confirm that generated build output under `Builds/` was not touched.
 
 ## Validation Checklist
@@ -118,7 +129,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Do not include these in v1 unless the first module set has been validated:
 
-- `InputHub`
 - buttons and reusable UI objects
 - labels and localization helpers
 - transitions

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_input_hub_events",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_input_hub_events",
+  "parent":{
+    "name":"InputHub",
+    "path":"folders/CommonUtils/InputHub.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

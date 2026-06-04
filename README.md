@@ -56,6 +56,12 @@ Import modules in this order:
    - `objects/o_notification_from_top/o_notification_from_top.yy`
    - Optional visual notifications. When imported, it registers a handler that
      lets `log_error` and `log_exception` show notifications in dev builds.
+6. `InputHub`
+   - `scripts/gmcu_input_hub_events/gmcu_input_hub_events.yy`
+   - `scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy`
+   - `objects/gmcu_o_input_hub/gmcu_o_input_hub.yy`
+   - Centralized keyboard/gamepad direction state and gamepad button
+     press/release events. New shared resources put the `gmcu_` prefix first.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -116,7 +122,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Confirm the consuming repo state with `git status`.
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
-  `EventBus`, then optional `InGameNotifications`.
+  `EventBus`, optional `InGameNotifications`, then `InputHub` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -138,7 +144,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Candidates for later extraction:
 
-- Input hub
 - Buttons and reusable UI objects
 - Labels and localization helpers
 - Transitions

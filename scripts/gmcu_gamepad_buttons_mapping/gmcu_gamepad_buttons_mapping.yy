@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_gamepad_buttons_mapping",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_gamepad_buttons_mapping",
+  "parent":{
+    "name":"InputHub",
+    "path":"folders/CommonUtils/InputHub.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
