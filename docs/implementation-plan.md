@@ -48,6 +48,19 @@ Import modules in this order:
      `GMCU_LOCALIZATION_IS_INITIALIZED`.
    - Depends on `Core` and `Logging`.
    - Translation CSV file names and content remain consumer-owned.
+8. `LayeredGUI`
+   - Portable priority-ordered Draw GUI manager with `gmcu_`-prefixed public
+     API.
+   - Provides `gmcu_o_layered_gui_manager`,
+     `gmcu_layered_gui_subscribe`, and `gmcu_layered_gui_unsubscribe`.
+   - Depends on `Core`, `Drawing`, and `Logging`.
+9. `UniversalCursor`
+   - Portable GUI cursor helper with `gmcu_`-prefixed public API.
+   - Provides `gmcu_o_universal_cursor`, `gmcu_universal_cursor_show`,
+     `gmcu_universal_cursor_hide`, `gmcu_universal_cursor_subscribe`, and
+     `gmcu_universal_cursor_unsubscribe`.
+   - Depends on `Core`, `Logging`, `Drawing`, `LayeredGUI`, and `InputHub`.
+   - Cursor sprite assets remain consumer-owned.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -124,6 +137,8 @@ git commit -m "Update gamemaker-common-utils pointer"
     entry, and gamepad connect/disconnect notifications.
   - `gmcu_localization_init` loads the consumer `datafiles/localization.csv`
     and localized labels/buttons still render translated text.
+  - `gmcu_o_universal_cursor` still drives menu hover/press behavior with
+    mouse, keyboard, and gamepad input.
   - Confirm that generated build output under `Builds/` was not touched.
 
 ## Validation Checklist
@@ -141,7 +156,7 @@ Do not include these in v1 unless the first module set has been validated:
 - labels
 - transitions
 - timed actions
-- universal cursor
+- debug/dev menu helpers
 - GameAnalytics wrappers
 - GlobalStats.io wrappers
 - HTML5 extensions such as JSUtils and NoMobileWeb

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_layered_gui_unsubscribe",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_layered_gui_unsubscribe",
+  "parent":{
+    "name":"LayeredGUI",
+    "path":"folders/CommonUtils/LayeredGUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

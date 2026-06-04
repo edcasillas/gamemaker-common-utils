@@ -68,6 +68,18 @@ Import modules in this order:
    - `scripts/gmcu_localization_t/gmcu_localization_t.yy`
    - CSV-backed translation lookup with `gmcu_`-prefixed API. Translation CSV
      file names and content remain owned by the consuming project.
+8. `LayeredGUI`
+   - `objects/gmcu_o_layered_gui_manager/gmcu_o_layered_gui_manager.yy`
+   - `scripts/gmcu_layered_gui_subscribe/gmcu_layered_gui_subscribe.yy`
+   - `scripts/gmcu_layered_gui_unsubscribe/gmcu_layered_gui_unsubscribe.yy`
+   - Priority-ordered Draw GUI callbacks for reusable GUI surfaces.
+9. `UniversalCursor`
+   - `objects/gmcu_o_universal_cursor/gmcu_o_universal_cursor.yy`
+   - `scripts/gmcu_universal_cursor_show/gmcu_universal_cursor_show.yy`
+   - `scripts/gmcu_universal_cursor_hide/gmcu_universal_cursor_hide.yy`
+   - `scripts/gmcu_universal_cursor_subscribe/gmcu_universal_cursor_subscribe.yy`
+   - `scripts/gmcu_universal_cursor_unsubscribe/gmcu_universal_cursor_unsubscribe.yy`
+   - Sprite-driven GUI cursor for mouse, keyboard, and gamepad interaction.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -128,7 +140,8 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Confirm the consuming repo state with `git status`.
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
-  `EventBus`, optional `InGameNotifications`, then `InputHub` if needed.
+  `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
+  `LayeredGUI`, then `UniversalCursor` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -154,7 +167,7 @@ Candidates for later extraction:
 - Labels
 - Transitions
 - Timed actions
-- Universal cursor
+- Debug/dev menu helpers
 - GameAnalytics wrappers
 - GlobalStats.io wrappers
 - HTML5 extensions

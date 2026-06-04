@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_universal_cursor_subscribe",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_universal_cursor_subscribe",
+  "parent":{
+    "name":"UniversalCursor",
+    "path":"folders/CommonUtils/UniversalCursor.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
