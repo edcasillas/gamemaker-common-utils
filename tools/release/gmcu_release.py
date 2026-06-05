@@ -14,6 +14,8 @@ import socket
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 import webbrowser
 from pathlib import Path
 
@@ -304,6 +306,28 @@ def port_available(port: int) -> bool:
             return False
 
 
+def select_port(preferred: int, search_limit: int = 100) -> int:
+    for port in range(preferred, preferred + search_limit):
+        if port_available(port):
+            return port
+    raise ReleaseError(
+        f"No available port found between {preferred} and {preferred + search_limit - 1}"
+    )
+
+
+def wait_for_http(url: str, process: subprocess.Popen, attempts: int = 20) -> None:
+    for _ in range(attempts):
+        if process.poll() is not None:
+            break
+        try:
+            with urllib.request.urlopen(url, timeout=0.5) as response:
+                if 200 <= response.status < 400:
+                    return
+        except (urllib.error.URLError, TimeoutError):
+            time.sleep(0.1)
+    raise ReleaseError(f"HTML server did not become reachable at {url}")
+
+
 def lan_ip() -> str | None:
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
         try:
@@ -328,22 +352,31 @@ def serve_html(config: dict, base: Path, port_override: int | None, open_browser
     html = config["html"]
     directory = resolve(base, html["directory"])
     entrypoint = directory / html.get("entrypoint", "index.html")
-    port = port_override or int(html.get("port", 8000))
+    preferred_port = int(html.get("port", 8000))
     if not entrypoint.is_file():
         raise ReleaseError(f"HTML entrypoint not found: {entrypoint}")
     state_path = server_state_path(config, base)
     state = read_server_state(state_path)
     if state and pid_alive(int(state["pid"])):
-        if Path(state["directory"]) != directory or int(state["port"]) != port:
+        if Path(state["directory"]) != directory:
             raise ReleaseError("A different Common Utils HTML server is already registered for this project")
+        if port_override is not None and int(state["port"]) != port_override:
+            raise ReleaseError(
+                f"The managed HTML server is already using port {state['port']}"
+            )
+        port = int(state["port"])
         local_url = print_server_urls(port)
         if open_browser:
             webbrowser.open(local_url)
         return
     if state_path.exists():
         state_path.unlink()
-    if not port_available(port):
-        raise ReleaseError(f"Port {port} is already in use by another process")
+    if port_override is not None:
+        port = port_override
+        if not port_available(port):
+            raise ReleaseError(f"Port {port} is already in use by another process")
+    else:
+        port = select_port(preferred_port)
     python = require_command("python3")
     state_path.parent.mkdir(parents=True, exist_ok=True)
     log_path = state_path.with_suffix(".log")
@@ -354,8 +387,12 @@ def serve_html(config: dict, base: Path, port_override: int | None, open_browser
         stderr=subprocess.STDOUT,
         start_new_session=True,
     )
-    time.sleep(0.5)
-    if process.poll() is not None:
+    local_url = f"http://localhost:{port}"
+    try:
+        wait_for_http(local_url, process)
+    except ReleaseError:
+        if process.poll() is None:
+            process.terminate()
         raise ReleaseError(f"HTML server failed to start; inspect {log_path}")
     state_path.write_text(
         json.dumps({"pid": process.pid, "directory": str(directory), "port": port}, indent=2) + "\n",

@@ -31,8 +31,11 @@ placeholders. Otherwise, export HTML from GameMaker and use `serve-html`.
 
 `--serve` is valid only for the configured HTML platform and starts the same
 background server as `serve-html`. The server listens on all interfaces and
-prints localhost and LAN URLs. State and logs go under the consumer-defined
-`server_state` path; commit neither file.
+prints localhost and LAN URLs. If the preferred port is occupied, it selects
+the next available port automatically and verifies that `index.html` responds
+before registering the server. An explicit `--port` remains strict and fails
+when occupied. State and logs go under the consumer-defined `server_state`
+path; commit neither file.
 
 `deploy` asks for confirmation that the exact export was tested. Automation
 must pass `--yes-tested`. It reads the latest channel version from

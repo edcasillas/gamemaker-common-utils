@@ -100,6 +100,10 @@ class ReleaseTests(unittest.TestCase):
             with self.assertRaises(gmcu_release.ReleaseError):
                 gmcu_release.confirm_tested(False)
 
+    @mock.patch.object(gmcu_release, "port_available", side_effect=[False, False, True])
+    def test_select_port_uses_next_available_port(self, _available):
+        self.assertEqual(8002, gmcu_release.select_port(8000))
+
     @mock.patch.object(gmcu_release, "run")
     @mock.patch.object(gmcu_release, "require_command", return_value="/usr/bin/npx")
     def test_export_build_invokes_gm_cli_without_versioning(self, _command, run_command):
