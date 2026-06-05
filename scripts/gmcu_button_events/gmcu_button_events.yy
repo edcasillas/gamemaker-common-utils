@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_button_events",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_button_events",
+  "parent":{
+    "name":"Buttons",
+    "path":"folders/CommonUtils/Objects/UI/Buttons.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -61,6 +61,19 @@ Import modules in this order:
      `gmcu_universal_cursor_unsubscribe`.
    - Depends on `Core`, `Logging`, `Drawing`, `LayeredGUI`, and `InputHub`.
    - Cursor sprite assets remain consumer-owned.
+10. `Buttons`
+   - Reusable game-space and GUI-space button base objects with `gmcu_` public
+     names.
+   - Provides `GMCU_EVENT_BUTTON_PRESSED`, `gmcu_o_base_button`,
+     `gmcu_o_base_button_game`, and `gmcu_o_base_button_gui`.
+   - Depends on `Core`, `Drawing`, `Logging`, `EventBus`, `Localization`,
+     `LayeredGUI`, and `UniversalCursor`.
+   - Sprites, fonts, sounds, and button IDs remain consumer-owned.
+11. `Labels`
+   - Reusable game-space and GUI-space label objects with `gmcu_` public names.
+   - Provides `gmcu_draw_text_outlined`, `gmcu_o_base_label`,
+     `gmcu_o_label_game`, and `gmcu_o_label_gui`.
+   - Depends on `Core`, `Drawing`, `Localization`, and `LayeredGUI`.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -139,6 +152,8 @@ git commit -m "Update gamemaker-common-utils pointer"
     and localized labels/buttons still render translated text.
   - `gmcu_o_universal_cursor` still drives menu hover/press behavior with
     mouse, keyboard, and gamepad input.
+  - `GMCU_EVENT_BUTTON_PRESSED` still reaches menu and game controllers.
+  - Localized button/label text uses the resolved translation string.
   - Confirm that generated build output under `Builds/` was not touched.
 
 ## Validation Checklist
@@ -152,8 +167,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Do not include these in v1 unless the first module set has been validated:
 
-- buttons and reusable UI objects
-- labels
 - transitions
 - timed actions
 - debug/dev menu helpers

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_draw_text_outlined",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_draw_text_outlined",
+  "parent":{
+    "name":"Drawing",
+    "path":"folders/CommonUtils/Drawing.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

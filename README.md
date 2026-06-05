@@ -80,6 +80,19 @@ Import modules in this order:
    - `scripts/gmcu_universal_cursor_subscribe/gmcu_universal_cursor_subscribe.yy`
    - `scripts/gmcu_universal_cursor_unsubscribe/gmcu_universal_cursor_unsubscribe.yy`
    - Sprite-driven GUI cursor for mouse, keyboard, and gamepad interaction.
+10. `Buttons`
+   - `scripts/gmcu_button_events/gmcu_button_events.yy`
+   - `objects/gmcu_o_base_button/gmcu_o_base_button.yy`
+   - `objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy`
+   - `objects/gmcu_o_base_button_gui/gmcu_o_base_button_gui.yy`
+   - Reusable localized buttons with EventBus dispatch and consumer-owned
+     sprites, fonts, sounds, and IDs.
+11. `Labels`
+   - `scripts/gmcu_draw_text_outlined/gmcu_draw_text_outlined.yy`
+   - `objects/gmcu_o_base_label/gmcu_o_base_label.yy`
+   - `objects/gmcu_o_label_game/gmcu_o_label_game.yy`
+   - `objects/gmcu_o_label_gui/gmcu_o_label_gui.yy`
+   - Reusable localized game/GUI labels and outlined text drawing.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -141,7 +154,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
-  `LayeredGUI`, then `UniversalCursor` if needed.
+  `LayeredGUI`, `UniversalCursor`, `Buttons`, then `Labels` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -163,8 +176,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Candidates for later extraction:
 
-- Buttons and reusable UI objects
-- Labels
 - Transitions
 - Timed actions
 - Debug/dev menu helpers
