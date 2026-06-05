@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_gameanalytics",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_gameanalytics",
+  "parent":{
+    "name":"ExternalServices",
+    "path":"folders/CommonUtils/ExternalServices.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

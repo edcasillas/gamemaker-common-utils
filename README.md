@@ -108,6 +108,11 @@ Import modules in this order:
    - `objects/gmcu_o_transition_hcurtain_open/gmcu_o_transition_hcurtain_open.yy`
    - Fade and horizontal-curtain room transitions. Audio and other
      project-specific side effects are supplied through consumer callbacks.
+14. `GameAnalytics`
+   - `scripts/gmcu_gameanalytics/gmcu_gameanalytics.yy`
+   - Defensive facade over a consumer-installed GameAnalytics SDK.
+   - The extension, SDK scripts, credentials, consent policy, and event
+     taxonomy remain consumer-owned.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -170,7 +175,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
   `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
-  `Transitions` if needed.
+  `Transitions` and `GameAnalytics` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -192,8 +197,9 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Candidates for later extraction:
 
-- Debug/dev menu helpers
-- GameAnalytics wrappers
 - GlobalStats.io wrappers
 - HTML5 extensions
-- Optional `.yymps` packaging
+
+`.yymps` packaging is not part of the active roadmap. It creates copied import
+packages rather than the editable submodule + symlink links used by current
+consumers.

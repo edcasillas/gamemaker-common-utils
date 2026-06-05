@@ -8,9 +8,9 @@ Unity common utils workflow: add the library as a Git submodule to a project,
 improve the shared code from whichever project is using it, push those changes,
 and pull them into other projects later.
 
-The primary distribution format for v1 is an editable Git submodule. GameMaker
-Local Asset Packages (`.yymps`) may be added later as an optional import format,
-but they are not required for the first usable version.
+The distribution format is an editable Git submodule. GameMaker Local Asset
+Packages (`.yymps`) are not part of the active plan because they copy imported
+resources and do not preserve the editable submodule + symlink workflow.
 
 ## v1 Module Boundaries
 
@@ -86,6 +86,12 @@ Import modules in this order:
    - Depends on `Core`, `Drawing`, `Logging`, and `EventBus`.
    - Audio fades, audio stopping, and other project-specific room-change side
      effects remain consumer-owned through transition callbacks.
+14. `GameAnalytics`
+   - Provides `gmcu_gameanalytics_init`, design/progression/error event
+     helpers, and session flushing.
+   - Depends on `Logging` and a consumer-installed GameAnalytics SDK.
+   - Extension files, SDK scripts, credentials, consent policy, build values,
+     and event taxonomy remain consumer-owned.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -183,8 +189,5 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Do not include these in v1 unless the first module set has been validated:
 
-- debug/dev menu helpers
-- GameAnalytics wrappers
 - GlobalStats.io wrappers
 - HTML5 extensions such as JSUtils and NoMobileWeb
-- `.yymps` packaging
