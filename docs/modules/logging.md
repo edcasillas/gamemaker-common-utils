@@ -13,10 +13,9 @@ Resources:
 - `scripts/log_exception/log_exception.yy`
 
 Logging is intentionally portable. It writes to GameMaker's debug output with
-`show_debug_message` and does not depend on GameAnalytics, JSUtils,
-GlobalStats.io, NoMobileWeb, or project-specific services.
+`show_debug_message` and does not depend on GameAnalytics, GlobalStats.io,
+HTML5 Helpers, or project-specific services.
 
 `log_error` and `log_exception` can show visual notifications when another
 module registers a notification handler through
 `common_utils_set_notification_handler`.
-

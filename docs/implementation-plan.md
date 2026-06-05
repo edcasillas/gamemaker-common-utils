@@ -25,8 +25,8 @@ Import modules in this order:
 3. `Logging`
    - Portable `log_debug`, `log_info`, `log_warn`, `log_error`, and
      `log_exception`.
-   - Must not depend on GameAnalytics, JSUtils, GlobalStats, NoMobileWeb, or
-     any game-specific service.
+   - Must not depend on GameAnalytics, GlobalStats, HTML5 Helpers, or any
+     game-specific service.
 4. `EventBus`
    - Publish-subscribe helper with the existing API:
      `eventbus_subscribe`, `eventbus_unsubscribe`, and `eventbus_dispatch`.
@@ -98,6 +98,12 @@ Import modules in this order:
    - The controller, HTTP scripts, credentials, GTD identifiers, player
      identity policy, persistence, response events, and payload schema remain
      consumer-owned.
+16. `HTML5 Helpers`
+   - Provides `gmcu_html5_is_mobile_device`, `gmcu_html5_block_canvas`, and
+     `gmcu_html5_console_error`.
+   - Mobile blocking policy, message text, analytics, and game-state behavior
+     remain consumer-owned.
+   - Does not inject consumer-specific startup scripts.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -193,6 +199,5 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 ## Future Modules
 
-Do not include these in v1 unless the first module set has been validated:
-
-- HTML5 extensions such as JSUtils and NoMobileWeb
+No additional modules are currently planned. Add new candidates only after a
+real consumer demonstrates a reusable boundary.

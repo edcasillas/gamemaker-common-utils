@@ -118,6 +118,12 @@ Import modules in this order:
    - Defensive facade over a consumer-installed GlobalStats.io client.
    - The controller, HTTP client, credentials, GTD identifiers, persistence,
      response events, and payload schema remain consumer-owned.
+16. `HTML5 Helpers`
+   - `extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy`
+   - Mobile-browser detection, canvas blocking with a consumer-provided
+     message, and browser-console error output.
+   - Mobile policy, message text, analytics, and game-state behavior remain
+     consumer-owned.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -180,7 +186,8 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
   `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
-  `Transitions`, `GameAnalytics`, and `GlobalStats.io` if needed.
+  `Transitions`, `GameAnalytics`, `GlobalStats.io`, and `HTML5 Helpers` if
+  needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -196,13 +203,11 @@ git commit -m "Update gamemaker-common-utils pointer"
 - GameMaker IDE validation is still required after import.
 - Logging is intentionally portable and does not send GameAnalytics or
   GlobalStats.io events.
-- HTML5 extensions such as JSUtils and NoMobileWeb are not included.
+- HTML5 build/export behavior still requires GameMaker IDE validation.
 
 ## Roadmap
 
-Candidates for later extraction:
-
-- HTML5 extensions
+No additional modules are currently planned for the extraction roadmap.
 
 `.yymps` packaging is not part of the active roadmap. It creates copied import
 packages rather than the editable submodule + symlink links used by current
