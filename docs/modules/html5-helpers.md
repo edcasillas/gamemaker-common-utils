@@ -17,12 +17,16 @@ JavaScript extension.
 message with a browser-back button. The message is added with `textContent`, so
 consumer text is not interpreted as HTML.
 
+The extension also preserves the legacy early mobile-blocking behavior through
+an HTML5 `PostBody` injection of `datafiles/disable-mobile.js`. That script
+wraps the existing `window.onload`, lets GameMaker initialize for analytics,
+then immediately replaces the mobile view with the original warning layout.
+
 ## Consumer-Owned Requirements
 
-The consumer decides whether mobile browsers should be blocked, supplies the
-displayed message, and owns any analytics or game-state changes performed
-before blocking the canvas. Common Utils does not inject a startup script or
-assume that every game rejects mobile play.
+Consumers that import the included `disable-mobile.js` opt into its fixed
+mobile-blocking policy and message. Analytics and game-state changes remain
+consumer-owned.
 
 These functions are HTML5 extension functions. Guard calls that can execute on
 other targets with `os_browser != browser_not_a_browser`.

@@ -120,10 +120,10 @@ Import modules in this order:
      response events, and payload schema remain consumer-owned.
 16. `HTML5 Helpers`
    - `extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy`
-   - Mobile-browser detection, canvas blocking with a consumer-provided
-     message, and browser-console error output.
-   - Mobile policy, message text, analytics, and game-state behavior remain
-     consumer-owned.
+   - Mobile-browser detection, browser-console output, and the legacy early
+     mobile warning through `datafiles/disable-mobile.js`.
+   - Consumers may omit the included file if they do not want that fixed
+     mobile-blocking behavior.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in

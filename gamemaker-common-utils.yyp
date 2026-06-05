@@ -32,7 +32,9 @@
     {"$GMFolder":"","%Name":"UniversalCursor","folderPath":"folders/CommonUtils/UniversalCursor.yy","name":"UniversalCursor","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
   "ForcedPrefabProjectReferences":[],
-  "IncludedFiles":[],
+  "IncludedFiles":[
+    {"$GMIncludedFile":"","%Name":"disable-mobile.js","CopyToMask":-1,"filePath":"datafiles","name":"disable-mobile.js","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+  ],
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{},

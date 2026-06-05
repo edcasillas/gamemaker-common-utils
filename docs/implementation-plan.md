@@ -101,9 +101,11 @@ Import modules in this order:
 16. `HTML5 Helpers`
    - Provides `gmcu_html5_is_mobile_device`, `gmcu_html5_block_canvas`, and
      `gmcu_html5_console_error`.
-   - Mobile blocking policy, message text, analytics, and game-state behavior
-     remain consumer-owned.
-   - Does not inject consumer-specific startup scripts.
+   - Preserves Fantasma's existing `PostBody` injection and
+     `datafiles/disable-mobile.js` behavior without changing timing or
+     presentation.
+   - Consumers can omit the included file when they do not want the fixed
+     mobile warning.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is

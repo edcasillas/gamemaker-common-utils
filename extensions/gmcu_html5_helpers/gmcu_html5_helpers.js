@@ -6,59 +6,35 @@ function gmcuHtml5IsMobileDevice() {
 
 function gmcuHtml5BlockCanvas(message) {
     var gameDiv = document.getElementById("gm4html5_div_id");
-    if (!gameDiv || !gameDiv.parentNode) {
-        console.error("[GMCU HTML5] Game canvas container was not found.");
-        return false;
+    if (gameDiv) {
+        var messageDiv = document.createElement("div");
+        messageDiv.id = "disabler-message";
+        messageDiv.className = "mainBody";
+        messageDiv.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: white;">
+            <div style="text-align: center;">
+            <p style="font-size: 50px;">⚠️</p>
+            <p style="font-size: 18px; color: black;"> ` + message + ` </p>
+            <form>
+                <input type="button" value="Go back!" onclick="history.back()" style="padding: 10px 20px; font-size: 16px;">
+            </form>
+            </div>
+        </div>
+        `;
+
+        gameDiv.parentNode.insertBefore(messageDiv, gameDiv);
+        gameDiv.style.display = "none";
+    } else {
+        console.error("Game canvas was not found.");
     }
 
-    var existingMessage = document.getElementById("gmcu-html5-block-message");
-    if (existingMessage) {
-        existingMessage.remove();
+    var id = window.setTimeout(function() {}, 0);
+    while (id--) {
+        window.clearTimeout(id);
+        window.clearInterval(id);
     }
 
-    var messageContainer = document.createElement("div");
-    messageContainer.id = "gmcu-html5-block-message";
-    messageContainer.className = "mainBody";
-    messageContainer.style.display = "flex";
-    messageContainer.style.justifyContent = "center";
-    messageContainer.style.alignItems = "center";
-    messageContainer.style.minHeight = "100vh";
-    messageContainer.style.backgroundColor = "white";
-    messageContainer.style.color = "black";
-
-    var content = document.createElement("div");
-    content.style.maxWidth = "36rem";
-    content.style.padding = "2rem";
-    content.style.textAlign = "center";
-
-    var warning = document.createElement("p");
-    warning.textContent = "!";
-    warning.style.fontSize = "3rem";
-    warning.style.fontWeight = "bold";
-    warning.style.margin = "0 0 1rem";
-
-    var text = document.createElement("p");
-    text.textContent = String(message);
-    text.style.fontSize = "1.125rem";
-    text.style.lineHeight = "1.5";
-
-    var backButton = document.createElement("button");
-    backButton.type = "button";
-    backButton.textContent = "Go back";
-    backButton.style.padding = "0.625rem 1.25rem";
-    backButton.style.fontSize = "1rem";
-    backButton.addEventListener("click", function () {
-        history.back();
-    });
-
-    content.appendChild(warning);
-    content.appendChild(text);
-    content.appendChild(backButton);
-    messageContainer.appendChild(content);
-    gameDiv.parentNode.insertBefore(messageContainer, gameDiv);
-    gameDiv.style.display = "none";
-
-    return true;
+    console.log("Game canvas disabled, and all events and timers cleared.");
 }
 
 function gmcuHtml5ConsoleError(message) {
