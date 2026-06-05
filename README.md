@@ -124,6 +124,16 @@ Import modules in this order:
      mobile warning through `datafiles/disable-mobile.js`.
    - Consumers may omit the included file if they do not want that fixed
      mobile-blocking behavior.
+17. `Release and Build Info`
+   - `tools/release/gmcu_release.py`
+   - `scripts/gmcu_build_info/gmcu_build_info.yy`
+   - `objects/gmcu_o_build_info_label/gmcu_o_build_info_label.yy`
+   - Exports through `gm-cli`, serves HTML exports on localhost and the LAN,
+     versions and publishes tested builds through Butler, and exposes runtime
+     build information.
+   - Consumer projects retain all build paths, GameMaker targets, itch.io
+     destinations, platform IDs, version state, build output, and presentation
+     values.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -186,8 +196,8 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
   `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
-  `Transitions`, `GameAnalytics`, `GlobalStats.io`, and `HTML5 Helpers` if
-  needed.
+  `Transitions`, `GameAnalytics`, `GlobalStats.io`, `HTML5 Helpers`, and
+  `Release and Build Info` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -204,6 +214,9 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Logging is intentionally portable and does not send GameAnalytics or
   GlobalStats.io events.
 - HTML5 build/export behavior still requires GameMaker IDE validation.
+- Release export and deployment are intentionally separate. The tooling never
+  publishes automatically after an export; the exact artifact must be tested
+  and deployment must be invoked explicitly.
 
 ## Roadmap
 
