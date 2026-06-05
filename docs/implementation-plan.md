@@ -74,6 +74,18 @@ Import modules in this order:
    - Provides `gmcu_draw_text_outlined`, `gmcu_o_base_label`,
      `gmcu_o_label_game`, and `gmcu_o_label_gui`.
    - Depends on `Core`, `Drawing`, `Localization`, and `LayeredGUI`.
+12. `TimedActions`
+   - Provides `gmcu_o_timed_actions_manager`, `gmcu_wait_for_seconds`, and
+     `gmcu_wait_for_steps`.
+   - Depends on `Core` and `Logging`.
+   - The manager is created lazily and persists across room changes.
+13. `Transitions`
+   - Provides `GMCU_TRANSITION_TO_ROOM_TYPE`,
+     `GMCU_EVENT_TRANSITION_FINISHED`, `gmcu_transition_to_room`, and reusable
+     fade/horizontal-curtain transition objects.
+   - Depends on `Core`, `Drawing`, `Logging`, and `EventBus`.
+   - Audio fades, audio stopping, and other project-specific room-change side
+     effects remain consumer-owned through transition callbacks.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -154,6 +166,10 @@ git commit -m "Update gamemaker-common-utils pointer"
     mouse, keyboard, and gamepad input.
   - `GMCU_EVENT_BUTTON_PRESSED` still reaches menu and game controllers.
   - Localized button/label text uses the resolved translation string.
+  - `gmcu_wait_for_seconds` and `gmcu_wait_for_steps` execute delayed actions.
+  - Fade and horizontal-curtain transitions change rooms and preserve
+    Fantasma's consumer-owned audio behavior.
+  - Opening curtains still dispatch `GMCU_EVENT_TRANSITION_FINISHED`.
   - Confirm that generated build output under `Builds/` was not touched.
 
 ## Validation Checklist
@@ -167,8 +183,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Do not include these in v1 unless the first module set has been validated:
 
-- transitions
-- timed actions
 - debug/dev menu helpers
 - GameAnalytics wrappers
 - GlobalStats.io wrappers

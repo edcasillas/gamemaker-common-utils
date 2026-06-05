@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_wait_for_steps",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_wait_for_steps",
+  "parent":{
+    "name":"TimedActions",
+    "path":"folders/CommonUtils/TimedActions.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

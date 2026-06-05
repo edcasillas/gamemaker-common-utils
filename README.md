@@ -93,6 +93,21 @@ Import modules in this order:
    - `objects/gmcu_o_label_game/gmcu_o_label_game.yy`
    - `objects/gmcu_o_label_gui/gmcu_o_label_gui.yy`
    - Reusable localized game/GUI labels and outlined text drawing.
+12. `TimedActions`
+   - `objects/gmcu_o_timed_actions_manager/gmcu_o_timed_actions_manager.yy`
+   - `scripts/gmcu_wait_for_seconds/gmcu_wait_for_seconds.yy`
+   - `scripts/gmcu_wait_for_steps/gmcu_wait_for_steps.yy`
+   - Persistent scheduling of callbacks after elapsed seconds or Step events.
+13. `Transitions`
+   - `scripts/gmcu_transition_events/gmcu_transition_events.yy`
+   - `scripts/gmcu_transition_types/gmcu_transition_types.yy`
+   - `scripts/gmcu_transition_to_room/gmcu_transition_to_room.yy`
+   - `objects/gmcu_o_transition_to_room/gmcu_o_transition_to_room.yy`
+   - `objects/gmcu_o_transition_fadeout_to_room/gmcu_o_transition_fadeout_to_room.yy`
+   - `objects/gmcu_o_transition_hcurtain_close_to_room/gmcu_o_transition_hcurtain_close_to_room.yy`
+   - `objects/gmcu_o_transition_hcurtain_open/gmcu_o_transition_hcurtain_open.yy`
+   - Fade and horizontal-curtain room transitions. Audio and other
+     project-specific side effects are supplied through consumer callbacks.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -154,7 +169,8 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
-  `LayeredGUI`, `UniversalCursor`, `Buttons`, then `Labels` if needed.
+  `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
+  `Transitions` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -176,8 +192,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Candidates for later extraction:
 
-- Transitions
-- Timed actions
 - Debug/dev menu helpers
 - GameAnalytics wrappers
 - GlobalStats.io wrappers

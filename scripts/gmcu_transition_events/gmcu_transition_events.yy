@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_transition_events",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_transition_events",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/CommonUtils/Transitions/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
