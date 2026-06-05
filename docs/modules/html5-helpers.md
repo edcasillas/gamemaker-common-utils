@@ -13,9 +13,9 @@ JavaScript extension.
 - `gmcu_html5_block_canvas(_message)`
 - `gmcu_html5_console_error(_message)`
 
-`gmcu_html5_block_canvas` hides `gm4html5_div_id` and inserts an accessible DOM
-message with a browser-back button. The message is added with `textContent`, so
-consumer text is not interpreted as HTML.
+`gmcu_html5_block_canvas` preserves the original dynamic canvas-disabler
+presentation, including the `⚠️` marker, message, back button, and timer
+cleanup.
 
 The extension also preserves the legacy early mobile-blocking behavior through
 an HTML5 `PostBody` injection of `datafiles/disable-mobile.js`. That script

@@ -12,6 +12,11 @@ The distribution format is an editable Git submodule. GameMaker Local Asset
 Packages (`.yymps`) are not part of the active plan because they copy imported
 resources and do not preserve the editable submodule + symlink workflow.
 
+Extraction changes ownership, not behavior. Preserve timing, presentation,
+text, side-effect order, initialization order, platform injection points, and
+consumer policy. Any intentional behavior change must be reviewed and
+validated separately.
+
 ## v1 Module Boundaries
 
 Import modules in this order:
@@ -195,7 +200,8 @@ git commit -m "Update gamemaker-common-utils pointer"
 ## Validation Checklist
 
 - `git diff --check`
-- `rg "Fantasma|objCtrl|GameAnalytics|GlobalStats|JSUtils|NoMobileWeb|localization.csv|Builds"`
+- Search shared code for consumer names, credentials, project assets, datafile
+  names, build paths, and obsolete pre-extraction resource names.
 - `git status --short`
 - GameMaker IDE smoke test in each consumer project after import.
 
