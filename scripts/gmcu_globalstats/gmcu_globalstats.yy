@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_globalstats",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_globalstats",
+  "parent":{
+    "name":"ExternalServices",
+    "path":"folders/CommonUtils/ExternalServices.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -113,6 +113,11 @@ Import modules in this order:
    - Defensive facade over a consumer-installed GameAnalytics SDK.
    - The extension, SDK scripts, credentials, consent policy, and event
      taxonomy remain consumer-owned.
+15. `GlobalStats.io`
+   - `scripts/gmcu_globalstats/gmcu_globalstats.yy`
+   - Defensive facade over a consumer-installed GlobalStats.io client.
+   - The controller, HTTP client, credentials, GTD identifiers, persistence,
+     response events, and payload schema remain consumer-owned.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -175,7 +180,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
   `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
-  `Transitions` and `GameAnalytics` if needed.
+  `Transitions`, `GameAnalytics`, and `GlobalStats.io` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -197,7 +202,6 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Candidates for later extraction:
 
-- GlobalStats.io wrappers
 - HTML5 extensions
 
 `.yymps` packaging is not part of the active roadmap. It creates copied import

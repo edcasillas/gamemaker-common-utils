@@ -92,6 +92,12 @@ Import modules in this order:
    - Depends on `Logging` and a consumer-installed GameAnalytics SDK.
    - Extension files, SDK scripts, credentials, consent policy, build values,
      and event taxonomy remain consumer-owned.
+15. `GlobalStats.io`
+   - Provides defensive leaderboard, share, and rank-section helpers.
+   - Depends on `Logging` and a consumer-installed GlobalStats.io client.
+   - The controller, HTTP scripts, credentials, GTD identifiers, player
+     identity policy, persistence, response events, and payload schema remain
+     consumer-owned.
 
 `show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
@@ -189,5 +195,4 @@ git commit -m "Update gamemaker-common-utils pointer"
 
 Do not include these in v1 unless the first module set has been validated:
 
-- GlobalStats.io wrappers
 - HTML5 extensions such as JSUtils and NoMobileWeb
