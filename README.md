@@ -34,7 +34,8 @@ Import modules in this order:
    - `scripts/common_macros/common_macros.yy`
 2. `Drawing`: Restores draw state after temporary draw changes.
    - `scripts/DrawingParameters/DrawingParameters.yy`
-3. `Logging`: Portable debug output using `show_debug_message`.
+3. `Logging`: Portable severity-aware output with configurable output and
+   telemetry handlers. It falls back to `show_debug_message`.
    - `scripts/log_config/log_config.yy`
    - `scripts/get_log_tags/get_log_tags.yy`
    - `scripts/log_debug/log_debug.yy`
@@ -54,7 +55,10 @@ Import modules in this order:
    - `scripts/gmcu_input_hub_events/gmcu_input_hub_events.yy`
    - `scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy`
    - `objects/gmcu_o_input_hub/gmcu_o_input_hub.yy`
-7. `Localization`: CSV-backed translation lookup with `gmcu_`-prefixed API. Translation CSV file names and content remain owned by the consuming project.
+7. `Localization`: CSV-backed translation lookup with `gmcu_`-prefixed API.
+   Translation CSV file names and content remain owned by the consuming
+   project. The default file name remains `localization.csv`, and translation
+   lookup lazily initializes the module when needed.
    - `scripts/gmcu_localization_init/gmcu_localization_init.yy`
    - `scripts/gmcu_localization_macros/gmcu_localization_macros.yy`
    - `scripts/gmcu_localization_t/gmcu_localization_t.yy`
@@ -69,7 +73,8 @@ Import modules in this order:
    - `scripts/gmcu_universal_cursor_subscribe/gmcu_universal_cursor_subscribe.yy`
    - `scripts/gmcu_universal_cursor_unsubscribe/gmcu_universal_cursor_unsubscribe.yy`
 10. `Buttons`: Reusable localized buttons with EventBus dispatch and consumer-owned
-     sprites, fonts, sounds, and IDs.
+     sprites, fonts, sounds, and IDs. Debug events use Logging and the optional
+     notification handler.
    - `scripts/gmcu_button_events/gmcu_button_events.yy`
    - `objects/gmcu_o_base_button/gmcu_o_base_button.yy`
    - `objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy`
@@ -79,7 +84,9 @@ Import modules in this order:
    - `objects/gmcu_o_base_label/gmcu_o_base_label.yy`
    - `objects/gmcu_o_label_game/gmcu_o_label_game.yy`
    - `objects/gmcu_o_label_gui/gmcu_o_label_gui.yy`
-12. `TimedActions`: Persistent scheduling of callbacks after elapsed seconds or Step events.
+12. `TimedActions`: Persistent scheduling of callbacks after elapsed seconds or
+    Step events, including the legacy debug log emitted before a Step-scheduled
+    callback executes.
    - `objects/gmcu_o_timed_actions_manager/gmcu_o_timed_actions_manager.yy`
    - `scripts/gmcu_wait_for_seconds/gmcu_wait_for_seconds.yy`
    - `scripts/gmcu_wait_for_steps/gmcu_wait_for_steps.yy`
@@ -102,8 +109,9 @@ Import modules in this order:
      response events, and payload schema remain consumer-owned.
 16. `HTML5 Helpers`
    - `extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy`
-   - Mobile-browser detection, browser-console output, and the legacy early
-     mobile warning through `datafiles/disable-mobile.js`.
+   - Mobile-browser detection, severity-aware browser-console output, secure
+     context UUID generation, and the legacy early mobile warning through
+     `datafiles/disable-mobile.js`.
    - Consumers may omit the included file if they do not want that fixed
      mobile-blocking behavior.
 17. `Release and Build Info`
@@ -200,7 +208,8 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Logging is portable and does not depend directly on GameAnalytics or
   GlobalStats.io. Consumers can register a telemetry handler to preserve
   project-specific log forwarding without coupling the shared module to an
-  analytics SDK.
+  analytics SDK. Consumers can also register an output handler; HTML5 consumers
+  can use the HTML5 Helpers console functions to preserve browser severity.
 - HTML5 build/export behavior still requires GameMaker IDE validation.
 - Release export and deployment are intentionally separate. The tooling never
   publishes automatically after an export; the exact artifact must be tested

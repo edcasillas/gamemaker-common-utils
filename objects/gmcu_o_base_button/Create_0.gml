@@ -49,14 +49,22 @@ function do_draw() {
 }
 
 function on_pressed() {
-	if(debug_events) { log_debug(button_id + " pressed; interactable: " + string(is_interactable)); }
+	if(debug_events) {
+		var _message = button_id + " pressed; interactable: " + string(is_interactable);
+		log_debug(_message);
+		common_utils_try_show_notification(_message);
+	}
 	if(!is_interactable) return;
 	image_index = 2;
 	is_pressed = true;
 }
 
 function on_released() {
-	if(debug_events) { log_debug(button_id + " released; interactable: " + string(is_interactable)); }
+	if(debug_events) {
+		var _message = button_id + " released; interactable: " + string(is_interactable);
+		log_debug(_message);
+		common_utils_try_show_notification(_message);
+	}
 	if(!is_interactable) return;
 	image_index = 1;
 
@@ -71,13 +79,21 @@ function on_released() {
 }
 
 function on_hover_enter() {
-	if(debug_events) { log_debug(button_id + " hover enter; interactable: " + string(is_interactable)); }
+	if(debug_events) {
+		var _message = button_id + " hover enter; interactable: " + string(is_interactable);
+		log_debug(_message);
+		common_utils_try_show_notification(_message);
+	}
 	if(!is_interactable) return;
 	image_index = 1;
 }
 
 function on_hover_leave() {
-	if(debug_events) { log_debug(button_id + " hover leave; interactable: " + string(is_interactable)); }
+	if(debug_events) {
+		var _message = button_id + " hover leave; interactable: " + string(is_interactable);
+		log_debug(_message);
+		common_utils_try_show_notification(_message);
+	}
 	if(!is_interactable) return;
 	is_pressed = false;
 	image_index = 0;

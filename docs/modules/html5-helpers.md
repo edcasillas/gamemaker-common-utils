@@ -11,7 +11,14 @@ JavaScript extension.
 
 - `gmcu_html5_is_mobile_device()`
 - `gmcu_html5_block_canvas(_message)`
+- `gmcu_html5_generate_uuid()`
+- `gmcu_html5_console_debug(_message)`
+- `gmcu_html5_console_info(_message)`
+- `gmcu_html5_console_warn(_message)`
 - `gmcu_html5_console_error(_message)`
+
+`gmcu_html5_generate_uuid` uses `crypto.randomUUID()` and therefore requires a
+secure browser context.
 
 `gmcu_html5_block_canvas` preserves the original dynamic canvas-disabler
 presentation, including the `⚠️` marker, message, back button, and timer

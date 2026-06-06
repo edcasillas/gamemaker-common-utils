@@ -3,18 +3,13 @@ global.gmcu_loc_map = undefined;
 
 /**
 @param {string} _lang_code Two-digit language code, or undefined to get the language code from the running OS.
-@param {string} _csv_file_name Name of the included CSV file containing the translations.
+@param {string} _csv_file_name Name of the included CSV file containing the translations. Defaults to localization.csv.
 */
-function gmcu_localization_init(_lang_code = undefined, _csv_file_name = undefined) {
+function gmcu_localization_init(_lang_code = undefined, _csv_file_name = "localization.csv") {
 	if(is_undefined(_lang_code)) {
 		global.gmcu_language = os_get_language();
 	} else {
 		global.gmcu_language = _lang_code;
-	}
-	
-	if(is_undefined(_csv_file_name)) {
-		log_error("No localization CSV file name was provided. Aborting localization initialization.");
-		return false;
 	}
 	
 	if(!file_exists(_csv_file_name)) {

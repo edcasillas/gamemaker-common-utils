@@ -27,7 +27,7 @@ Macros:
 
 Functions:
 
-- `gmcu_localization_init(_lang_code = undefined, _csv_file_name = undefined)`
+- `gmcu_localization_init(_lang_code = undefined, _csv_file_name = "localization.csv")`
 - `gmcu_localization_t(_str)`
 
 Globals:
@@ -47,10 +47,12 @@ key,en,es
 PLAY,Play,Jugar
 ```
 
-Call `gmcu_localization_init(undefined, "your-file.csv")` once during project
-startup. If `_lang_code` is omitted, the module uses `os_get_language()`. If the
-CSV file, language column, or key is missing, lookups fall back to the original
-key string.
+Call `gmcu_localization_init(undefined, "your-file.csv")` during project
+startup when using a non-default file. If `_lang_code` is omitted, the module
+uses `os_get_language()`. If lookup occurs before explicit initialization,
+`gmcu_localization_t` lazily initializes with `localization.csv`. If the CSV
+file, language column, or key is missing, lookups fall back to the original key
+string.
 
 ## Consumer Notes
 

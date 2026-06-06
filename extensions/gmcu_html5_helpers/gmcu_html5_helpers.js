@@ -37,6 +37,22 @@ function gmcuHtml5BlockCanvas(message) {
     console.log("Game canvas disabled, and all events and timers cleared.");
 }
 
+function gmcuHtml5GenerateUuid() {
+    return crypto.randomUUID();
+}
+
+function gmcuHtml5ConsoleDebug(message) {
+    console.debug(String(message));
+}
+
+function gmcuHtml5ConsoleInfo(message) {
+    console.info(String(message));
+}
+
+function gmcuHtml5ConsoleWarn(message) {
+    console.warn(String(message));
+}
+
 function gmcuHtml5ConsoleError(message) {
     console.error(String(message));
 }

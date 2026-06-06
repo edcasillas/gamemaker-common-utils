@@ -13,6 +13,41 @@
 
 global.gmcu_log_telemetry_handler = undefined;
 global.gmcu_log_telemetry_dispatching = false;
+global.gmcu_log_output_handler = undefined;
+global.gmcu_log_output_dispatching = false;
+
+function gmcu_log_set_output_handler(_handler) {
+	global.gmcu_log_output_handler = _handler;
+	global.gmcu_log_output_dispatching = false;
+}
+
+function gmcu_log_write_output(_severity, _message) {
+	if (!variable_global_exists("gmcu_log_output_handler")
+		|| is_undefined(global.gmcu_log_output_handler)) {
+		show_debug_message(_message);
+		return;
+	}
+	if (!variable_global_exists("gmcu_log_output_dispatching")) {
+		global.gmcu_log_output_dispatching = false;
+	}
+	if (global.gmcu_log_output_dispatching) {
+		show_debug_message(_message);
+		return;
+	}
+
+	global.gmcu_log_output_dispatching = true;
+	try {
+		var _handler = global.gmcu_log_output_handler;
+		_handler(_severity, _message);
+	} catch (_exception) {
+		show_debug_message(_message);
+		show_debug_message(
+			"[ERROR]" + get_log_tags()
+			+ " Logging output handler failed: " + string(_exception)
+		);
+	}
+	global.gmcu_log_output_dispatching = false;
+}
 
 function gmcu_log_set_telemetry_handler(_handler) {
 	global.gmcu_log_telemetry_handler = _handler;

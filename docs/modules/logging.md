@@ -12,9 +12,19 @@ Resources:
 - `scripts/log_error/log_error.yy`
 - `scripts/log_exception/log_exception.yy`
 
-Logging is intentionally portable. It writes to GameMaker's debug output with
-`show_debug_message` and does not depend on GameAnalytics, GlobalStats.io,
-HTML5 Helpers, or project-specific services.
+Logging is intentionally portable and does not depend directly on
+GameAnalytics, GlobalStats.io, HTML5 Helpers, or project-specific services.
+Without an adapter it writes to GameMaker's debug output with
+`show_debug_message`.
+
+Consumers can preserve target-specific output behavior by registering a
+handler:
+
+```gml
+gmcu_log_set_output_handler(function(_severity, _message) {
+    target_console_write(_severity, _message);
+});
+```
 
 Consumers can preserve project telemetry by registering a handler:
 

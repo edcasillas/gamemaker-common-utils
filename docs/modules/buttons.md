@@ -57,3 +57,5 @@ controllers to `GMCU_EVENT_BUTTON_PRESSED` through EventBus.
 
 Button sprites should provide frames `0`, `1`, and `2` for idle, hover, and
 pressed states. Fonts, sounds, sprites, and button IDs remain consumer-owned.
+When `debug_events` is enabled, button events are logged and also sent to the
+optional Common Utils notification handler.

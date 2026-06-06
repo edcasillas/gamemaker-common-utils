@@ -1,7 +1,7 @@
 function log_error(_message, _show_notification = true) {
 	if (ENABLE_ERROR_LOG) {
 		var _msg = "[ERROR]" + get_log_tags() + " " + string(_message);
-		show_debug_message(_msg);
+		gmcu_log_write_output(GMCU_LOG_LEVEL_ERROR, _msg);
 		gmcu_log_buffer_push(GMCU_LOG_LEVEL_ERROR, _msg);
 		gmcu_log_send_telemetry(GMCU_LOG_LEVEL_ERROR, _msg);
 	}
