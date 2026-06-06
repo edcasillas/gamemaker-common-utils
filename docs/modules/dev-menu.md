@@ -49,6 +49,11 @@ mouse, keyboard, gamepad, and EventBus consumers from receiving input while it
 is open. Set `block_game_instances: false` only when the consumer implements
 its own complete input and simulation blocking policy.
 
+In-game notification instances remain active while the menu is open so
+exceptions caught by menu callbacks can still appear above the overlay.
+Callbacks invoked by the menu are exception-isolated: failures are reported
+through Logging instead of escaping the menu Step event.
+
 ## Items And Standard Pages
 
 - `gmcu_dev_menu_action`
@@ -66,3 +71,26 @@ structured buffer maintained by the Logging module.
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.
+
+## HTML5 Callback Safety
+
+GameMaker HTML5 may lose locally captured variables from functions stored for
+later execution. Standard room, language, and log pages therefore keep their
+arguments and providers as explicit struct fields instead of closure-generated
+callbacks.
+
+Use named scripts or callbacks that do not depend on captured local variables
+for consumer actions that must work on HTML5. Validate opening every dynamic
+page and executing every deferred action in an actual HTML5 runner; a
+successful VM compile does not detect these runtime failures.
+
+## Room Navigation
+
+The room adapter changes rooms but cannot initialize game-specific persistent
+state. Consumers whose rooms depend on a controller, save state, or progression
+object must provide a `goto_room` callback that prepares that state before
+calling `room_goto`.
+
+Rooms intended for direct IDE testing should also bootstrap their required
+state independently rather than assuming they were entered through normal
+progression.
