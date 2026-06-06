@@ -17,6 +17,10 @@ last_mouse_x = -1;
 last_mouse_y = -1;
 mouse_active = false;
 
+/**
+ * @description Applies Dev Menu pages, callbacks, input behavior, and visual theme defaults.
+ * @param {Struct} _config Declarative Dev Menu configuration.
+ */
 function configure(_config) {
 	config = _config;
 	pages = variable_struct_exists(config, "pages") ? config.pages : [];
@@ -37,6 +41,10 @@ function configure(_config) {
 	if (!variable_struct_exists(_theme, "selected_color")) _theme.selected_color = make_color_rgb(55, 90, 145);
 	if (!variable_struct_exists(_theme, "text_color")) _theme.text_color = c_white;
 	if (!variable_struct_exists(_theme, "muted_color")) _theme.muted_color = make_color_rgb(160, 165, 175);
+	if (!variable_struct_exists(_theme, "log_debug_color")) _theme.log_debug_color = c_white;
+	if (!variable_struct_exists(_theme, "log_info_color")) _theme.log_info_color = _theme.muted_color;
+	if (!variable_struct_exists(_theme, "log_warn_color")) _theme.log_warn_color = c_yellow;
+	if (!variable_struct_exists(_theme, "log_error_color")) _theme.log_error_color = c_red;
 	if (!variable_struct_exists(_theme, "font")) _theme.font = -1;
 	close_menu(false);
 }
@@ -53,6 +61,10 @@ function current_page() {
 	return get_page(page_stack[array_length(page_stack) - 1]);
 }
 
+/**
+ * @description Builds the visible item array for the current static or generated Dev Menu page.
+ * @returns {Array<Struct>} Items ready for navigation and rendering.
+ */
 function current_items() {
 	var _page = current_page();
 	if (is_undefined(_page)) return [];
@@ -84,7 +96,8 @@ function current_items() {
 					var _entry = _logs[_j];
 					array_push(_log_items, {
 						type: "text",
-						label: "[" + string_upper(_entry.level) + "] " + _entry.message
+						label: _entry.message,
+						level: _entry.level
 					});
 				}
 				return _log_items;

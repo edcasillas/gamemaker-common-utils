@@ -45,7 +45,25 @@ for (var _row = 0; _row < _visible_rows; _row++) {
 		draw_rectangle(_panel_x + 8, _y1, _panel_x + _panel_w - 8, _y2, false);
 	}
 
-	draw_set_color(_enabled ? _theme.text_color : _theme.muted_color);
+	var _text_color = _theme.text_color;
+	if (variable_struct_exists(_item, "level")) {
+		switch (_item.level) {
+			case GMCU_LOG_LEVEL_INFO:
+				_text_color = _theme.log_info_color;
+				break;
+			case GMCU_LOG_LEVEL_WARN:
+				_text_color = _theme.log_warn_color;
+				break;
+			case GMCU_LOG_LEVEL_ERROR:
+			case GMCU_LOG_LEVEL_EXCEPTION:
+				_text_color = _theme.log_error_color;
+				break;
+			default:
+				_text_color = _theme.log_debug_color;
+				break;
+		}
+	}
+	draw_set_color(_enabled ? _text_color : _theme.muted_color);
 	var _label = _item.label;
 	if (_item.type == "submenu") _label += " >";
 	if (_item.type == "toggle") _label += ": " + (_item.get_value() ? "ON" : "OFF");

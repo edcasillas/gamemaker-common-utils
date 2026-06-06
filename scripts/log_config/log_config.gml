@@ -31,8 +31,7 @@ function gmcu_log_set_output_handler(_handler) {
  * @param {string} _message Fully formatted log message.
  */
 function gmcu_log_write_output(_severity, _message) {
-	if (!variable_global_exists("gmcu_log_output_handler")
-		|| is_undefined(global.gmcu_log_output_handler)) {
+	if (!variable_global_exists("gmcu_log_output_handler") || is_undefined(global.gmcu_log_output_handler)) {
 		show_debug_message(_message);
 		return;
 	}
@@ -65,6 +64,7 @@ function gmcu_log_write_output(_severity, _message) {
 function gmcu_log_set_telemetry_handler(_handler) {
 	global.gmcu_log_telemetry_handler = _handler;
 	global.gmcu_log_telemetry_dispatching = false;
+	show_debug_message("[INFO]" + get_log_tags() + " Telemetry handler has been set.");
 }
 
 /**

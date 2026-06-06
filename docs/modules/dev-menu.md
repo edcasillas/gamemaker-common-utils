@@ -67,7 +67,14 @@ through Logging instead of escaping the menu Step event.
 
 The room module supports filter, label, sorting, and transition callbacks.
 Language integration is callback-based. The log viewer reads the bounded
-structured buffer maintained by the Logging module.
+structured buffer maintained by the Logging module. Log rows use severity
+colors by default: debug is white, info is muted gray, warnings are yellow,
+and errors or exceptions are red. Override these theme fields when needed:
+
+- `log_debug_color`
+- `log_info_color`
+- `log_warn_color`
+- `log_error_color`
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.
