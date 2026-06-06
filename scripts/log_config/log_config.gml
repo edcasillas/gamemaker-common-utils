@@ -11,6 +11,35 @@
 #macro GMCU_LOG_LEVEL_ERROR "error"
 #macro GMCU_LOG_LEVEL_EXCEPTION "exception"
 
+global.gmcu_log_telemetry_handler = undefined;
+global.gmcu_log_telemetry_dispatching = false;
+
+function gmcu_log_set_telemetry_handler(_handler) {
+	global.gmcu_log_telemetry_handler = _handler;
+	global.gmcu_log_telemetry_dispatching = false;
+}
+
+function gmcu_log_send_telemetry(_severity, _message) {
+	if (!variable_global_exists("gmcu_log_telemetry_handler")) return;
+	if (is_undefined(global.gmcu_log_telemetry_handler)) return;
+	if (!variable_global_exists("gmcu_log_telemetry_dispatching")) {
+		global.gmcu_log_telemetry_dispatching = false;
+	}
+	if (global.gmcu_log_telemetry_dispatching) return;
+
+	global.gmcu_log_telemetry_dispatching = true;
+	try {
+		var _handler = global.gmcu_log_telemetry_handler;
+		_handler(_severity, _message);
+	} catch (_exception) {
+		show_debug_message(
+			"[ERROR]" + get_log_tags()
+			+ " Logging telemetry handler failed: " + string(_exception)
+		);
+	}
+	global.gmcu_log_telemetry_dispatching = false;
+}
+
 function gmcu_log_buffer_ensure_initialized() {
 	if (!variable_global_exists("gmcu_log_buffer") || !is_array(global.gmcu_log_buffer)) {
 		global.gmcu_log_buffer = [];

@@ -197,8 +197,10 @@ git commit -m "Update gamemaker-common-utils pointer"
 - This repo includes a lightweight project container, not a standalone playable
   sample project.
 - GameMaker IDE validation is still required after import.
-- Logging is intentionally portable and does not send GameAnalytics or
-  GlobalStats.io events.
+- Logging is portable and does not depend directly on GameAnalytics or
+  GlobalStats.io. Consumers can register a telemetry handler to preserve
+  project-specific log forwarding without coupling the shared module to an
+  analytics SDK.
 - HTML5 build/export behavior still requires GameMaker IDE validation.
 - Release export and deployment are intentionally separate. The tooling never
   publishes automatically after an export; the exact artifact must be tested

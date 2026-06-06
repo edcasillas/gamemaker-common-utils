@@ -5,6 +5,7 @@ function log_exception(_exception, _tag = "", _show_notification = true) {
 
 	show_debug_message(_msg);
 	gmcu_log_buffer_push(GMCU_LOG_LEVEL_EXCEPTION, _msg);
+	gmcu_log_send_telemetry(GMCU_LOG_LEVEL_ERROR, _msg);
 
 	var _notification_message = "Exception: " + string(_exception);
 	if (!is_undefined(_exception.message)) {

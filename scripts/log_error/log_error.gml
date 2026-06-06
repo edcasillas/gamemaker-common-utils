@@ -3,6 +3,7 @@ function log_error(_message, _show_notification = true) {
 		var _msg = "[ERROR]" + get_log_tags() + " " + string(_message);
 		show_debug_message(_msg);
 		gmcu_log_buffer_push(GMCU_LOG_LEVEL_ERROR, _msg);
+		gmcu_log_send_telemetry(GMCU_LOG_LEVEL_ERROR, _msg);
 	}
 
 	common_utils_try_show_notification(string(_message), "error", _show_notification);
