@@ -1,7 +1,6 @@
-# gamemaker-common-utils
+# Game Maker Common Utils
 
-Reusable GameMaker utilities intended to be shared across Ed Casillas
-GameMaker projects.
+A collection of reusable GameMaker utilities.
 
 The primary workflow is an editable Git submodule: add this repository to a
 project, use the resources from inside the submodule, improve the utilities
@@ -30,14 +29,12 @@ the submodule.
 
 Import modules in this order:
 
-1. `Core`
-   - `scripts/common_macros/common_macros.yy`
-   - Shared macros and helpers such as `OBJECT_NAME`, `ROOM_NAME`,
+1. `Core`: Shared macros and helpers such as `OBJECT_NAME`, `ROOM_NAME`,
      `DELTA_TIME_SECONDS`, `LAYER_DEPTH_MIN`, and notification handler setup.
-2. `Drawing`
+   - `scripts/common_macros/common_macros.yy`
+2. `Drawing`: Restores draw state after temporary draw changes.
    - `scripts/DrawingParameters/DrawingParameters.yy`
-   - Restores draw state after temporary draw changes.
-3. `Logging`
+3. `Logging`: Portable debug output using `show_debug_message`.
    - `scripts/log_config/log_config.yy`
    - `scripts/get_log_tags/get_log_tags.yy`
    - `scripts/log_debug/log_debug.yy`
@@ -45,60 +42,49 @@ Import modules in this order:
    - `scripts/log_warn/log_warn.yy`
    - `scripts/log_error/log_error.yy`
    - `scripts/log_exception/log_exception.yy`
-   - Portable debug output using `show_debug_message`.
-4. `EventBus`
-   - `scripts/event_bus/event_bus.yy`
-   - Publish-subscribe API: `eventbus_subscribe`, `eventbus_unsubscribe`,
+4. `EventBus`: Publish-subscribe API: `eventbus_subscribe`, `eventbus_unsubscribe`,
      `eventbus_dispatch`.
-5. `InGameNotifications`
+   - `scripts/event_bus/event_bus.yy`
+5. `InGameNotifications`: Optional visual notifications. When imported, it registers a handler that lets `log_error` and `log_exception` show notifications in dev builds.
    - `scripts/InGameNotificationSettings/InGameNotificationSettings.yy`
    - `scripts/show_notification/show_notification.yy`
    - `objects/o_notification_from_top/o_notification_from_top.yy`
-   - Optional visual notifications. When imported, it registers a handler that
-     lets `log_error` and `log_exception` show notifications in dev builds.
-6. `InputHub`
+6. `InputHub`: Centralized keyboard/gamepad direction state and gamepad button
+     press/release events. New shared resources put the `gmcu_` prefix first.
    - `scripts/gmcu_input_hub_events/gmcu_input_hub_events.yy`
    - `scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy`
    - `objects/gmcu_o_input_hub/gmcu_o_input_hub.yy`
-   - Centralized keyboard/gamepad direction state and gamepad button
-     press/release events. New shared resources put the `gmcu_` prefix first.
-7. `Localization`
+7. `Localization`: CSV-backed translation lookup with `gmcu_`-prefixed API. Translation CSV file names and content remain owned by the consuming project.
    - `scripts/gmcu_localization_init/gmcu_localization_init.yy`
    - `scripts/gmcu_localization_macros/gmcu_localization_macros.yy`
    - `scripts/gmcu_localization_t/gmcu_localization_t.yy`
-   - CSV-backed translation lookup with `gmcu_`-prefixed API. Translation CSV
-     file names and content remain owned by the consuming project.
-8. `LayeredGUI`
+8. `LayeredGUI`: Priority-ordered Draw GUI callbacks for reusable GUI surfaces.
    - `objects/gmcu_o_layered_gui_manager/gmcu_o_layered_gui_manager.yy`
    - `scripts/gmcu_layered_gui_subscribe/gmcu_layered_gui_subscribe.yy`
    - `scripts/gmcu_layered_gui_unsubscribe/gmcu_layered_gui_unsubscribe.yy`
-   - Priority-ordered Draw GUI callbacks for reusable GUI surfaces.
-9. `UniversalCursor`
+9. `UniversalCursor`: Sprite-driven GUI cursor for mouse, keyboard, and gamepad interaction.
    - `objects/gmcu_o_universal_cursor/gmcu_o_universal_cursor.yy`
    - `scripts/gmcu_universal_cursor_show/gmcu_universal_cursor_show.yy`
    - `scripts/gmcu_universal_cursor_hide/gmcu_universal_cursor_hide.yy`
    - `scripts/gmcu_universal_cursor_subscribe/gmcu_universal_cursor_subscribe.yy`
    - `scripts/gmcu_universal_cursor_unsubscribe/gmcu_universal_cursor_unsubscribe.yy`
-   - Sprite-driven GUI cursor for mouse, keyboard, and gamepad interaction.
-10. `Buttons`
+10. `Buttons`: Reusable localized buttons with EventBus dispatch and consumer-owned
+     sprites, fonts, sounds, and IDs.
    - `scripts/gmcu_button_events/gmcu_button_events.yy`
    - `objects/gmcu_o_base_button/gmcu_o_base_button.yy`
    - `objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy`
    - `objects/gmcu_o_base_button_gui/gmcu_o_base_button_gui.yy`
-   - Reusable localized buttons with EventBus dispatch and consumer-owned
-     sprites, fonts, sounds, and IDs.
-11. `Labels`
+11. `Labels`: Reusable localized game/GUI labels and outlined text drawing.
    - `scripts/gmcu_draw_text_outlined/gmcu_draw_text_outlined.yy`
    - `objects/gmcu_o_base_label/gmcu_o_base_label.yy`
    - `objects/gmcu_o_label_game/gmcu_o_label_game.yy`
    - `objects/gmcu_o_label_gui/gmcu_o_label_gui.yy`
-   - Reusable localized game/GUI labels and outlined text drawing.
-12. `TimedActions`
+12. `TimedActions`: Persistent scheduling of callbacks after elapsed seconds or Step events.
    - `objects/gmcu_o_timed_actions_manager/gmcu_o_timed_actions_manager.yy`
    - `scripts/gmcu_wait_for_seconds/gmcu_wait_for_seconds.yy`
    - `scripts/gmcu_wait_for_steps/gmcu_wait_for_steps.yy`
-   - Persistent scheduling of callbacks after elapsed seconds or Step events.
-13. `Transitions`
+13. `Transitions`: Fade and horizontal-curtain room transitions. Audio and other
+     project-specific side effects are supplied through consumer callbacks.
    - `scripts/gmcu_transition_events/gmcu_transition_events.yy`
    - `scripts/gmcu_transition_types/gmcu_transition_types.yy`
    - `scripts/gmcu_transition_to_room/gmcu_transition_to_room.yy`
@@ -106,16 +92,12 @@ Import modules in this order:
    - `objects/gmcu_o_transition_fadeout_to_room/gmcu_o_transition_fadeout_to_room.yy`
    - `objects/gmcu_o_transition_hcurtain_close_to_room/gmcu_o_transition_hcurtain_close_to_room.yy`
    - `objects/gmcu_o_transition_hcurtain_open/gmcu_o_transition_hcurtain_open.yy`
-   - Fade and horizontal-curtain room transitions. Audio and other
-     project-specific side effects are supplied through consumer callbacks.
-14. `GameAnalytics`
+14. `GameAnalytics`: Defensive facade over a consumer-installed GameAnalytics SDK.
    - `scripts/gmcu_gameanalytics/gmcu_gameanalytics.yy`
-   - Defensive facade over a consumer-installed GameAnalytics SDK.
    - The extension, SDK scripts, credentials, consent policy, and event
      taxonomy remain consumer-owned.
-15. `GlobalStats.io`
+15. `GlobalStats.io`: Defensive facade over a consumer-installed GlobalStats.io client.
    - `scripts/gmcu_globalstats/gmcu_globalstats.yy`
-   - Defensive facade over a consumer-installed GlobalStats.io client.
    - The controller, HTTP client, credentials, GTD identifiers, persistence,
      response events, and payload schema remain consumer-owned.
 16. `HTML5 Helpers`
@@ -134,11 +116,10 @@ Import modules in this order:
    - Consumer projects retain all build paths, GameMaker targets, itch.io
      destinations, platform IDs, version state, build output, and presentation
      values.
-18. `Dev Menu`
+18. `Dev Menu`: DevBuild-only programmatic overlay with nested pages, keyboard/gamepad/
+     mouse navigation, room and language adapters, and structured log viewing.
    - `scripts/gmcu_dev_menu/gmcu_dev_menu.yy`
    - `objects/gmcu_o_dev_menu/gmcu_o_dev_menu.yy`
-   - DevBuild-only programmatic overlay with nested pages, keyboard/gamepad/
-     mouse navigation, room and language adapters, and structured log viewing.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in
@@ -222,11 +203,3 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Release export and deployment are intentionally separate. The tooling never
   publishes automatically after an export; the exact artifact must be tested
   and deployment must be invoked explicitly.
-
-## Roadmap
-
-No additional modules are currently planned for the extraction roadmap.
-
-`.yymps` packaging is not part of the active roadmap. It creates copied import
-packages rather than the editable submodule + symlink links used by current
-consumers.
