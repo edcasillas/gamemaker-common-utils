@@ -134,6 +134,11 @@ Import modules in this order:
    - Consumer projects retain all build paths, GameMaker targets, itch.io
      destinations, platform IDs, version state, build output, and presentation
      values.
+18. `Dev Menu`
+   - `scripts/gmcu_dev_menu/gmcu_dev_menu.yy`
+   - `objects/gmcu_o_dev_menu/gmcu_o_dev_menu.yy`
+   - DevBuild-only programmatic overlay with nested pages, keyboard/gamepad/
+     mouse navigation, room and language adapters, and structured log viewing.
 
 Module notes live in [`docs/modules`](docs/modules). The implementation and
 migration checklist lives in

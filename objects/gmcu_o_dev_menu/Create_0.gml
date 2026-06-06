@@ -1,0 +1,212 @@
+if (instance_number(object_index) > 1) {
+	instance_destroy();
+	return;
+}
+
+persistent = true;
+is_open = false;
+config = undefined;
+pages = [];
+page_stack = [];
+selected_index = 0;
+scroll_offset = 0;
+row_height = 28;
+header_height = 54;
+panel_margin = 24;
+last_mouse_x = -1;
+last_mouse_y = -1;
+mouse_active = false;
+
+function configure(_config) {
+	config = _config;
+	pages = variable_struct_exists(config, "pages") ? config.pages : [];
+	if (array_length(pages) == 0) {
+		pages = [gmcu_dev_menu_page("main", "Dev Menu")];
+	}
+	if (!variable_struct_exists(config, "trigger_pressed")) {
+		config.trigger_pressed = gmcu_dev_menu_default_trigger;
+	}
+	if (!variable_struct_exists(config, "block_game_instances")) {
+		config.block_game_instances = true;
+	}
+	if (!variable_struct_exists(config, "theme")) config.theme = {};
+	var _theme = config.theme;
+	if (!variable_struct_exists(_theme, "overlay_color")) _theme.overlay_color = c_black;
+	if (!variable_struct_exists(_theme, "overlay_alpha")) _theme.overlay_alpha = 0.82;
+	if (!variable_struct_exists(_theme, "panel_color")) _theme.panel_color = make_color_rgb(20, 24, 32);
+	if (!variable_struct_exists(_theme, "selected_color")) _theme.selected_color = make_color_rgb(55, 90, 145);
+	if (!variable_struct_exists(_theme, "text_color")) _theme.text_color = c_white;
+	if (!variable_struct_exists(_theme, "muted_color")) _theme.muted_color = make_color_rgb(160, 165, 175);
+	if (!variable_struct_exists(_theme, "font")) _theme.font = -1;
+	close_menu(false);
+}
+
+function get_page(_id) {
+	for (var _i = 0; _i < array_length(pages); _i++) {
+		if (pages[_i].id == _id) return pages[_i];
+	}
+	return undefined;
+}
+
+function current_page() {
+	if (array_length(page_stack) == 0) return pages[0];
+	return get_page(page_stack[array_length(page_stack) - 1]);
+}
+
+function current_items() {
+	var _page = current_page();
+	if (is_undefined(_page)) return [];
+	if (variable_struct_exists(_page, "type")) {
+		switch (_page.type) {
+			case "languages":
+				var _language_items = [];
+				var _languages = _page.get_languages();
+				var _current_language = _page.get_current();
+				for (var _i = 0; _i < array_length(_languages); _i++) {
+					var _language = _languages[_i];
+					var _label = string(_language);
+					if (_language == _current_language) _label = "* " + _label;
+					array_push(_language_items, {
+						type: "language",
+						label: _label,
+						language: _language,
+						set_language: _page.set_language
+					});
+				}
+				return _language_items;
+			case "logs":
+				var _log_items = [{
+					type: "clear_logs",
+					label: "Clear logs"
+				}];
+				var _logs = gmcu_log_buffer_get();
+				for (var _j = array_length(_logs) - 1; _j >= 0; _j--) {
+					var _entry = _logs[_j];
+					array_push(_log_items, {
+						type: "text",
+						label: "[" + string_upper(_entry.level) + "] " + _entry.message
+					});
+				}
+				return _log_items;
+		}
+	}
+	if (!is_undefined(_page.get_items)) return _page.get_items();
+	return _page.items;
+}
+
+function open_menu() {
+	if (is_open || is_undefined(config)) return;
+	is_open = true;
+	page_stack = [pages[0].id];
+	selected_index = 0;
+	scroll_offset = 0;
+	if (config.block_game_instances) {
+		instance_deactivate_all(true);
+		instance_activate_object(o_notification_from_top);
+	}
+	try {
+		if (variable_struct_exists(config, "on_open")) config.on_open();
+		if (variable_struct_exists(config, "pause")) config.pause();
+	} catch (_exception) {
+		log_exception(_exception, "gmcu_o_dev_menu.open_menu");
+	}
+}
+
+function close_menu(_notify = true) {
+	if (!is_open) return;
+	is_open = false;
+	page_stack = [];
+	if (config.block_game_instances) {
+		instance_activate_all();
+	}
+	if (_notify) {
+		try {
+			if (variable_struct_exists(config, "resume")) config.resume();
+			if (variable_struct_exists(config, "on_close")) config.on_close();
+		} catch (_exception) {
+			log_exception(_exception, "gmcu_o_dev_menu.close_menu");
+		}
+	}
+}
+
+function push_page(_page_id) {
+	if (is_undefined(get_page(_page_id))) return;
+	array_push(page_stack, _page_id);
+	selected_index = 0;
+	scroll_offset = 0;
+}
+
+function go_back() {
+	if (array_length(page_stack) <= 1) {
+		close_menu();
+		return;
+	}
+	array_pop(page_stack);
+	selected_index = 0;
+	scroll_offset = 0;
+}
+
+function item_enabled(_item) {
+	if (!variable_struct_exists(_item, "enabled") || is_undefined(_item.enabled)) return true;
+	return _item.enabled();
+}
+
+function activate_item(_direction = 1) {
+	var _items = current_items();
+	if (selected_index < 0 || selected_index >= array_length(_items)) return;
+	var _item = _items[selected_index];
+	if (!item_enabled(_item)) return;
+
+	switch (_item.type) {
+		case "action":
+			try {
+				_item.action();
+			} catch (_exception) {
+				log_exception(_exception, "gmcu_o_dev_menu.activate_item");
+			}
+			break;
+		case "room":
+			try {
+				_item.goto_room(_item.target_room);
+			} catch (_exception) {
+				log_exception(_exception, "gmcu_o_dev_menu.activate_room");
+			}
+			break;
+		case "language":
+			try {
+				_item.set_language(_item.language);
+			} catch (_exception) {
+				log_exception(_exception, "gmcu_o_dev_menu.activate_language");
+			}
+			break;
+		case "clear_logs":
+			gmcu_log_buffer_clear();
+			selected_index = 0;
+			scroll_offset = 0;
+			break;
+		case "submenu":
+			push_page(_item.page_id);
+			break;
+		case "toggle":
+			try {
+				_item.set_value(!_item.get_value());
+			} catch (_exception) {
+				log_exception(_exception, "gmcu_o_dev_menu.activate_toggle");
+			}
+			break;
+		case "value":
+			try {
+				_item.change_value(_direction);
+			} catch (_exception) {
+				log_exception(_exception, "gmcu_o_dev_menu.activate_value");
+			}
+			break;
+	}
+}
+
+function move_selection(_delta) {
+	var _items = current_items();
+	var _count = array_length(_items);
+	if (_count == 0) return;
+	selected_index = (selected_index + _delta + _count) mod _count;
+}

@@ -2,6 +2,7 @@ function log_error(_message, _show_notification = true) {
 	if (ENABLE_ERROR_LOG) {
 		var _msg = "[ERROR]" + get_log_tags() + " " + string(_message);
 		show_debug_message(_msg);
+		gmcu_log_buffer_push(GMCU_LOG_LEVEL_ERROR, _msg);
 	}
 
 	common_utils_try_show_notification(string(_message), "error", _show_notification);
@@ -20,4 +21,3 @@ function common_utils_try_show_notification(_message, _kind = "info", _show_noti
 		show_debug_message("[ERROR]" + get_log_tags() + " Notification handler failed: " + string(_ex));
 	}
 }
-

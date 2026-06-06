@@ -4,6 +4,7 @@ function log_exception(_exception, _tag = "", _show_notification = true) {
 	_msg += " " + string(_exception);
 
 	show_debug_message(_msg);
+	gmcu_log_buffer_push(GMCU_LOG_LEVEL_EXCEPTION, _msg);
 
 	var _notification_message = "Exception: " + string(_exception);
 	if (!is_undefined(_exception.message)) {
@@ -12,4 +13,3 @@ function log_exception(_exception, _tag = "", _show_notification = true) {
 
 	common_utils_try_show_notification(_notification_message, "exception", _show_notification);
 }
-

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_dev_menu",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_dev_menu",
+  "parent":{
+    "name":"DevMenu",
+    "path":"folders/CommonUtils/DevMenu.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

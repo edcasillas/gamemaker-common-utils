@@ -12,6 +12,7 @@
   "Folders":[
     {"$GMFolder":"","%Name":"CommonUtils","folderPath":"folders/CommonUtils.yy","name":"CommonUtils","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Core","folderPath":"folders/CommonUtils/Core.yy","name":"Core","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"DevMenu","folderPath":"folders/CommonUtils/DevMenu.yy","name":"DevMenu","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Drawing","folderPath":"folders/CommonUtils/Drawing.yy","name":"Drawing","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"EventBus","folderPath":"folders/CommonUtils/EventBus.yy","name":"EventBus","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Extensions","folderPath":"folders/CommonUtils/Extensions.yy","name":"Extensions","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -46,6 +47,7 @@
     {"id":{"name":"gmcu_o_base_button","path":"objects/gmcu_o_base_button/gmcu_o_base_button.yy",},},
     {"id":{"name":"gmcu_o_base_label","path":"objects/gmcu_o_base_label/gmcu_o_base_label.yy",},},
     {"id":{"name":"gmcu_o_build_info_label","path":"objects/gmcu_o_build_info_label/gmcu_o_build_info_label.yy",},},
+    {"id":{"name":"gmcu_o_dev_menu","path":"objects/gmcu_o_dev_menu/gmcu_o_dev_menu.yy",},},
     {"id":{"name":"gmcu_o_input_hub","path":"objects/gmcu_o_input_hub/gmcu_o_input_hub.yy",},},
     {"id":{"name":"gmcu_o_label_game","path":"objects/gmcu_o_label_game/gmcu_o_label_game.yy",},},
     {"id":{"name":"gmcu_o_label_gui","path":"objects/gmcu_o_label_gui/gmcu_o_label_gui.yy",},},
@@ -63,6 +65,7 @@
     {"id":{"name":"get_log_tags","path":"scripts/get_log_tags/get_log_tags.yy",},},
     {"id":{"name":"gmcu_build_info","path":"scripts/gmcu_build_info/gmcu_build_info.yy",},},
     {"id":{"name":"gmcu_button_events","path":"scripts/gmcu_button_events/gmcu_button_events.yy",},},
+    {"id":{"name":"gmcu_dev_menu","path":"scripts/gmcu_dev_menu/gmcu_dev_menu.yy",},},
     {"id":{"name":"gmcu_draw_text_outlined","path":"scripts/gmcu_draw_text_outlined/gmcu_draw_text_outlined.yy",},},
     {"id":{"name":"gmcu_gameanalytics","path":"scripts/gmcu_gameanalytics/gmcu_gameanalytics.yy",},},
     {"id":{"name":"gmcu_gamepad_buttons_mapping","path":"scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy",},},
