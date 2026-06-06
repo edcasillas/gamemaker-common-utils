@@ -2,8 +2,10 @@ global.gmcu_language = "";
 global.gmcu_loc_map = undefined;
 
 /**
+@description Loads a consumer-owned localization CSV and selects the requested or operating-system language.
 @param {string} _lang_code Two-digit language code, or undefined to get the language code from the running OS.
 @param {string} _csv_file_name Name of the included CSV file containing the translations. Defaults to localization.csv.
+@returns {Bool} Whether the localization table was loaded successfully.
 */
 function gmcu_localization_init(_lang_code = undefined, _csv_file_name = "localization.csv") {
 	if(is_undefined(_lang_code)) {

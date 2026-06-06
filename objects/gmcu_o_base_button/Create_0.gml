@@ -30,8 +30,8 @@ is_pressed = false;
 created = true;
 
 /**
-This function will be called by inheritors of o_base_button in either draw or draw GUI events.
-*/
+ * @description Draws the button sprite and optional centered text while restoring prior draw state.
+ */
 function do_draw() {
 	draw_self();
 
@@ -48,6 +48,9 @@ function do_draw() {
 	_draw_params.apply();
 }
 
+/**
+ * @description Applies the pressed visual state and records that an interactable button was pressed.
+ */
 function on_pressed() {
 	if(debug_events) {
 		var _message = button_id + " pressed; interactable: " + string(is_interactable);
@@ -59,6 +62,9 @@ function on_pressed() {
 	is_pressed = true;
 }
 
+/**
+ * @description Releases the button and schedules its action when a valid press preceded the release.
+ */
 function on_released() {
 	if(debug_events) {
 		var _message = button_id + " released; interactable: " + string(is_interactable);
@@ -78,6 +84,9 @@ function on_released() {
 	alarm[0] = action_delay;
 }
 
+/**
+ * @description Applies the hover visual state to an interactable button.
+ */
 function on_hover_enter() {
 	if(debug_events) {
 		var _message = button_id + " hover enter; interactable: " + string(is_interactable);
@@ -88,6 +97,9 @@ function on_hover_enter() {
 	image_index = 1;
 }
 
+/**
+ * @description Restores the idle state and cancels any pending press when hover ends.
+ */
 function on_hover_leave() {
 	if(debug_events) {
 		var _message = button_id + " hover leave; interactable: " + string(is_interactable);

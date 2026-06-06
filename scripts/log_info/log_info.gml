@@ -1,3 +1,7 @@
+/**
+ * @description Writes an informational message, stores it for the Dev Menu, and forwards it to telemetry.
+ * @param {Any} _message Value to log.
+ */
 function log_info(_message) {
 	if (!ENABLE_INFO_LOG) return;
 

@@ -1,3 +1,8 @@
+/**
+ * @description Writes a debug message, stores it for the Dev Menu, and optionally forwards it to telemetry.
+ * @param {Any} _message Value to log.
+ * @param {Bool} _local_only Whether to skip telemetry forwarding.
+ */
 function log_debug(_message, _local_only = false) {
 	if (!ENABLE_DEBUG_LOG) return;
 
