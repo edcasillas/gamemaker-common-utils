@@ -3,16 +3,20 @@
 `GameAnalytics` provides a defensive facade over a consumer-installed
 GameAnalytics SDK.
 
-## Resource
+## Usage
+
+Initialize with consumer-owned credentials and call the facade instead of SDK
+functions directly. The module disables itself when initialization fails.
+
+## Resources
 
 - `scripts/gmcu_gameanalytics`
 
 ## Dependencies
 
-Import after:
-
-1. `Logging`
-2. A consumer-owned GameAnalytics extension and its `ga_*` SDK scripts
+- [`Logging`](logging.md): Reports unavailable SDK functions and failures.
+  - [`Core`](core.md)
+- Consumer-owned GameAnalytics extension and `ga_*` SDK scripts.
 
 ## API
 
@@ -26,7 +30,7 @@ Initialization accepts an options struct with consumer-owned `game_key` and
 `game_secret`. Optional fields are `build`, `info_log`, `verbose_log`, and
 `enabled`.
 
-## Consumer-Owned Requirements
+## Contributing
 
 The GameAnalytics extension, SDK scripts, credentials, build identifiers,
 consent policy, and project event taxonomy remain in the consumer. Never place

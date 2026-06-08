@@ -3,6 +3,10 @@
 `LayeredGUI` lets instances register an `on_draw_gui` callback with a priority
 so GUI drawing can happen in a stable order from one Draw GUI manager.
 
+## Usage
+
+Subscribe in Create, implement `on_draw_gui`, and unsubscribe in Clean Up.
+
 ## Resources
 
 - `objects/gmcu_o_layered_gui_manager`
@@ -11,14 +15,10 @@ so GUI drawing can happen in a stable order from one Draw GUI manager.
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Drawing`
-3. `Logging`
-
-The manager uses `DrawingParameters` to restore draw state after each
-subscriber, and logging for invalid subscriber diagnostics.
+- [`Drawing`](drawing.md): Restores draw state after each subscriber.
+  - [`Core`](core.md)
+- [`Logging`](logging.md): Reports invalid subscribers.
+  - [`Core`](core.md)
 
 ## API
 
@@ -38,7 +38,7 @@ function on_draw_gui() {
 }
 ```
 
-## Consumer Notes
+## Contributing
 
 Call `gmcu_layered_gui_subscribe(_priority)` from Create and
 `gmcu_layered_gui_unsubscribe()` from Clean Up. Larger priority values are drawn

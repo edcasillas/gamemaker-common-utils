@@ -3,16 +3,20 @@
 `GlobalStats.io` provides a defensive facade over a consumer-installed
 GlobalStats.io client.
 
-## Resource
+## Usage
+
+Call the facade after the consumer-owned controller is initialized. Every
+operation returns `false` when the client or required identity is unavailable.
+
+## Resources
 
 - `scripts/gmcu_globalstats`
 
 ## Dependencies
 
-Import after:
-
-1. `Logging`
-2. A consumer-owned GlobalStats.io controller and its `gs_*` client scripts
+- [`Logging`](logging.md): Reports unavailable client functions and failures.
+  - [`Core`](core.md)
+- Consumer-owned GlobalStats.io controller and `gs_*` client scripts.
 
 ## API
 
@@ -25,7 +29,7 @@ Leaderboard entry counts are clamped to the supported range of 1 through 100.
 The rank-section helper uses the controller's current player ID when one is not
 provided explicitly.
 
-## Consumer-Owned Requirements
+## Contributing
 
 The GlobalStats.io controller, HTTP client scripts, credentials, GTD
 identifiers, player identity policy, persistence, response events, and payload

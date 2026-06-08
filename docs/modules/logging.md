@@ -1,24 +1,20 @@
 # Logging
 
-Import `Logging` after `Core`.
+`Logging` provides severity-aware output, a bounded development log buffer,
+optional target output, and optional telemetry forwarding.
 
-Resources:
+## Usage
 
-- `scripts/log_config/log_config.yy`
-- `scripts/get_log_tags/get_log_tags.yy`
-- `scripts/log_debug/log_debug.yy`
-- `scripts/log_info/log_info.yy`
-- `scripts/log_warn/log_warn.yy`
-- `scripts/log_error/log_error.yy`
-- `scripts/log_exception/log_exception.yy`
-
-Logging is intentionally portable and does not depend directly on
-GameAnalytics, GlobalStats.io, HTML5 Helpers, or project-specific services.
-Without an adapter it writes to GameMaker's debug output with
+Call `gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`, `gmcu_log_error`, or
+`gmcu_log_exception`. Without adapters, messages use
 `show_debug_message`.
 
-Consumers can preserve target-specific output behavior by registering a
-handler:
+```gml
+gmcu_log_info("Game initialized");
+gmcu_log_error("Save failed");
+```
+
+Register output or telemetry adapters only when the consumer needs them:
 
 ```gml
 gmcu_log_set_output_handler(function(_severity, _message) {
@@ -26,20 +22,40 @@ gmcu_log_set_output_handler(function(_severity, _message) {
 });
 ```
 
-Consumers can preserve project telemetry by registering a handler:
+## Resources
 
-```gml
-gmcu_log_set_telemetry_handler(function(_severity, _message) {
-    analytics_send_error(_severity, _message);
-});
-```
+- `scripts/gmcu_log_config`: Severity macros, adapters, recursion protection,
+  and development buffer.
+- `scripts/gmcu_log_get_tags`: Builds room/object context tags.
+- `scripts/gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`,
+  `gmcu_log_error`, and `gmcu_log_exception`: Public severity functions.
 
-The handler receives `GMCU_LOG_LEVEL_DEBUG`, `GMCU_LOG_LEVEL_INFO`,
-`GMCU_LOG_LEVEL_WARN`, or `GMCU_LOG_LEVEL_ERROR`. Exceptions are reported as
-error severity. `log_debug(_message, true)` remains local-only and does not
-invoke the telemetry handler. Dispatch is recursion-protected so failures in
-the analytics adapter cannot create an infinite logging loop.
+## Dependencies
 
-`log_error` and `log_exception` can show visual notifications when another
-module registers a notification handler through
-`common_utils_set_notification_handler`.
+- [`Core`](core.md): Supplies build configuration, context names, and the
+  optional notification-handler registry.
+
+## API
+
+- `gmcu_log_debug(_message, _local_only = false)`: Writes debug output when
+  `GMCU_ENABLE_DEBUG_LOG` is enabled.
+- `gmcu_log_info(_message)`, `gmcu_log_warn(_message)`: Write informational or
+  warning output.
+- `gmcu_log_error(_message, _show_notification = true)`: Writes an error and
+  optionally requests a visual notification.
+- `gmcu_log_exception(_exception, _tag = "", _show_notification = true)`:
+  Formats and reports an exception.
+- `gmcu_log_set_output_handler(_handler)`: Replaces target output.
+- `gmcu_log_set_telemetry_handler(_handler)`: Sets optional telemetry
+  forwarding.
+- `gmcu_log_buffer_get()`, `gmcu_log_buffer_clear()`, and
+  `gmcu_log_buffer_set_capacity(_capacity)`: Manage the Dev Menu log buffer.
+- `GMCU_LOG_LEVEL_*` and `GMCU_ENABLE_*_LOG`: Severity and build-policy macros.
+
+[`InGameNotifications`](in-game-notifications.md) can register the optional
+visual handler. Logging does not depend directly on analytics SDKs or HTML5.
+
+## Contributing
+
+Keep each `scripts/gmcu_log_*` resource path local in the consumer and symlink
+the corresponding folders to Common Utils.

@@ -23,23 +23,23 @@ Import modules in this order:
 
 1. `Core`
    - Shared macros and low-level helpers.
-   - Provides `OBJECT_NAME`, `ROOM_NAME`, `DELTA_TIME_SECONDS`,
-     `LAYER_DEPTH_MIN`, `LAYER_DEPTH_MAX`, and dev-build flags.
+   - Provides `GMCU_OBJECT_NAME`, `GMCU_ROOM_NAME`, `GMCU_DELTA_TIME_SECONDS`,
+     `GMCU_LAYER_DEPTH_MIN`, `GMCU_LAYER_DEPTH_MAX`, and dev-build flags.
 2. `Drawing`
-   - Drawing-state helpers such as `DrawingParameters`.
+   - Drawing-state helpers such as `gmcu_DrawingParameters`.
 3. `Logging`
-   - Portable `log_debug`, `log_info`, `log_warn`, `log_error`, and
-     `log_exception`.
+   - Portable `gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`, `gmcu_log_error`, and
+     `gmcu_log_exception`.
    - Must not depend on GameAnalytics, GlobalStats, HTML5 Helpers, or any
      game-specific service.
 4. `EventBus`
    - Publish-subscribe helper with the existing API:
-     `eventbus_subscribe`, `eventbus_unsubscribe`, and `eventbus_dispatch`.
+     `gmcu_eventbus_subscribe`, `gmcu_eventbus_unsubscribe`, and `gmcu_eventbus_dispatch`.
    - Depends only on `Core` and `Logging`.
 5. `InGameNotifications`
    - Optional visual notification system.
-   - Provides `show_notification`, `InGameNotificationSettings`, and
-     `o_notification_from_top`.
+   - Provides `gmcu_show_notification`, `gmcu_InGameNotificationSettings`, and
+     `gmcu_o_notification_from_top`.
    - Depends on `Core` and `Drawing`.
 6. `InputHub`
    - Portable input helper with `gmcu_`-prefixed public API.
@@ -112,12 +112,13 @@ Import modules in this order:
    - Consumers can omit the included file when they do not want the fixed
      mobile warning.
 
-`show_notification` is included in v1, but it is not a hard dependency of the
+`gmcu_show_notification` is included in v1, but it is not a hard dependency of the
 EventBus. Logging may use notifications only when the notification module is
 present and enabled.
 
-New shared resources use `gmcu_` as the first token in the public resource or
-API name, including objects such as `gmcu_o_input_hub`.
+All shared resources and public APIs use `gmcu_` as the first token; macros,
+enums, and constants use `GMCU_`. This includes objects such as
+`gmcu_o_input_hub`. Unprefixed compatibility aliases are not provided.
 
 ## Submodule Usage
 
@@ -163,9 +164,9 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Import modules in dependency order: `Core`, `Drawing`, `Logging`, `EventBus`,
   `InGameNotifications` if visual notifications are needed, then `InputHub`.
 - Check for name conflicts before replacing existing project resources:
-  `log_debug`, `log_info`, `log_warn`, `log_error`, `log_exception`,
-  `event_bus`, `show_notification`, `InGameNotificationSettings`, and
-  `o_notification_from_top`. New modules should use `gmcu_` first in their
+  `gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`, `gmcu_log_error`, `gmcu_log_exception`,
+  `event_bus`, `gmcu_show_notification`, `gmcu_InGameNotificationSettings`, and
+  `gmcu_o_notification_from_top`. New modules should use `gmcu_` first in their
   resource names to reduce collisions.
 - Run `git diff --check`.
 - Open the project in GameMaker and run a smoke test, because GameMaker resource

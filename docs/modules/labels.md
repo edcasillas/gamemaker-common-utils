@@ -3,6 +3,11 @@
 `Labels` provides reusable game-space and GUI-space text objects with optional
 localization and outlined text drawing.
 
+## Usage
+
+Create a child of the game-space or GUI-space label, set `text`, and enable
+`translate` when the value is a [`Localization`](localization.md) key.
+
 ## Resources
 
 - `scripts/gmcu_draw_text_outlined`
@@ -12,12 +17,10 @@ localization and outlined text drawing.
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Drawing`
-3. `Localization`
-4. `LayeredGUI`
+- [`Localization`](localization.md): Resolves translated label text.
+- [`LayeredGUI`](layered-gui.md): Orders GUI-space label drawing.
+- [`Drawing`](drawing.md): Protects draw state.
+- [`Core`](core.md)
 
 ## API
 
@@ -35,3 +38,8 @@ Set `translate` to use `gmcu_localization_t(text)`. The resolved string is
 stored in `actual_text` and used for drawing.
 
 Fonts, colors, text keys, positions, and GUI priorities remain consumer-owned.
+
+## Contributing
+
+Keep the listed resource paths local in the consumer and symlink their folders
+to Common Utils.

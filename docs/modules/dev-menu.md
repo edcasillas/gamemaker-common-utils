@@ -1,8 +1,13 @@
 # Dev Menu
 
 `Dev Menu` provides a programmatically configured, persistent development
-overlay. It is available only when `IS_DEV_BUILD` is true and does not require
+overlay. It is available only when `GMCU_IS_DEV_BUILD` is true and does not require
 an object to be placed in a room.
+
+## Usage
+
+Create a root page and pass it to `gmcu_dev_menu_init`. The function creates or
+reconfigures the persistent menu singleton.
 
 ## Resources
 
@@ -11,16 +16,12 @@ an object to be placed in a room.
 
 ## Dependencies
 
-Import after:
+- [`Core`](core.md): Supplies DevBuild policy and shared constants.
+- [`Drawing`](drawing.md): Protects overlay draw state.
+- [`Logging`](logging.md): Reports callback failures and supplies log history.
+- [`InputHub`](input-hub.md): Supplies keyboard/gamepad navigation.
 
-1. `Core`
-2. `Drawing`
-3. `Logging`
-4. `InputHub`
-
-## Initialization
-
-Create a root page and initialize the singleton:
+Initialize the singleton:
 
 ```gml
 var _config = {
@@ -54,7 +55,7 @@ exceptions caught by menu callbacks can still appear above the overlay.
 Callbacks invoked by the menu are exception-isolated: failures are reported
 through Logging instead of escaping the menu Step event.
 
-## Items And Standard Pages
+## API
 
 - `gmcu_dev_menu_action`
 - `gmcu_dev_menu_submenu`
@@ -101,3 +102,8 @@ calling `room_goto`.
 Rooms intended for direct IDE testing should also bootstrap their required
 state independently rather than assuming they were entered through normal
 progression.
+
+## Contributing
+
+Keep `scripts/gmcu_dev_menu` and `objects/gmcu_o_dev_menu` as local consumer
+paths and symlink their folders to Common Utils.

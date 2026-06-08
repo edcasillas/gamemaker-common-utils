@@ -3,6 +3,11 @@
 `UniversalCursor` provides a sprite-driven GUI cursor that can hover and press
 registered interactable instances using mouse, keyboard, or gamepad input.
 
+## Usage
+
+Show the cursor with a consumer-owned sprite and subscribe interactable
+instances during Create.
+
 ## Resources
 
 - `objects/gmcu_o_universal_cursor`
@@ -13,16 +18,12 @@ registered interactable instances using mouse, keyboard, or gamepad input.
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Logging`
-3. `Drawing`
-4. `LayeredGUI`
-5. `InputHub`
-
-`UniversalCursor` uses `GMCU_DIRECTION_ANGLE` and `gmcu_o_input_hub` for
-gamepad helpers, and `LayeredGUI` for Draw GUI ordering.
+- [`InputHub`](input-hub.md): Supplies directional navigation and gamepad
+  helpers.
+- [`LayeredGUI`](layered-gui.md): Orders cursor drawing.
+- [`Drawing`](drawing.md): Protects draw state.
+- [`Logging`](logging.md): Reports invalid subscribers.
+- [`Core`](core.md)
 
 ## API
 
@@ -46,7 +47,7 @@ function on_pressed() {}
 function on_released() {}
 ```
 
-## Consumer Notes
+## Contributing
 
 Cursor sprites remain consumer-owned. Pass the desired cursor sprite to
 `gmcu_universal_cursor_show(_sprite_index)`.

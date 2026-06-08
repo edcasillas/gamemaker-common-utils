@@ -18,7 +18,7 @@ pattern is:
 
 1. Add this repo as `vendor/gamemaker-common-utils`.
 2. Keep the consumer `.yyp` pointing to normal local resource paths such as
-   `scripts/event_bus/event_bus.yy`.
+   `scripts/gmcu_event_bus/gmcu_event_bus.yy`.
 3. Replace each local resource folder with a symlink to the matching folder in
    `vendor/gamemaker-common-utils`.
 
@@ -64,8 +64,8 @@ git submodule update --init --recursive
 Then register the desired `.yy` resources from
 `vendor/gamemaker-common-utils` in the consuming project's `.yyp`, but keep the
 consumer `.yyp` resource paths local. For example, use
-`scripts/event_bus/event_bus.yy`, then symlink `scripts/event_bus` to
-`vendor/gamemaker-common-utils/scripts/event_bus`.
+`scripts/gmcu_event_bus/gmcu_event_bus.yy`, then symlink `scripts/gmcu_event_bus` to
+`vendor/gamemaker-common-utils/scripts/gmcu_event_bus`.
 
 If importing through the GameMaker IDE, import from inside the full checked-out
 repository, not from loose copied `.yy` files. GameMaker expects a parent `.yyp`

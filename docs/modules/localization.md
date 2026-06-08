@@ -3,6 +3,11 @@
 `Localization` loads translations from a consumer-owned CSV included file and
 returns localized text for the active language.
 
+## Usage
+
+Call `gmcu_localization_init()` during startup, or let
+`gmcu_localization_t(_key)` lazily load the default `localization.csv`.
+
 ## Resources
 
 - `scripts/gmcu_localization_init`
@@ -11,13 +16,9 @@ returns localized text for the active language.
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Logging`
-
-`Localization` uses `log_error`, `log_warn`, `log_info`, and `log_exception`
-for diagnostics. Translation CSV files remain owned by the consuming project.
+- [`Logging`](logging.md): Reports CSV, language, and lookup diagnostics.
+  - [`Core`](core.md)
+- [`Core`](core.md)
 
 ## API
 
@@ -54,7 +55,7 @@ uses `os_get_language()`. If lookup occurs before explicit initialization,
 file, language column, or key is missing, lookups fall back to the original key
 string.
 
-## Consumer Notes
+## Contributing
 
 Keep localization content in the consumer project, usually as an included file
 such as `datafiles/localization.csv`. Do not move credentials, build output, or

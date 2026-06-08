@@ -1,26 +1,48 @@
 # EventBus
 
-Import `EventBus` after `Core` and `Logging`.
+`EventBus` lets instances publish and observe named events without direct
+references to one another.
 
-Resources:
+## Usage
 
-- `scripts/event_bus/event_bus.yy`
-
-API:
-
-- `eventbus_subscribe(_event_name)`
-- `eventbus_unsubscribe(_event_name)`
-- `eventbus_dispatch(_event_name, _event_args = undefined)`
-
-Observers subscribe from the instance that should receive events. They should
-unsubscribe before cleanup and define:
+Subscribe from the receiving instance, implement `on_event`, and unsubscribe
+in Clean Up:
 
 ```gml
+gmcu_eventbus_subscribe(EVENT_PAUSE_CHANGED);
+
 on_event = function(_event_name, _event_args) {
-	// handle event
-}
+    if (_event_name == EVENT_PAUSE_CHANGED) {
+        paused = _event_args;
+    }
+};
 ```
 
-Event names should be constants or macros owned by the consumer project or by a
-higher-level Common Utils module.
+Dispatch with `gmcu_eventbus_dispatch(EVENT_PAUSE_CHANGED, true)`.
 
+## Resources
+
+- `scripts/gmcu_event_bus`: Owns the observer map and the subscribe,
+  unsubscribe, and dispatch functions.
+
+## Dependencies
+
+- [`Core`](core.md): Supplies safe object-name diagnostics.
+- [`Logging`](logging.md): Reports subscriptions, dispatches, stale observers,
+  missing callbacks, and callback exceptions.
+  - [`Core`](core.md)
+
+## API
+
+- `gmcu_eventbus_subscribe(_event_name)`: Subscribes `self`.
+- `gmcu_eventbus_unsubscribe(_event_name)`: Removes `self` from an event.
+- `gmcu_eventbus_dispatch(_event_name, _event_args = undefined)`: Calls
+  `on_event` on each live observer.
+- `global.gmcu_eventbus_observers_map`: Internal observer registry.
+
+Event names are owned by the module or consumer that defines their meaning.
+
+## Contributing
+
+Keep `scripts/gmcu_event_bus/gmcu_event_bus.yy` as the local consumer path and
+symlink its folder to Common Utils.

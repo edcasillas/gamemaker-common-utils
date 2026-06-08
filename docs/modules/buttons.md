@@ -4,6 +4,12 @@
 GUI-space buttons with localization, hover/press state, optional click audio,
 and EventBus dispatch.
 
+## Usage
+
+Create a consumer-owned child of the appropriate base object, assign its
+sprites and `button_id`, then subscribe a controller to
+`GMCU_EVENT_BUTTON_PRESSED` through [`EventBus`](event-bus.md).
+
 ## Resources
 
 - `scripts/gmcu_button_events`
@@ -13,15 +19,15 @@ and EventBus dispatch.
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Drawing`
-3. `Logging`
-4. `EventBus`
-5. `Localization`
-6. `LayeredGUI`
-7. `UniversalCursor`
+- [`EventBus`](event-bus.md): Dispatches button activation events.
+- [`Localization`](localization.md): Resolves optional localized text.
+- [`UniversalCursor`](universal-cursor.md): Supplies shared hover and press
+  interaction.
+  - [`InputHub`](input-hub.md)
+  - [`LayeredGUI`](layered-gui.md)
+- [`Logging`](logging.md): Reports optional debug events.
+- [`Drawing`](drawing.md): Protects draw state.
+- [`Core`](core.md)
 
 ## API
 
@@ -50,10 +56,11 @@ Important inherited properties include:
 - `is_interactable`
 - `debug_events`
 
-## Consumer Notes
+## Contributing
 
 Create consumer-owned child objects for project sprites and behavior. Subscribe
-controllers to `GMCU_EVENT_BUTTON_PRESSED` through EventBus.
+controllers to `GMCU_EVENT_BUTTON_PRESSED` through
+[`EventBus`](event-bus.md).
 
 Button sprites should provide frames `0`, `1`, and `2` for idle, hover, and
 pressed states. Fonts, sounds, sprites, and button IDs remain consumer-owned.

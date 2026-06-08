@@ -20,7 +20,7 @@ monitored gamepad button press or release. The dispatched event argument is the
 GameMaker `gp_*` button constant:
 
 ```gml
-eventbus_subscribe(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED);
+gmcu_eventbus_subscribe(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED);
 
 on_event = function(_event_name, _event_args) {
     if (_event_name == GMCU_EVENT_GAMEPAD_BUTTON_PRESSED

@@ -2,6 +2,11 @@
 
 `Transitions` provides reusable fade and horizontal-curtain room changes.
 
+## Usage
+
+Call `gmcu_transition_to_room` with a target room, transition type, duration,
+and optional callbacks.
+
 ## Resources
 
 - `scripts/gmcu_transition_events`
@@ -14,12 +19,14 @@
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Drawing`
-3. `Logging`
-4. `EventBus`
+- [`Core`](core.md): Supplies timing and layer-depth constants.
+- [`Drawing`](drawing.md): Protects transition draw state.
+  - [`Core`](core.md)
+- [`Logging`](logging.md): Reports invalid transition configuration.
+  - [`Core`](core.md)
+- [`EventBus`](event-bus.md): Dispatches opening-curtain completion.
+  - [`Core`](core.md)
+  - [`Logging`](logging.md)
 
 ## API
 
@@ -53,3 +60,7 @@ properties. When complete, it dispatches `GMCU_EVENT_TRANSITION_FINISHED` with
 Audio fades, `audio_stop_all()`, music restoration, analytics, and other
 project-specific side effects do not belong to this module. Supply them through
 the optional callbacks.
+
+## Contributing
+
+Keep the listed resource paths local and symlink their folders to Common Utils.

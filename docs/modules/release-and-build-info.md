@@ -4,7 +4,7 @@ This module separates export, testing, versioning, and publication by design.
 An export is never published automatically: test the exact artifact first,
 then invoke `deploy` explicitly.
 
-## CLI
+## Usage
 
 Run the shared tool from a consumer repository:
 
@@ -52,6 +52,19 @@ butler status username/project
 The CLI searches `PATH`, `~/bin/butler`, and the macOS itch app's managed
 Butler installation. A consumer may override this with `tools.butler`.
 
+## Resources
+
+- `tools/release/gmcu_release.py`: Export, serve, version, status, and deploy
+  CLI.
+- `scripts/gmcu_build_info`: Runtime build metadata API.
+- `objects/gmcu_o_build_info_label`: Optional bottom-right build label.
+
+## Dependencies
+
+- [`Core`](core.md): Supplies build configuration policy to runtime resources.
+- External tools such as `gm-cli` and Butler are required only for the
+  corresponding CLI commands.
+
 ## Consumer Configuration
 
 The normal consumer file is intentionally small:
@@ -70,7 +83,7 @@ consumer `.yyp`, `Builds/<platform>`, matching itch channel names,
 Advanced projects may override those fields, but ordinary consumers should not
 repeat conventions.
 
-## GameMaker API
+## API
 
 Import or symlink:
 
@@ -92,3 +105,8 @@ Optional fields are `version_prefix`, `separator`, and `build_file`. Missing
 
 The shared label preserves Fantasma's bottom-right black background and white
 text. Consumer-specific author and date values are supplied at initialization.
+
+## Contributing
+
+Consumer repositories retain build paths, export artifacts, itch.io
+destinations, version state, credentials, and presentation values.

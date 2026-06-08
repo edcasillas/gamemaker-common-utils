@@ -3,9 +3,18 @@
 `HTML5 Helpers` provides small browser integrations through a GameMaker HTML5
 JavaScript extension.
 
-## Resource
+## Usage
+
+Call these helpers only on HTML5, or guard cross-target calls with
+`os_browser != browser_not_a_browser`.
+
+## Resources
 
 - `extensions/gmcu_html5_helpers`
+
+## Dependencies
+
+`HTML5 Helpers` has no Common Utils module dependencies.
 
 ## API
 
@@ -29,7 +38,7 @@ an HTML5 `PostBody` injection of `datafiles/disable-mobile.js`. That script
 wraps the existing `window.onload`, lets GameMaker initialize for analytics,
 then immediately replaces the mobile view with the original warning layout.
 
-## Consumer-Owned Requirements
+## Contributing
 
 Consumers that import the included `disable-mobile.js` opt into its fixed
 mobile-blocking policy and message. Analytics and game-state changes remain
