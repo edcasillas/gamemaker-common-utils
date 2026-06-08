@@ -39,6 +39,10 @@ gp_padr, //	D-pad right
 h_axis = 0;
 v_axis = 0;
 
+/**
+ * @description Returns the current combined keyboard or gamepad direction.
+ * @returns {Real|Undefined} GameMaker direction angle, or undefined when idle.
+ */
 function gmcu_get_direction() {
 	if(h_axis != 0 || v_axis != 0) {
 		return point_direction(0, 0, h_axis, v_axis);
@@ -47,10 +51,18 @@ function gmcu_get_direction() {
 	}
 }
 
+/**
+ * @description Returns whether Input Hub has tracked at least one connected gamepad.
+ * @returns {Bool} True when a gamepad is connected.
+ */
 function gmcu_has_connected_gamepad() {
 	return array_length(gamepads) > 0;
 }
 
+/**
+ * @description Reduces the current input direction to one of four cardinal angles.
+ * @returns {Real|Undefined} A cardinal GMCU_DIRECTION_ANGLE value, or undefined when idle.
+ */
 function gmcu_get_four_way_direction() {
 	var _dir = gmcu_get_direction();
 	if(_dir == undefined) {
@@ -75,10 +87,20 @@ function gmcu_get_four_way_direction() {
 	}
 }
 
+/**
+ * @description Checks whether a gamepad button was released on gamepad slot 0 this Step.
+ * @param {Real} _button GameMaker gp_* button constant.
+ * @returns {Bool} True when a connected gamepad released the button.
+ */
 function gmcu_gamepad_button_released(_button) {
 	return gmcu_has_connected_gamepad() && gamepad_button_check_released(0, _button);
 }
 
+/**
+ * @description Checks whether a gamepad button was pressed on gamepad slot 0 this Step.
+ * @param {Real} _button GameMaker gp_* button constant.
+ * @returns {Bool} True when a connected gamepad pressed the button.
+ */
 function gmcu_gamepad_button_pressed(_button) {
 	return gmcu_has_connected_gamepad() && gamepad_button_check_pressed(0, _button);
 }

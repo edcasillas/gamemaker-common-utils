@@ -29,108 +29,27 @@ the submodule.
 
 Import modules in this order:
 
-1. `Core`: Shared macros and helpers such as `OBJECT_NAME`, `ROOM_NAME`,
-     `DELTA_TIME_SECONDS`, `LAYER_DEPTH_MIN`, and notification handler setup.
-   - `scripts/common_macros/common_macros.yy`
-2. `Drawing`: Restores draw state after temporary draw changes.
-   - `scripts/DrawingParameters/DrawingParameters.yy`
-3. `Logging`: Portable severity-aware output with configurable output and
-   telemetry handlers. It falls back to `show_debug_message`.
-   - `scripts/log_config/log_config.yy`
-   - `scripts/get_log_tags/get_log_tags.yy`
-   - `scripts/log_debug/log_debug.yy`
-   - `scripts/log_info/log_info.yy`
-   - `scripts/log_warn/log_warn.yy`
-   - `scripts/log_error/log_error.yy`
-   - `scripts/log_exception/log_exception.yy`
-4. `EventBus`: Publish-subscribe API: `eventbus_subscribe`, `eventbus_unsubscribe`,
-     `eventbus_dispatch`.
-   - `scripts/event_bus/event_bus.yy`
-5. `InGameNotifications`: Optional visual notifications. When imported, it registers a handler that lets `log_error` and `log_exception` show notifications in dev builds.
-   - `scripts/InGameNotificationSettings/InGameNotificationSettings.yy`
-   - `scripts/show_notification/show_notification.yy`
-   - `objects/o_notification_from_top/o_notification_from_top.yy`
-6. `InputHub`: Centralized keyboard/gamepad direction state and gamepad button
-     press/release events. New shared resources put the `gmcu_` prefix first.
-   - `scripts/gmcu_input_hub_events/gmcu_input_hub_events.yy`
-   - `scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy`
-   - `objects/gmcu_o_input_hub/gmcu_o_input_hub.yy`
-7. `Localization`: CSV-backed translation lookup with `gmcu_`-prefixed API.
-   Translation CSV file names and content remain owned by the consuming
-   project. The default file name remains `localization.csv`, and translation
-   lookup lazily initializes the module when needed.
-   - `scripts/gmcu_localization_init/gmcu_localization_init.yy`
-   - `scripts/gmcu_localization_macros/gmcu_localization_macros.yy`
-   - `scripts/gmcu_localization_t/gmcu_localization_t.yy`
-8. `LayeredGUI`: Priority-ordered Draw GUI callbacks for reusable GUI surfaces.
-   - `objects/gmcu_o_layered_gui_manager/gmcu_o_layered_gui_manager.yy`
-   - `scripts/gmcu_layered_gui_subscribe/gmcu_layered_gui_subscribe.yy`
-   - `scripts/gmcu_layered_gui_unsubscribe/gmcu_layered_gui_unsubscribe.yy`
-9. `UniversalCursor`: Sprite-driven GUI cursor for mouse, keyboard, and gamepad interaction.
-   - `objects/gmcu_o_universal_cursor/gmcu_o_universal_cursor.yy`
-   - `scripts/gmcu_universal_cursor_show/gmcu_universal_cursor_show.yy`
-   - `scripts/gmcu_universal_cursor_hide/gmcu_universal_cursor_hide.yy`
-   - `scripts/gmcu_universal_cursor_subscribe/gmcu_universal_cursor_subscribe.yy`
-   - `scripts/gmcu_universal_cursor_unsubscribe/gmcu_universal_cursor_unsubscribe.yy`
-10. `Buttons`: Reusable localized buttons with EventBus dispatch and consumer-owned
-     sprites, fonts, sounds, and IDs. Debug events use Logging and the optional
-     notification handler.
-   - `scripts/gmcu_button_events/gmcu_button_events.yy`
-   - `objects/gmcu_o_base_button/gmcu_o_base_button.yy`
-   - `objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy`
-   - `objects/gmcu_o_base_button_gui/gmcu_o_base_button_gui.yy`
-11. `Labels`: Reusable localized game/GUI labels and outlined text drawing.
-   - `scripts/gmcu_draw_text_outlined/gmcu_draw_text_outlined.yy`
-   - `objects/gmcu_o_base_label/gmcu_o_base_label.yy`
-   - `objects/gmcu_o_label_game/gmcu_o_label_game.yy`
-   - `objects/gmcu_o_label_gui/gmcu_o_label_gui.yy`
-12. `TimedActions`: Persistent scheduling of callbacks after elapsed seconds or
-    Step events, including the legacy debug log emitted before a Step-scheduled
-    callback executes.
-   - `objects/gmcu_o_timed_actions_manager/gmcu_o_timed_actions_manager.yy`
-   - `scripts/gmcu_wait_for_seconds/gmcu_wait_for_seconds.yy`
-   - `scripts/gmcu_wait_for_steps/gmcu_wait_for_steps.yy`
-13. `Transitions`: Fade and horizontal-curtain room transitions. Audio and other
-     project-specific side effects are supplied through consumer callbacks.
-   - `scripts/gmcu_transition_events/gmcu_transition_events.yy`
-   - `scripts/gmcu_transition_types/gmcu_transition_types.yy`
-   - `scripts/gmcu_transition_to_room/gmcu_transition_to_room.yy`
-   - `objects/gmcu_o_transition_to_room/gmcu_o_transition_to_room.yy`
-   - `objects/gmcu_o_transition_fadeout_to_room/gmcu_o_transition_fadeout_to_room.yy`
-   - `objects/gmcu_o_transition_hcurtain_close_to_room/gmcu_o_transition_hcurtain_close_to_room.yy`
-   - `objects/gmcu_o_transition_hcurtain_open/gmcu_o_transition_hcurtain_open.yy`
-14. `GameAnalytics`: Defensive facade over a consumer-installed GameAnalytics SDK.
-   - `scripts/gmcu_gameanalytics/gmcu_gameanalytics.yy`
-   - The extension, SDK scripts, credentials, consent policy, and event
-     taxonomy remain consumer-owned.
-15. `GlobalStats.io`: Defensive facade over a consumer-installed GlobalStats.io client.
-   - `scripts/gmcu_globalstats/gmcu_globalstats.yy`
-   - The controller, HTTP client, credentials, GTD identifiers, persistence,
-     response events, and payload schema remain consumer-owned.
-16. `HTML5 Helpers`
-   - `extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy`
-   - Mobile-browser detection, severity-aware browser-console output, secure
-     context UUID generation, and the legacy early mobile warning through
-     `datafiles/disable-mobile.js`.
-   - Consumers may omit the included file if they do not want that fixed
-     mobile-blocking behavior.
-17. `Release and Build Info`
-   - `tools/release/gmcu_release.py`
-   - `scripts/gmcu_build_info/gmcu_build_info.yy`
-   - `objects/gmcu_o_build_info_label/gmcu_o_build_info_label.yy`
-   - Exports through `gm-cli`, serves HTML exports on localhost and the LAN,
-     versions and publishes tested builds through Butler, and exposes runtime
-     build information.
-   - Consumer projects retain all build paths, GameMaker targets, itch.io
-     destinations, platform IDs, version state, build output, and presentation
-     values.
-18. `Dev Menu`: DevBuild-only programmatic overlay with nested pages, keyboard/gamepad/
-     mouse navigation, room and language adapters, and structured log viewing.
-   - `scripts/gmcu_dev_menu/gmcu_dev_menu.yy`
-   - `objects/gmcu_o_dev_menu/gmcu_o_dev_menu.yy`
+1. [`Core`](docs/modules/core.md): Shared macros and foundational helpers.
+2. [`Drawing`](docs/modules/drawing.md): Temporary draw-state management.
+3. [`Logging`](docs/modules/logging.md): Severity-aware logging with optional output and telemetry handlers.
+4. [`EventBus`](docs/modules/event-bus.md): Publish-subscribe event dispatch.
+5. [`InGameNotifications`](docs/modules/in-game-notifications.md): Optional visual development notifications.
+6. [`InputHub`](docs/modules/input-hub.md): Centralized keyboard and gamepad input.
+7. [`Localization`](docs/modules/localization.md): CSV-backed translation lookup.
+8. [`LayeredGUI`](docs/modules/layered-gui.md): Priority-ordered Draw GUI callbacks.
+9. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
+10. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
+11. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
+12. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
+13. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
+14. [`GameAnalytics`](docs/modules/gameanalytics.md): Defensive GameAnalytics facade.
+15. [`GlobalStats.io`](docs/modules/globalstats.md): Defensive GlobalStats.io facade.
+16. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
+17. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
+18. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
 
-Module notes live in [`docs/modules`](docs/modules). The implementation and
-migration checklist lives in
+Each module page documents its resources, dependencies, API, usage, and
+consumer ownership boundaries. The implementation and migration checklist lives in
 [`docs/implementation-plan.md`](docs/implementation-plan.md).
 
 ## Add As A Submodule

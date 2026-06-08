@@ -1,4 +1,4 @@
-// Maps the game pad button codes to their names for debugging purposes.
+/// @description Initializes readable debug names for GameMaker gamepad button constants.
 global.gmcu_gamepad_buttons_mapping = {};
 global.gmcu_gamepad_buttons_mapping[$ string(gp_face1)] = "gp_face1";       // Top button 1 (A on Xbox, cross on PS)
 global.gmcu_gamepad_buttons_mapping[$ string(gp_face2)] = "gp_face2";       // Top button 2 (B on Xbox, circle on PS)

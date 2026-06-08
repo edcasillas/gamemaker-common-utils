@@ -3,11 +3,46 @@
 `InputHub` centralizes basic keyboard and gamepad direction state, gamepad
 connect/disconnect tracking, and gamepad button press/release events.
 
+## Usage
+
+Place one `gmcu_o_input_hub` instance in the first room that should initialize
+input. The object is persistent and deletes duplicate instances.
+
+Read direction state through the instance methods:
+
+```gml
+var _direction = gmcu_o_input_hub.gmcu_get_direction();
+var _four_way_direction = gmcu_o_input_hub.gmcu_get_four_way_direction();
+```
+
+Subscribe through `EventBus` when code should react to any monitored gamepad
+button press or release. The dispatched event argument is the GameMaker `gp_*`
+button constant:
+
+```gml
+eventbus_subscribe(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED);
+
+on_event = function(_event_name, _event_args) {
+    if (_event_name == GMCU_EVENT_GAMEPAD_BUTTON_PRESSED
+    && _event_args == gp_face1) {
+        // Handle the primary face button.
+    }
+};
+```
+
+Use `gmcu_gamepad_button_pressed()` and `gmcu_gamepad_button_released()` for
+direct polling when an event subscription is unnecessary.
+
 ## Resources
 
-- `scripts/gmcu_input_hub_events`
-- `scripts/gmcu_gamepad_buttons_mapping`
-- `objects/gmcu_o_input_hub`
+- `scripts/gmcu_input_hub_events`: Declares the EventBus event names and the
+  `GMCU_DIRECTION_ANGLE` direction enum.
+- `scripts/gmcu_gamepad_buttons_mapping`: Initializes
+  `global.gmcu_gamepad_buttons_mapping`, which maps GameMaker `gp_*` constants
+  to readable names used by debug logs.
+- `objects/gmcu_o_input_hub`: Persistent runtime controller that tracks
+  connected gamepads, combines keyboard and gamepad direction input, and
+  dispatches monitored gamepad button events.
 
 ## Dependencies
 
@@ -26,33 +61,43 @@ Import after:
 
 Events:
 
-- `GMCU_EVENT_GAMEPAD_BUTTON_PRESSED`
-- `GMCU_EVENT_GAMEPAD_BUTTON_RELEASED`
+- `GMCU_EVENT_GAMEPAD_BUTTON_PRESSED`: Dispatched once when a monitored
+  gamepad button becomes pressed. The event argument is the pressed `gp_*`
+  constant.
+- `GMCU_EVENT_GAMEPAD_BUTTON_RELEASED`: Dispatched once when a monitored
+  gamepad button becomes released. The event argument is the released `gp_*`
+  constant.
 
 Direction enum:
 
-- `GMCU_DIRECTION_ANGLE`
+- `GMCU_DIRECTION_ANGLE`: Named GameMaker direction angles from `RIGHT` at
+  `0` degrees through the eight cardinal and diagonal directions.
 
 Object:
 
-- `gmcu_o_input_hub`
+- `gmcu_o_input_hub`: Persistent singleton-style controller. Keyboard
+  direction takes priority; D-pad and left-stick input are used when no
+  keyboard direction is active.
 
 Methods:
 
-- `gmcu_o_input_hub.gmcu_get_direction()`
-- `gmcu_o_input_hub.gmcu_get_four_way_direction()`
-- `gmcu_o_input_hub.gmcu_has_connected_gamepad()`
-- `gmcu_o_input_hub.gmcu_gamepad_button_pressed(_button)`
-- `gmcu_o_input_hub.gmcu_gamepad_button_released(_button)`
+- `gmcu_o_input_hub.gmcu_get_direction()`: Returns the current direction angle
+  from the combined horizontal and vertical axes, or `undefined` when idle.
+- `gmcu_o_input_hub.gmcu_get_four_way_direction()`: Reduces current input to
+  `UP`, `DOWN`, `LEFT`, or `RIGHT`, or returns `undefined` when idle.
+- `gmcu_o_input_hub.gmcu_has_connected_gamepad()`: Returns whether Input Hub
+  has tracked at least one connected gamepad.
+- `gmcu_o_input_hub.gmcu_gamepad_button_pressed(_button)`: Returns whether the
+  requested `gp_*` button was pressed on gamepad slot `0` this Step.
+- `gmcu_o_input_hub.gmcu_gamepad_button_released(_button)`: Returns whether the
+  requested `gp_*` button was released on gamepad slot `0` this Step.
 
 Globals:
 
-- `global.gmcu_gamepad_buttons_mapping`
+- `global.gmcu_gamepad_buttons_mapping`: Struct keyed by the string form of
+  each `gp_*` constant. Values are readable constant names for debug output.
 
-## Consumer Notes
-
-Place one `gmcu_o_input_hub` instance in the first room that should initialize
-input. The object is persistent and deletes duplicate instances.
+## Contributing
 
 For editable submodule use, keep the consumer `.yyp` paths local:
 

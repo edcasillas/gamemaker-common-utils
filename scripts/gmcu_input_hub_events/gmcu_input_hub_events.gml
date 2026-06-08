@@ -1,3 +1,4 @@
+/// @description Declares Input Hub EventBus event names and direction angles.
 #macro GMCU_EVENT_GAMEPAD_BUTTON_PRESSED "GMCU_EVENT_GAMEPAD_BUTTON_PRESSED" // event args is the button being pressed (gp_*)
 #macro GMCU_EVENT_GAMEPAD_BUTTON_RELEASED "GMCU_EVENT_GAMEPAD_BUTTON_RELEASED" // event args is the button being released (gp_*)
 
