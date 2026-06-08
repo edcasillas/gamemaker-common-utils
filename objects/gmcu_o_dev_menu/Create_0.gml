@@ -115,13 +115,13 @@ function open_menu() {
 	scroll_offset = 0;
 	if (config.block_game_instances) {
 		instance_deactivate_all(true);
-		instance_activate_object(o_notification_from_top);
+		instance_activate_object(gmcu_o_notification_from_top);
 	}
 	try {
 		if (variable_struct_exists(config, "on_open")) config.on_open();
 		if (variable_struct_exists(config, "pause")) config.pause();
 	} catch (_exception) {
-		log_exception(_exception, "gmcu_o_dev_menu.open_menu");
+		gmcu_log_exception(_exception, "gmcu_o_dev_menu.open_menu");
 	}
 }
 
@@ -137,7 +137,7 @@ function close_menu(_notify = true) {
 			if (variable_struct_exists(config, "resume")) config.resume();
 			if (variable_struct_exists(config, "on_close")) config.on_close();
 		} catch (_exception) {
-			log_exception(_exception, "gmcu_o_dev_menu.close_menu");
+			gmcu_log_exception(_exception, "gmcu_o_dev_menu.close_menu");
 		}
 	}
 }
@@ -175,21 +175,21 @@ function activate_item(_direction = 1) {
 			try {
 				_item.action();
 			} catch (_exception) {
-				log_exception(_exception, "gmcu_o_dev_menu.activate_item");
+				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_item");
 			}
 			break;
 		case "room":
 			try {
 				_item.goto_room(_item.target_room);
 			} catch (_exception) {
-				log_exception(_exception, "gmcu_o_dev_menu.activate_room");
+				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_room");
 			}
 			break;
 		case "language":
 			try {
 				_item.set_language(_item.language);
 			} catch (_exception) {
-				log_exception(_exception, "gmcu_o_dev_menu.activate_language");
+				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_language");
 			}
 			break;
 		case "clear_logs":
@@ -204,14 +204,14 @@ function activate_item(_direction = 1) {
 			try {
 				_item.set_value(!_item.get_value());
 			} catch (_exception) {
-				log_exception(_exception, "gmcu_o_dev_menu.activate_toggle");
+				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_toggle");
 			}
 			break;
 		case "value":
 			try {
 				_item.change_value(_direction);
 			} catch (_exception) {
-				log_exception(_exception, "gmcu_o_dev_menu.activate_value");
+				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_value");
 			}
 			break;
 	}

@@ -1,5 +1,5 @@
 if (instance_number(object_index) > 1) {
-	log_warn("[GMCU TimedActions] Manager already exists. Deleting duplicate.");
+	gmcu_log_warn("[GMCU TimedActions] Manager already exists. Deleting duplicate.");
 	instance_destroy();
 	return;
 }

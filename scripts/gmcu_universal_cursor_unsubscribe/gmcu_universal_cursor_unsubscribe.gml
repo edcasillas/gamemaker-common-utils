@@ -3,5 +3,5 @@ function gmcu_universal_cursor_unsubscribe() {
 		return;
 	}
 	gmcu_o_universal_cursor.unsubscribe(self);
-	log_debug("Unsubscribed from universal cursor");
+	gmcu_log_debug("Unsubscribed from universal cursor");
 }

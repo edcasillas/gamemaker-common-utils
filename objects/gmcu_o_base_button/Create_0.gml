@@ -1,24 +1,24 @@
 created = false;
 if(button_id == "") {
-	log_error("Button ID has not been defined; instance will be removed.");
+	gmcu_log_error("Button ID has not been defined; instance will be removed.");
 	instance_destroy();
 	return;
 }
 
 if(sprite_index == noone) {
-	log_error("Button '" + button_id + "' does not have a sprite assigned; instance will be removed.");
+	gmcu_log_error("Button '" + button_id + "' does not have a sprite assigned; instance will be removed.");
 	instance_destroy();
 	return;
 }
 
-log_debug("Creating Button ID: " + button_id);
+gmcu_log_debug("Creating Button ID: " + button_id);
 
 image_speed = 0;
 image_index = 0;
 
 if(text != "" && localize_text) {
 	text = gmcu_localization_t(text);
-	log_debug("Text has been localized to '" + text + "'");
+	gmcu_log_debug("Text has been localized to '" + text + "'");
 }
 
 /*
@@ -37,7 +37,7 @@ function do_draw() {
 
 	if(text == "") return;
 
-	var _draw_params = new DrawingParameters(); 
+	var _draw_params = new gmcu_DrawingParameters();
 
 	if(font != noone) draw_set_font(font);
 	draw_set_halign(fa_center);
@@ -54,8 +54,8 @@ function do_draw() {
 function on_pressed() {
 	if(debug_events) {
 		var _message = button_id + " pressed; interactable: " + string(is_interactable);
-		log_debug(_message);
-		common_utils_try_show_notification(_message);
+		gmcu_log_debug(_message);
+		gmcu_log_try_show_notification(_message);
 	}
 	if(!is_interactable) return;
 	image_index = 2;
@@ -68,8 +68,8 @@ function on_pressed() {
 function on_released() {
 	if(debug_events) {
 		var _message = button_id + " released; interactable: " + string(is_interactable);
-		log_debug(_message);
-		common_utils_try_show_notification(_message);
+		gmcu_log_debug(_message);
+		gmcu_log_try_show_notification(_message);
 	}
 	if(!is_interactable) return;
 	image_index = 1;
@@ -90,8 +90,8 @@ function on_released() {
 function on_hover_enter() {
 	if(debug_events) {
 		var _message = button_id + " hover enter; interactable: " + string(is_interactable);
-		log_debug(_message);
-		common_utils_try_show_notification(_message);
+		gmcu_log_debug(_message);
+		gmcu_log_try_show_notification(_message);
 	}
 	if(!is_interactable) return;
 	image_index = 1;
@@ -103,8 +103,8 @@ function on_hover_enter() {
 function on_hover_leave() {
 	if(debug_events) {
 		var _message = button_id + " hover leave; interactable: " + string(is_interactable);
-		log_debug(_message);
-		common_utils_try_show_notification(_message);
+		gmcu_log_debug(_message);
+		gmcu_log_try_show_notification(_message);
 	}
 	if(!is_interactable) return;
 	is_pressed = false;

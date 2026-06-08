@@ -11,7 +11,7 @@ function gmcu_localization_t(_str) {
 	}
 	
 	if(!ds_map_exists(global.gmcu_loc_map, _str)) {
-		log_warn("Key '" + _str + "' was not found in localization file for language " + global.gmcu_language);
+		gmcu_log_warn("Key '" + _str + "' was not found in localization file for language " + global.gmcu_language);
 		return _str;
 	}
 	

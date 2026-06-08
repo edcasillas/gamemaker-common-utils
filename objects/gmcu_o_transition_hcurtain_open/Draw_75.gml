@@ -1,4 +1,4 @@
-var _previous_drawing_parameters = new DrawingParameters();
+var _previous_drawing_parameters = new gmcu_DrawingParameters();
 
 draw_set_color(c_black);
 draw_rectangle(0, 0, curtain_size, window_get_height(), false);

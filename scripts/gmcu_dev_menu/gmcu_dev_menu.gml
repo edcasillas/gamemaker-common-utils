@@ -47,7 +47,7 @@ function gmcu_dev_menu_default_trigger() {
 }
 
 function gmcu_dev_menu_init(_config) {
-	if (!IS_DEV_BUILD) return noone;
+	if (!GMCU_IS_DEV_BUILD) return noone;
 
 	var _instance = instance_find(gmcu_o_dev_menu, 0);
 	if (_instance == noone) {

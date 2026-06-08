@@ -27,14 +27,14 @@ function gmcu_transition_to_room(
 		transition_options: _options
 	};
 
-	log_debug("[GMCU Transitions] Transitioning to room " + room_get_name(_target_room));
+	gmcu_log_debug("[GMCU Transitions] Transitioning to room " + room_get_name(_target_room));
 
 	switch (_transition_type) {
 		case GMCU_TRANSITION_TO_ROOM_TYPE.FADEOUT:
 			instance_create_depth(
 				0,
 				0,
-				LAYER_DEPTH_MIN,
+				GMCU_LAYER_DEPTH_MIN,
 				gmcu_o_transition_fadeout_to_room,
 				_transition_args
 			);
@@ -44,14 +44,14 @@ function gmcu_transition_to_room(
 			instance_create_depth(
 				0,
 				0,
-				LAYER_DEPTH_MIN,
+				GMCU_LAYER_DEPTH_MIN,
 				gmcu_o_transition_hcurtain_close_to_room,
 				_transition_args
 			);
 			break;
 
 		default:
-			log_error(
+			gmcu_log_error(
 				"[GMCU Transitions] Unsupported transition type "
 				+ string(_transition_type)
 			);

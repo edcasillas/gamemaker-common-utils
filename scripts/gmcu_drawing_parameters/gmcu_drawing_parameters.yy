@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_drawing_parameters",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_drawing_parameters",
+  "parent":{
+    "name":"Drawing",
+    "path":"folders/CommonUtils/Drawing.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

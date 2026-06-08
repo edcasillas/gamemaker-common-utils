@@ -46,7 +46,7 @@ for (var _i = 0; _i < ds_list_size(interactables); _i++) {
     var _interactable = interactables[| _i];
 	
     if (_interactable == noone || !instance_exists(_interactable)) {
-        log_error("Invalid instance subscribed to gmcu_o_universal_cursor. Make sure to unsubscribe objects in the Clean Up event.");
+        gmcu_log_error("Invalid instance subscribed to gmcu_o_universal_cursor. Make sure to unsubscribe objects in the Clean Up event.");
         ds_list_add(_invalid_indices, _i); // Mark index for removal
         continue;
     }
@@ -63,7 +63,7 @@ for (var _i = 0; _i < ds_list_size(interactables); _i++) {
 				try {
 					hovered_interactable.on_hover_leave(); // Trigger exit event on previously hovered interactable
 				} catch(_exception) {
-					log_exception(_exception, "on_hover_leave");
+					gmcu_log_exception(_exception, "on_hover_leave");
 					ds_list_add(_invalid_indices, _i); // Mark index for removal
 					continue;
 				}
@@ -74,7 +74,7 @@ for (var _i = 0; _i < ds_list_size(interactables); _i++) {
 			try {
 				hovered_interactable.on_hover_enter(); // Trigger enter event on new interactable
 			} catch(_exception) {
-				log_exception(_exception, "on_hover_enter");
+				gmcu_log_exception(_exception, "on_hover_enter");
 				ds_list_add(_invalid_indices, _i); // Mark index for removal
 				continue;
 			}
@@ -92,7 +92,7 @@ if(_invalid_indices_count) {
 	    ds_list_delete(interactables, _index_to_remove);
 	}
 	var _interactables_count = ds_list_size(interactables);
-	log_warn(string(_invalid_indices_count) + " invalid indices were detected to be subscribed in gmcu_o_universal_cursor and have been unsubscribed. " + string(_interactables_count) + " remain subscribed.");
+	gmcu_log_warn(string(_invalid_indices_count) + " invalid indices were detected to be subscribed in gmcu_o_universal_cursor and have been unsubscribed. " + string(_interactables_count) + " remain subscribed.");
 }
 
 // Clean up the temporary list

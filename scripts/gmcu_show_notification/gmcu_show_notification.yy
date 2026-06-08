@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_show_notification",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_show_notification",
+  "parent":{
+    "name":"InGameNotifications",
+    "path":"folders/CommonUtils/InGameNotifications.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

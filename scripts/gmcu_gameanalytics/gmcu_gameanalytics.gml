@@ -8,13 +8,13 @@ global.gmcu_gameanalytics_enabled = false;
  */
 function gmcu_gameanalytics_init(_options) {
 	if (!is_struct(_options)) {
-		log_error("[GMCU GameAnalytics] Expected an options struct.");
+		gmcu_log_error("[GMCU GameAnalytics] Expected an options struct.");
 		return false;
 	}
 
 	if (!variable_struct_exists(_options, "game_key")
 		|| !variable_struct_exists(_options, "game_secret")) {
-		log_error("[GMCU GameAnalytics] Missing consumer-owned credentials.");
+		gmcu_log_error("[GMCU GameAnalytics] Missing consumer-owned credentials.");
 		return false;
 	}
 
@@ -25,7 +25,7 @@ function gmcu_gameanalytics_init(_options) {
 
 	global.gmcu_gameanalytics_enabled = _enabled;
 	if (!_enabled) {
-		log_info("[GMCU GameAnalytics] Event submission is disabled.");
+		gmcu_log_info("[GMCU GameAnalytics] Event submission is disabled.");
 		return true;
 	}
 
@@ -50,7 +50,7 @@ function gmcu_gameanalytics_init(_options) {
 		return true;
 	} catch (_exception) {
 		global.gmcu_gameanalytics_enabled = false;
-		log_exception(_exception, "gmcu_gameanalytics_init");
+		gmcu_log_exception(_exception, "gmcu_gameanalytics_init");
 		return false;
 	}
 }
@@ -66,7 +66,7 @@ function gmcu_gameanalytics_add_design_event(_event_id, _value = undefined) {
 		}
 		return true;
 	} catch (_exception) {
-		log_exception(_exception, "gmcu_gameanalytics_add_design_event");
+		gmcu_log_exception(_exception, "gmcu_gameanalytics_add_design_event");
 		return false;
 	}
 }
@@ -99,7 +99,7 @@ function gmcu_gameanalytics_add_progression_event(
 		}
 		return true;
 	} catch (_exception) {
-		log_exception(_exception, "gmcu_gameanalytics_add_progression_event");
+		gmcu_log_exception(_exception, "gmcu_gameanalytics_add_progression_event");
 		return false;
 	}
 }
@@ -111,7 +111,7 @@ function gmcu_gameanalytics_add_error_event(_severity, _message) {
 		ga_addErrorEvent(_severity, _message);
 		return true;
 	} catch (_exception) {
-		log_exception(_exception, "gmcu_gameanalytics_add_error_event");
+		gmcu_log_exception(_exception, "gmcu_gameanalytics_add_error_event");
 		return false;
 	}
 }
@@ -123,7 +123,7 @@ function gmcu_gameanalytics_end_session() {
 		ga_endSession();
 		return true;
 	} catch (_exception) {
-		log_exception(_exception, "gmcu_gameanalytics_end_session");
+		gmcu_log_exception(_exception, "gmcu_gameanalytics_end_session");
 		return false;
 	}
 }

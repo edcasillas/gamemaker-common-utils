@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_core",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_core",
+  "parent":{
+    "name":"Core",
+    "path":"folders/CommonUtils/Core.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

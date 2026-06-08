@@ -15,7 +15,7 @@ function gmcu_localization_init(_lang_code = undefined, _csv_file_name = "locali
 	}
 	
 	if(!file_exists(_csv_file_name)) {
-		log_error("File " + _csv_file_name + " does not exist. Aborting localization initialization.");
+		gmcu_log_error("File " + _csv_file_name + " does not exist. Aborting localization initialization.");
 		return false;
 	}
 	
@@ -29,7 +29,7 @@ function gmcu_localization_init(_lang_code = undefined, _csv_file_name = "locali
 	}
 	
 	if(_lang_col_index == ww) {
-		log_error("Could not find language definition for lang code " + global.gmcu_language + " in file " + _csv_file_name);
+		gmcu_log_error("Could not find language definition for lang code " + global.gmcu_language + " in file " + _csv_file_name);
 		return false;
 	}
 	
@@ -45,21 +45,21 @@ function gmcu_localization_init(_lang_code = undefined, _csv_file_name = "locali
 			var _value = file_grid[# _lang_col_index, _i];
 			
 			if(_key == "") {
-				log_error("Localization file " + _csv_file_name + " contains invalid empty key.");
+				gmcu_log_error("Localization file " + _csv_file_name + " contains invalid empty key.");
 				continue;
 			}
 			
 			if(_value == "") {
-				log_error("Localization file " + _csv_file_name + " contains invalid empty value for key '" + _key + "'");
+				gmcu_log_error("Localization file " + _csv_file_name + " contains invalid empty value for key '" + _key + "'");
 				continue;
 			}
 			
 			ds_map_add(global.gmcu_loc_map, _key, _value);
 		} catch (_exception) {
-			log_exception(_exception);
+			gmcu_log_exception(_exception);
 		}
 	}	
 	
-	log_info("Localization engine has been initialized for language " + string(global.gmcu_language));
+	gmcu_log_info("Localization engine has been initialized for language " + string(global.gmcu_language));
 	return true;
 }

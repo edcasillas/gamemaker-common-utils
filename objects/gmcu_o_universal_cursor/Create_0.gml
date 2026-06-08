@@ -1,5 +1,5 @@
 if(instance_number(object_index) > 1) {
-	log_warn("[GMCU UniversalCursor] Instance already exists. Deleting duplicate.");
+	gmcu_log_warn("[GMCU UniversalCursor] Instance already exists. Deleting duplicate.");
 	instance_destroy();
 	return;
 }
@@ -41,9 +41,9 @@ Navigate between interactables in a specified direction (up, down, left, right).
 @param {real} _direction GMCU_DIRECTION_ANGLE.UP | GMCU_DIRECTION_ANGLE.DOWN | GMCU_DIRECTION_ANGLE.LEFT | GMCU_DIRECTION_ANGLE.RIGHT
 */
 function navigate(_direction) {
-	log_debug("Navigating " + string(_direction));
+	gmcu_log_debug("Navigating " + string(_direction));
     var _best_interactable = noone; // Stores the closest interactable in the specified direction
-    var _min_dist = INT_MAX; // Initialize minimum distance to a very high value
+    var _min_dist = GMCU_INT_MAX; // Initialize minimum distance to a very high value
     
 	// Loop through all interactables to find the best one based on direction
     for (var _i = 0; _i < ds_list_size(interactables); _i++) {

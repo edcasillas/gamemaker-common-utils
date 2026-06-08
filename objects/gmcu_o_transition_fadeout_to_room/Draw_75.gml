@@ -1,4 +1,4 @@
-var _previous_drawing_parameters = new DrawingParameters();
+var _previous_drawing_parameters = new gmcu_DrawingParameters();
 
 draw_set_alpha(transition_progress);
 draw_set_color(fade_to_color);

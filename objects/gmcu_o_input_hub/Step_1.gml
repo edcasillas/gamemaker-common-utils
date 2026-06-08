@@ -32,11 +32,11 @@ for(var _i = 0; _i < array_length(gamepad_buttons); _i++) {
 	var _button_code = gamepad_buttons[_i];
 	var _button_name = global.gmcu_gamepad_buttons_mapping[$ string(_button_code)];
 	if(gamepad_button_check_pressed(0, _button_code)) {
-		log_debug("Button " + _button_name + " pressed", true);
-		eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED, _button_code);
+		gmcu_log_debug("Button " + _button_name + " pressed", true);
+		gmcu_eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED, _button_code);
 	}
 	if(gamepad_button_check_released(0, _button_code)) {
-		log_debug("Button " + _button_name + " released", true);
-		eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_RELEASED, _button_code);
+		gmcu_log_debug("Button " + _button_name + " released", true);
+		gmcu_eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_RELEASED, _button_code);
 	}
 }

@@ -2,7 +2,7 @@ actual_text = text;
 if(translate) {	actual_text = gmcu_localization_t(text); }
 
 function do_draw() {
-	var _draw_params = new DrawingParameters(); 
+	var _draw_params = new gmcu_DrawingParameters();
 
 	draw_set_color(color);
 	draw_set_font(font);
