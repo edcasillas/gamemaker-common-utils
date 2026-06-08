@@ -18,6 +18,10 @@
 global.gmcu_notifications_enabled = false;
 global.gmcu_notification_handler = undefined;
 
+/**
+ * @description Returns the current instance's object name with a safe fallback.
+ * @returns {String} Object name, or UNKNOWN_OBJECT when it cannot be resolved.
+ */
 function get_current_object_name() {
 	try {
 		return object_get_name(object_index);
@@ -26,6 +30,10 @@ function get_current_object_name() {
 	}
 }
 
+/**
+ * @description Returns the current room name with a safe fallback.
+ * @returns {String} Room name, or UNKNOWN_ROOM when it cannot be resolved.
+ */
 function get_current_room_name() {
 	try {
 		return room_get_name(room);
@@ -34,8 +42,11 @@ function get_current_room_name() {
 	}
 }
 
+/**
+ * @description Registers or clears the optional visual notification handler.
+ * @param {Function|Undefined} _handler Notification callback, or undefined to disable notifications.
+ */
 function common_utils_set_notification_handler(_handler) {
 	global.gmcu_notification_handler = _handler;
 	global.gmcu_notifications_enabled = !is_undefined(_handler);
 }
-
