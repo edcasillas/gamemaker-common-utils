@@ -15,9 +15,9 @@ var _direction = gmcu_o_input_hub.gmcu_get_direction();
 var _four_way_direction = gmcu_o_input_hub.gmcu_get_four_way_direction();
 ```
 
-Subscribe through `EventBus` when code should react to any monitored gamepad
-button press or release. The dispatched event argument is the GameMaker `gp_*`
-button constant:
+Subscribe through [`EventBus`](event-bus.md) when code should react to any
+monitored gamepad button press or release. The dispatched event argument is the
+GameMaker `gp_*` button constant:
 
 ```gml
 eventbus_subscribe(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED);
@@ -35,8 +35,9 @@ direct polling when an event subscription is unnecessary.
 
 ## Resources
 
-- `scripts/gmcu_input_hub_events`: Declares the EventBus event names and the
-  `GMCU_DIRECTION_ANGLE` direction enum.
+- `scripts/gmcu_input_hub_events`: Declares the
+  [`EventBus`](event-bus.md) event names and the `GMCU_DIRECTION_ANGLE`
+  direction enum.
 - `scripts/gmcu_gamepad_buttons_mapping`: Initializes
   `global.gmcu_gamepad_buttons_mapping`, which maps GameMaker `gp_*` constants
   to readable names used by debug logs.
@@ -46,16 +47,17 @@ direct polling when an event subscription is unnecessary.
 
 ## Dependencies
 
-Import after:
-
-1. `Core`
-2. `Drawing`
-3. `Logging`
-4. `EventBus`
-5. `InGameNotifications`
-
-`InputHub` uses `EventBus` for button events, `Logging` for debug output, and
-`InGameNotifications` for DevBuild gamepad connect/disconnect notifications.
+- [`EventBus`](event-bus.md): Dispatches gamepad button press and release
+  events.
+  - [`Core`](core.md)
+  - [`Logging`](logging.md)
+    - [`Core`](core.md)
+- [`Logging`](logging.md): Writes gamepad connection and button debug output.
+  - [`Core`](core.md)
+- [`InGameNotifications`](in-game-notifications.md): Shows DevBuild gamepad
+  connect and disconnect notifications.
+  - [`Core`](core.md)
+  - [`Drawing`](drawing.md)
 
 ## API
 
