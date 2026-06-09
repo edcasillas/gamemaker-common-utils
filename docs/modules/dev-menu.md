@@ -22,6 +22,8 @@ reconfigures the persistent menu singleton.
 - [`InputHub`](input-hub.md): Supplies keyboard/gamepad navigation.
 - Optional [`LayeredGUI`](layered-gui.md): Supplies subscriber diagnostics when
   its manager exists in the current room.
+- Optional [`UniversalCursor`](universal-cursor.md): Supplies interactable and
+  hover diagnostics while its singleton exists.
 
 Initialize the singleton:
 
@@ -89,6 +91,12 @@ instance id in actual draw order. Its rows use the same clipboard interaction
 as logs. The snapshot is taken before the menu deactivates gameplay instances
 and refreshes each time the menu opens. The integration resolves the optional
 manager by asset name, so Dev Menu does not require LayeredGUI.
+
+When [`UniversalCursor`](universal-cursor.md) is imported, the root page also
+adds `Universal Cursor` while its singleton exists. The page lists object name,
+optional diagnostic name, instance id, and the subscriber that was hovered
+when the menu opened. Its rows are copyable. The optional cursor is resolved
+by asset name, so Dev Menu does not require UniversalCursor.
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.

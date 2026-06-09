@@ -18,6 +18,8 @@ last_mouse_y = -1;
 mouse_active = false;
 layered_gui_available = false;
 layered_gui_items = [];
+universal_cursor_available = false;
+universal_cursor_items = [];
 
 /**
  * @description Applies Dev Menu pages, callbacks, input behavior, and visual theme defaults.
@@ -30,15 +32,22 @@ function configure(_config) {
 		pages = [gmcu_dev_menu_page("main", "Dev Menu")];
 	}
 	var _has_layered_gui_page = false;
+	var _has_universal_cursor_page = false;
 	for (var _i = 0; _i < array_length(pages); _i++) {
 		if (pages[_i].id == "gmcu_layered_gui") {
 			_has_layered_gui_page = true;
-			break;
+		}
+		if (pages[_i].id == "gmcu_universal_cursor") {
+			_has_universal_cursor_page = true;
 		}
 	}
 	if (!_has_layered_gui_page) {
 		array_push(pages, gmcu_dev_menu_page("gmcu_layered_gui", "Layered GUI"));
 		pages[array_length(pages) - 1].type = "layered_gui";
+	}
+	if (!_has_universal_cursor_page) {
+		array_push(pages, gmcu_dev_menu_page("gmcu_universal_cursor", "Universal Cursor"));
+		pages[array_length(pages) - 1].type = "universal_cursor";
 	}
 	if (!variable_struct_exists(config, "trigger_pressed")) {
 		config.trigger_pressed = gmcu_dev_menu_default_trigger;
@@ -117,16 +126,23 @@ function current_items() {
 				return _log_items;
 			case "layered_gui":
 				return layered_gui_items;
+			case "universal_cursor":
+				return universal_cursor_items;
 		}
 	}
 	var _items = !is_undefined(_page.get_items) ? _page.get_items() : _page.items;
-	if (_page.id == pages[0].id && layered_gui_available) {
+	if (_page.id == pages[0].id && (layered_gui_available || universal_cursor_available)) {
 		var _root_items = [];
 		for (var _i = 0; _i < array_length(_items); _i++) {
 			array_push(_root_items, _items[_i]);
 		}
 		_items = _root_items;
-		array_push(_items, gmcu_dev_menu_submenu("Layered GUI", "gmcu_layered_gui"));
+		if (layered_gui_available) {
+			array_push(_items, gmcu_dev_menu_submenu("Layered GUI", "gmcu_layered_gui"));
+		}
+		if (universal_cursor_available) {
+			array_push(_items, gmcu_dev_menu_submenu("Universal Cursor", "gmcu_universal_cursor"));
+		}
 	}
 	return _items;
 }
@@ -176,11 +192,56 @@ function refresh_layered_gui_items() {
 }
 
 /**
+ * @description Captures Universal Cursor subscribers before modal instance deactivation.
+ */
+function refresh_universal_cursor_items() {
+	universal_cursor_available = false;
+	universal_cursor_items = [];
+
+	var _cursor_object = asset_get_index("gmcu_o_universal_cursor");
+	if (_cursor_object == -1) return;
+
+	var _cursor = instance_find(_cursor_object, 0);
+	if (_cursor == noone || !variable_instance_exists(_cursor, "interactables")) return;
+	universal_cursor_available = true;
+
+	var _interactables = _cursor.interactables;
+	for (var _i = 0; _i < ds_list_size(_interactables); _i++) {
+		var _entry = _interactables[| _i];
+		var _interactable = _entry.instance;
+		var _label = "<invalid subscriber>";
+		if (_interactable != noone && instance_exists(_interactable)) {
+			_label = _interactable == _cursor.hovered_interactable ? "* " : "  ";
+			_label += object_get_name(_interactable.object_index);
+			if (variable_struct_exists(_entry, "diagnostic_name")
+				&& !is_undefined(_entry.diagnostic_name)
+				&& string(_entry.diagnostic_name) != "") {
+				_label += " | " + string(_entry.diagnostic_name);
+			}
+			_label += " | id " + string(_interactable.id);
+		}
+		array_push(universal_cursor_items, {
+			type: "copy_text",
+			label: _label,
+			copy_text: _label
+		});
+	}
+
+	if (array_length(universal_cursor_items) == 0) {
+		array_push(universal_cursor_items, {
+			type: "text",
+			label: "No subscribers"
+		});
+	}
+}
+
+/**
  * @description Opens the modal Dev Menu and snapshots optional diagnostic modules.
  */
 function open_menu() {
 	if (is_open || is_undefined(config)) return;
 	refresh_layered_gui_items();
+	refresh_universal_cursor_items();
 	is_open = true;
 	page_stack = [pages[0].id];
 	selected_index = 0;

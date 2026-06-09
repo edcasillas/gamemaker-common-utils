@@ -57,7 +57,7 @@ gmcu_universal_cursor_hide();
 Subscribe from Create after the instance is initialized:
 
 ```gml
-gmcu_universal_cursor_subscribe();
+gmcu_universal_cursor_subscribe("play_button");
 
 function on_hover_enter() {
 	image_index = 1;
@@ -92,6 +92,26 @@ unsubscribing correctly.
 Common Utils GUI buttons already implement this contract and subscribe through
 `gmcu_o_base_button_gui`. Child button objects normally configure or override
 button behavior instead of subscribing a second time.
+
+The optional subscription argument is a diagnostic name. GameMaker does not
+expose Room Editor instance names from runtime ids, so pass an existing stable
+identifier when several subscribers share an object. Common Utils buttons pass
+their `button_id` automatically.
+
+## Dev Menu Diagnostics
+
+When [`Dev Menu`](dev-menu.md) is also imported, its root page automatically
+adds `Universal Cursor` while the cursor singleton exists. The page lists each
+subscriber as:
+
+```text
+hover marker | object name | diagnostic name | instance id
+```
+
+`*` marks the subscriber that was hovered when the menu opened. The snapshot
+is taken before the modal menu deactivates gameplay instances. Select a row and
+press Enter, the gamepad confirmation button, or click it to copy the complete
+row to the clipboard. No consumer configuration is required.
 
 ## Position And Hit Testing
 
@@ -171,8 +191,9 @@ changing between cursor-driven UI and gameplay.
   the supplied sprite and hides the system cursor.
 - `gmcu_universal_cursor_hide(_restore_system_cursor = true)`: Hides the
   universal cursor and optionally restores the default system cursor.
-- `gmcu_universal_cursor_subscribe()`: Registers `self` for hover, navigation,
-  and activation.
+- `gmcu_universal_cursor_subscribe(_diagnostic_name = undefined)`: Registers
+  `self` for hover, navigation, and activation. The optional name appears only
+  in diagnostics.
 - `gmcu_universal_cursor_unsubscribe()`: Removes `self` when registered.
 
 Subscriber callbacks take no parameters and return no value:

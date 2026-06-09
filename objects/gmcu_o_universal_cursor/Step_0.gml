@@ -43,7 +43,7 @@ var _invalid_indices = ds_list_create(); // List to keep track of invalid indice
 
 var _is_hovering = false;
 for (var _i = 0; _i < ds_list_size(interactables); _i++) {
-    var _interactable = interactables[| _i];
+    var _interactable = interactables[| _i].instance;
 	
     if (_interactable == noone || !instance_exists(_interactable)) {
         gmcu_log_error("Invalid instance subscribed to gmcu_o_universal_cursor. Make sure to unsubscribe objects in the Clean Up event.");

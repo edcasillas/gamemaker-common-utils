@@ -18,21 +18,27 @@ hovered_interactable = noone;
 interactables = ds_list_create();
 
 /**
-Subscribe a new interactable object to be detected by the cursor.
-@param {Id.Instance} _instance
-*/
-function subscribe(_instance) { 
-	ds_list_add(interactables, _instance);
+ * @description Adds an interactable instance to the cursor.
+ * @param {Id.Instance} _instance Interactable instance to register.
+ * @param {String|Undefined} _diagnostic_name Optional human-readable instance label.
+ */
+function subscribe(_instance, _diagnostic_name = undefined) {
+	ds_list_add(interactables, {
+		instance: _instance,
+		diagnostic_name: _diagnostic_name
+	});
 }
 
 /**
-Unsubscribe an interactable object from cursor detection
-@param {Id.Instance} _instance
-*/
+ * @description Removes an interactable instance from the cursor.
+ * @param {Id.Instance} _instance Registered instance to remove.
+ */
 function unsubscribe(_instance) {
-	var _pos = ds_list_find_index(interactables, _instance);
-	if(_pos >= 0) {
-		ds_list_delete(interactables, _pos);
+	for (var _i = 0; _i < ds_list_size(interactables); _i++) {
+		if (interactables[| _i].instance == _instance) {
+			ds_list_delete(interactables, _i);
+			break;
+		}
 	}
 }
 
@@ -47,7 +53,7 @@ function navigate(_direction) {
     
 	// Loop through all interactables to find the best one based on direction
     for (var _i = 0; _i < ds_list_size(interactables); _i++) {
-        var _interactable = interactables[| _i];
+        var _interactable = interactables[| _i].instance;
         
         if (_interactable != hovered_interactable) { // Ignore currently hovered interactable
             var _dx = _interactable.x - gui_x;
@@ -65,7 +71,7 @@ function navigate(_direction) {
 	
 	// If no interactable was found in the specified direction, default to the first interactable if none is selected
 	if(_best_interactable == noone && hovered_interactable == noone && ds_list_size(interactables) > 0) {
-		_best_interactable = interactables[| 0];
+		_best_interactable = interactables[| 0].instance;
 	}
     
 	// Update cursor position to the selected interactable's position
