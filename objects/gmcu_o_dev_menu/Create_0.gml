@@ -16,6 +16,8 @@ panel_margin = 24;
 last_mouse_x = -1;
 last_mouse_y = -1;
 mouse_active = false;
+layered_gui_available = false;
+layered_gui_items = [];
 
 /**
  * @description Applies Dev Menu pages, callbacks, input behavior, and visual theme defaults.
@@ -26,6 +28,17 @@ function configure(_config) {
 	pages = variable_struct_exists(config, "pages") ? config.pages : [];
 	if (array_length(pages) == 0) {
 		pages = [gmcu_dev_menu_page("main", "Dev Menu")];
+	}
+	var _has_layered_gui_page = false;
+	for (var _i = 0; _i < array_length(pages); _i++) {
+		if (pages[_i].id == "gmcu_layered_gui") {
+			_has_layered_gui_page = true;
+			break;
+		}
+	}
+	if (!_has_layered_gui_page) {
+		array_push(pages, gmcu_dev_menu_page("gmcu_layered_gui", "Layered GUI"));
+		pages[array_length(pages) - 1].type = "layered_gui";
 	}
 	if (!variable_struct_exists(config, "trigger_pressed")) {
 		config.trigger_pressed = gmcu_dev_menu_default_trigger;
@@ -101,14 +114,66 @@ function current_items() {
 					});
 				}
 				return _log_items;
+			case "layered_gui":
+				return layered_gui_items;
 		}
 	}
-	if (!is_undefined(_page.get_items)) return _page.get_items();
-	return _page.items;
+	var _items = !is_undefined(_page.get_items) ? _page.get_items() : _page.items;
+	if (_page.id == pages[0].id && layered_gui_available) {
+		var _root_items = [];
+		for (var _i = 0; _i < array_length(_items); _i++) {
+			array_push(_root_items, _items[_i]);
+		}
+		_items = _root_items;
+		array_push(_items, gmcu_dev_menu_submenu("Layered GUI", "gmcu_layered_gui"));
+	}
+	return _items;
 }
 
+/**
+ * @description Captures Layered GUI subscribers before modal instance deactivation.
+ */
+function refresh_layered_gui_items() {
+	layered_gui_available = false;
+	layered_gui_items = [];
+
+	var _manager_object = asset_get_index("gmcu_o_layered_gui_manager");
+	if (_manager_object == -1) return;
+
+	var _manager = instance_find(_manager_object, 0);
+	if (_manager == noone || !variable_instance_exists(_manager, "subscribers")) return;
+	layered_gui_available = true;
+
+	var _subscribers = _manager.subscribers;
+	for (var _i = 0; _i < ds_list_size(_subscribers); _i++) {
+		var _entry = _subscribers[| _i];
+		var _subscriber = _entry.instance;
+		var _label = string(_entry.priority) + " | <invalid subscriber>";
+		if (_subscriber != noone && instance_exists(_subscriber)) {
+			_label = string(_entry.priority)
+				+ " | " + object_get_name(_subscriber.object_index)
+				+ " | id " + string(_subscriber.id);
+		}
+		array_push(layered_gui_items, {
+			type: "text",
+			label: _label
+		});
+	}
+
+	if (array_length(layered_gui_items) == 0) {
+		array_push(layered_gui_items, {
+			type: "text",
+			label: "No subscribers"
+		});
+	}
+}
+
+/**
+ * @description Opens the modal Dev Menu and snapshots optional diagnostic modules.
+ */
 function open_menu() {
 	if (is_open || is_undefined(config)) return;
+	refresh_layered_gui_items();
 	is_open = true;
 	page_stack = [pages[0].id];
 	selected_index = 0;

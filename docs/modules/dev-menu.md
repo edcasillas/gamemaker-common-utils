@@ -20,6 +20,8 @@ reconfigures the persistent menu singleton.
 - [`Drawing`](drawing.md): Protects overlay draw state.
 - [`Logging`](logging.md): Reports callback failures and supplies log history.
 - [`InputHub`](input-hub.md): Supplies keyboard/gamepad navigation.
+- Optional [`LayeredGUI`](layered-gui.md): Supplies subscriber diagnostics when
+  its manager exists in the current room.
 
 Initialize the singleton:
 
@@ -76,6 +78,13 @@ and errors or exceptions are red. Override these theme fields when needed:
 - `log_info_color`
 - `log_warn_color`
 - `log_error_color`
+
+When [`LayeredGUI`](layered-gui.md) is also imported, the root page
+automatically includes `Layered GUI` while its manager exists in the current
+room. The read-only page shows priority, object name, and instance id in actual
+draw order. Its snapshot is taken before the menu deactivates gameplay
+instances and refreshes each time the menu opens. The integration resolves the
+optional manager by asset name, so Dev Menu does not require LayeredGUI.
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.
