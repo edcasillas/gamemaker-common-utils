@@ -5,7 +5,21 @@ so GUI drawing can happen in a stable order from one Draw GUI manager.
 
 ## Usage
 
-Subscribe in Create, implement `on_draw_gui`, and unsubscribe in Clean Up.
+Subscribe instances in the Create event and implement `on_draw_gui`:
+
+```gml
+gmcu_layered_gui_subscribe(0);
+
+function on_draw_gui() {
+	draw_self();
+}
+```
+
+Unsubscribe in Clean Up:
+
+```gml
+gmcu_layered_gui_unsubscribe();
+```
 
 ## Resources
 
