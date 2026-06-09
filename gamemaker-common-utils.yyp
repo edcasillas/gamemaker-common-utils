@@ -66,7 +66,6 @@
     {"id":{"name":"gmcu_draw_text_outlined","path":"scripts/gmcu_draw_text_outlined/gmcu_draw_text_outlined.yy",},},
     {"id":{"name":"gmcu_drawing_parameters","path":"scripts/gmcu_drawing_parameters/gmcu_drawing_parameters.yy",},},
     {"id":{"name":"gmcu_event_bus","path":"scripts/gmcu_event_bus/gmcu_event_bus.yy",},},
-    {"id":{"name":"gmcu_gameanalytics","path":"scripts/gmcu_gameanalytics/gmcu_gameanalytics.yy",},},
     {"id":{"name":"gmcu_gamepad_buttons_mapping","path":"scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy",},},
     {"id":{"name":"gmcu_globalstats","path":"scripts/gmcu_globalstats/gmcu_globalstats.yy",},},
     {"id":{"name":"gmcu_in_game_notification_settings","path":"scripts/gmcu_in_game_notification_settings/gmcu_in_game_notification_settings.yy",},},

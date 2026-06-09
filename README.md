@@ -42,11 +42,10 @@ Import modules in this order:
 11. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
 12. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
 13. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
-14. [`GameAnalytics`](docs/modules/gameanalytics.md): Defensive GameAnalytics facade.
-15. [`GlobalStats.io`](docs/modules/globalstats.md): Defensive GlobalStats.io facade.
-16. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
-17. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
-18. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
+14. [`GlobalStats.io`](docs/modules/globalstats.md): Defensive GlobalStats.io facade.
+15. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
+16. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
+17. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
 
 Each module page documents its resources, dependencies, API, usage, and
 consumer ownership boundaries. The implementation and migration checklist lives in
@@ -109,7 +108,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
   `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
   `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
-  `Transitions`, `GameAnalytics`, `GlobalStats.io`, `HTML5 Helpers`, and
+  `Transitions`, `GlobalStats.io`, `HTML5 Helpers`, and
   `Release and Build Info` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
@@ -129,6 +128,8 @@ git commit -m "Update gamemaker-common-utils pointer"
   project-specific log forwarding without coupling the shared module to an
   analytics SDK. Consumers can also register an output handler; HTML5 consumers
   can use the HTML5 Helpers console functions to preserve browser severity.
+- Provider integrations such as GameAnalytics remain consumer-owned and connect
+  to Logging through `gmcu_log_set_telemetry_handler`.
 - HTML5 build/export behavior still requires GameMaker IDE validation.
 - Release export and deployment are intentionally separate. The tooling never
   publishes automatically after an export; the exact artifact must be tested
