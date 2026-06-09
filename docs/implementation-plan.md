@@ -91,13 +91,7 @@ Import modules in this order:
    - Depends on `Core`, `Drawing`, `Logging`, and `EventBus`.
    - Audio fades, audio stopping, and other project-specific room-change side
      effects remain consumer-owned through transition callbacks.
-14. `GlobalStats.io`
-   - Provides defensive leaderboard, share, and rank-section helpers.
-   - Depends on `Logging` and a consumer-installed GlobalStats.io client.
-   - The controller, HTTP scripts, credentials, GTD identifiers, player
-     identity policy, persistence, response events, and payload schema remain
-     consumer-owned.
-15. `HTML5 Helpers`
+14. `HTML5 Helpers`
    - Provides `gmcu_html5_is_mobile_device`, `gmcu_html5_block_canvas`, and
      `gmcu_html5_console_error`.
    - Preserves Fantasma's existing `PostBody` injection and
