@@ -79,12 +79,16 @@ and errors or exceptions are red. Override these theme fields when needed:
 - `log_warn_color`
 - `log_error_color`
 
+Log rows are copyable. Select one and press Enter, the gamepad confirmation
+button, or click it to copy the complete message to the clipboard.
+
 When [`LayeredGUI`](layered-gui.md) is also imported, the root page
 automatically includes `Layered GUI` while its manager exists in the current
-room. The read-only page shows priority, object name, and instance id in actual
-draw order. Its snapshot is taken before the menu deactivates gameplay
-instances and refreshes each time the menu opens. The integration resolves the
-optional manager by asset name, so Dev Menu does not require LayeredGUI.
+room. The page shows priority, object name, optional diagnostic name, and
+instance id in actual draw order. Its rows use the same clipboard interaction
+as logs. The snapshot is taken before the menu deactivates gameplay instances
+and refreshes each time the menu opens. The integration resolves the optional
+manager by asset name, so Dev Menu does not require LayeredGUI.
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.

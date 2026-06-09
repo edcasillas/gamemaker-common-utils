@@ -108,8 +108,9 @@ function current_items() {
 				for (var _j = array_length(_logs) - 1; _j >= 0; _j--) {
 					var _entry = _logs[_j];
 					array_push(_log_items, {
-						type: "text",
+						type: "copy_text",
 						label: _entry.message,
+						copy_text: _entry.message,
 						level: _entry.level
 					});
 				}
@@ -151,12 +152,18 @@ function refresh_layered_gui_items() {
 		var _label = string(_entry.priority) + " | <invalid subscriber>";
 		if (_subscriber != noone && instance_exists(_subscriber)) {
 			_label = string(_entry.priority)
-				+ " | " + object_get_name(_subscriber.object_index)
-				+ " | id " + string(_subscriber.id);
+				+ " | " + object_get_name(_subscriber.object_index);
+			if (variable_struct_exists(_entry, "diagnostic_name")
+				&& !is_undefined(_entry.diagnostic_name)
+				&& string(_entry.diagnostic_name) != "") {
+				_label += " | " + string(_entry.diagnostic_name);
+			}
+			_label += " | id " + string(_subscriber.id);
 		}
 		array_push(layered_gui_items, {
-			type: "text",
-			label: _label
+			type: "copy_text",
+			label: _label,
+			copy_text: _label
 		});
 	}
 
@@ -278,6 +285,9 @@ function activate_item(_direction = 1) {
 			} catch (_exception) {
 				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_value");
 			}
+			break;
+		case "copy_text":
+			clipboard_set_text(_item.copy_text);
 			break;
 	}
 }

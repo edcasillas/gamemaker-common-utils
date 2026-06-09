@@ -73,5 +73,12 @@ for (var _row = 0; _row < _visible_rows; _row++) {
 
 draw_set_color(_theme.muted_color);
 draw_set_halign(fa_right);
-draw_text(_panel_x + _panel_w - 18, _panel_y + header_height * 0.5, "F1/Esc/B: Back");
+var _help = "F1/Esc/B: Back";
+if (array_length(_items) > 0
+	&& selected_index >= 0
+	&& selected_index < array_length(_items)
+	&& _items[selected_index].type == "copy_text") {
+	_help = "Enter/A/Click: Copy | " + _help;
+}
+draw_text(_panel_x + _panel_w - 18, _panel_y + header_height * 0.5, _help);
 _draw_params.apply();

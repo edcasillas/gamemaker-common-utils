@@ -3,7 +3,7 @@ if(!created) { return; } // instance_destroy was called on parent.
 
 gmcu_universal_cursor_subscribe();
 
-gmcu_layered_gui_subscribe(0);
+gmcu_layered_gui_subscribe(0, button_id);
 function on_draw_gui() { 
 	do_draw();
 

@@ -10,7 +10,7 @@ Subscribe in Create, define `on_draw_gui`, and unsubscribe in Clean Up:
 
 ```gml
 // Create
-gmcu_layered_gui_subscribe(0);
+gmcu_layered_gui_subscribe(0, "play_button");
 
 function on_draw_gui() {
 	draw_self();
@@ -24,6 +24,11 @@ Every subscriber must define `on_draw_gui` as a function on the instance.
 Larger priority values draw earlier, so lower values appear later and can draw
 over higher-priority subscribers. Subscribers with equal priorities keep their
 subscription order.
+
+The optional second argument is a human-readable diagnostic name. GameMaker
+does not expose Room Editor instance names from a runtime instance id, so pass
+an existing identifier such as a button id when several instances share the
+same object. Omit it when the object name and runtime id are sufficient.
 
 The manager skips a subscriber when the instance is hidden or its assigned
 layer is hidden. After every callback it restores the captured draw state, so
@@ -42,12 +47,14 @@ When both modules are imported, [`Dev Menu`](dev-menu.md) automatically adds a
 in their actual draw order as:
 
 ```text
-priority | object name | instance id
+priority | object name | diagnostic name | instance id
 ```
 
 The list is captured immediately before the modal menu deactivates gameplay
 instances and refreshes each time the menu opens. Invalid references are shown
-without interrupting the menu. No consumer configuration is required.
+without interrupting the menu. Select a row and press Enter, the gamepad
+confirmation button, or click it to copy the complete row to the clipboard. No
+consumer configuration is required.
 
 ## Resources
 
@@ -73,8 +80,9 @@ Object:
 
 Functions:
 
-- `gmcu_layered_gui_subscribe(_priority)`: Registers `self`; larger priorities
-  draw earlier.
+- `gmcu_layered_gui_subscribe(_priority, _diagnostic_name = undefined)`:
+  Registers `self`; larger priorities draw earlier. The optional name appears
+  only in diagnostics.
 - `gmcu_layered_gui_unsubscribe()`: Removes `self` when subscribed.
 
 Subscribers define:

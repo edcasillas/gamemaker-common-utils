@@ -1,10 +1,11 @@
 /**
-Subscribe an object to be drawn by the Layered GUI Manager.
-@param {real} _priority Priority/layer to which the subscribed instance will be drawn.
-*/
-function gmcu_layered_gui_subscribe(_priority) {
+ * @description Subscribes the calling instance to the Layered GUI Manager.
+ * @param {Real} _priority Priority at which the instance will be drawn.
+ * @param {String|Undefined} _diagnostic_name Optional instance label for diagnostics.
+ */
+function gmcu_layered_gui_subscribe(_priority, _diagnostic_name = undefined) {
 	if(!instance_exists(gmcu_o_layered_gui_manager)) {
 		instance_create_depth(0, 0, 0, gmcu_o_layered_gui_manager);
 	}
-	gmcu_o_layered_gui_manager.subscribe(self, _priority);
+	gmcu_o_layered_gui_manager.subscribe(self, _priority, _diagnostic_name);
 }
