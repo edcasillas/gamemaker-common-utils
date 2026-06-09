@@ -229,6 +229,46 @@ Inherited instance methods:
 - `on_released()`: Plays optional audio and schedules activation after a valid
   press.
 
+## Improvement Opportunities
+
+The current module is usable and intentionally preserves existing consumer
+behavior. The following are design opportunities, not committed API changes:
+
+- **Clarify or replace the game-space variant.** Universal Cursor performs
+  GUI-space hit testing, so `gmcu_o_base_button_game` works reliably only when
+  game and GUI coordinates align. A future design could accept explicit bounds
+  or coordinate conversion callbacks, or rename the variant to communicate
+  this limitation.
+- **Support a direct action callback.** EventBus is useful when a controller
+  should own all menu policy, but it adds subscription and string-switch
+  overhead for simple local actions. An optional callback could execute
+  directly while retaining EventBus as the default or fallback.
+- **Make delay semantics explicit.** `action_delay = 0` currently becomes a
+  one-step delay. A future API could make zero immediate or rename the property
+  to `action_delay_steps` and document a minimum of one.
+- **Decouple visual states from fixed sprite frames.** The current
+  `0 = idle`, `1 = hovered`, `2 = pressed` convention is simple but rigid.
+  Optional state callbacks or configurable frame properties could support
+  animation and alternative presentation without replacing interaction logic.
+- **Centralize disabled-state transitions.** Setting `is_interactable` to false
+  does not automatically clear hover or pressed presentation. A setter such as
+  `set_interactable()` could own state cleanup and prevent consumers from
+  calling `on_hover_leave()` manually.
+- **Protect callback invariants.** Consumer overrides must preserve internal
+  state such as `is_pressed`. Separating state transitions from overridable
+  visual hooks would make customization less error-prone.
+- **Remove or formalize empty Mouse events.** The game-space variant contains
+  intentionally inactive Mouse event placeholders. Removing them would reduce
+  confusion, while enabling them would require a clear policy to avoid
+  duplicate Universal Cursor input.
+- **Refresh localized text at runtime.** Text is localized once during Create.
+  Projects that change language while a button remains alive currently need
+  their own refresh path.
+
+Any implementation should remain backward compatible unless consumers
+explicitly accept a migration. Prefer solving a demonstrated project need over
+adding configuration for hypothetical variants.
+
 ## Consumer Ownership
 
 Sprites, fonts, sounds, button ids, localized strings, child objects, menu
