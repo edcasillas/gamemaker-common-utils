@@ -1,27 +1,38 @@
 # Release and Build Info
 
 This module separates export, testing, versioning, and publication by design.
-An export is never published automatically: test the exact artifact first,
-then invoke `deploy` explicitly.
+Consumers use a double-click menu for normal work and retain the detailed CLI
+for automation and diagnosis.
 
-## Usage
+## Consumer Setup
 
-Run the shared tool from a consumer repository:
+1. Vendor Common Utils at `vendor/gamemaker-common-utils`.
+2. Copy `tools/release/Release.command` to the consumer repository root.
+3. Make the copied launcher executable.
+4. Add a root `itch-config.json`.
+
+The launcher needs no project-specific edits. Double-click it to serve or stop
+an HTML build, or to publish a tested artifact.
+
+## CLI Usage
 
 ```sh
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  export --config itch-deploy/itch-config.json --platform html --serve
+  menu
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  serve-html --config itch-deploy/itch-config.json --open
+  serve-html --open
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  stop-html --config itch-deploy/itch-config.json
+  stop-html
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  status --config itch-deploy/itch-config.json
+  status
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  version --config itch-deploy/itch-config.json --platform html
+  version --platform html
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  deploy --config itch-deploy/itch-config.json --platform html
+  deploy --platform html
 ```
+
+All commands default to root `itch-config.json`. `--config` remains available
+for non-conventional layouts.
 
 `export` uses `gm-cli package` by default. As of gm-cli 2.1.0, the official CLI
 reports that HTML5 target support is still coming soon. Consumers may provide a
@@ -37,10 +48,17 @@ before registering the server. An explicit `--port` remains strict and fails
 when occupied. State and logs go under the consumer-defined `server_state`
 path; commit neither file.
 
-`deploy` asks for confirmation that the exact export was tested. Automation
-must pass `--yes-tested`. It reads the latest channel version from
-`butler status`, falls back to the consumer's versioned state file, writes
-`options.ini` and `buildnumber.txt`, then calls `butler push`.
+`deploy` requires branch `main` and a clean working tree. It asks for
+confirmation that the exact export was tested; automation must pass
+`--yes-tested`. It reads the latest channel version from `butler status`, falls
+back to the consumer's versioned state file, updates generated version files
+and the selected GameMaker target's `option_<target>_version`, then calls
+`butler push`. After a successful upload it commits only the version state and
+target options file, creates `releases/v<version>`, and separately asks whether
+to push the commit and tag.
+
+If Git bookkeeping fails after upload, the tool does not attempt to undo the
+itch.io release. It prints the commands needed to complete the commit and tag.
 
 Install and authenticate Butler before using `status` or `deploy`:
 
@@ -56,6 +74,7 @@ Butler installation. A consumer may override this with `tools.butler`.
 
 - `tools/release/gmcu_release.py`: Export, serve, version, status, and deploy
   CLI.
+- `tools/release/Release.command`: Reusable zero-argument consumer launcher.
 - `scripts/gmcu_build_info`: Runtime build metadata API.
 - `objects/gmcu_o_build_info_label`: Optional bottom-right build label.
 
@@ -79,9 +98,9 @@ The normal consumer file is intentionally small:
 
 Platform order supplies stable IDs starting at `1`. Common Utils infers the
 consumer `.yyp`, `Builds/<platform>`, matching itch channel names,
-`options.ini`, `buildnumber.txt`, `config.jsonc`, and the HTML server defaults.
-Advanced projects may override those fields, but ordinary consumers should not
-repeat conventions.
+`options.ini`, `buildnumber.txt`, `itch-deploy/config.jsonc`, and the HTML
+server defaults. Advanced projects may override those fields, but ordinary
+consumers should not repeat conventions.
 
 ## API
 

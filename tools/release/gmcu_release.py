@@ -22,6 +22,15 @@ from pathlib import Path
 
 VERSION_RE = re.compile(r"^(?P<year>\d{4})\.(?P<month>\d{2})\.(?P<platform>\d+)\.(?P<count>\d+)$")
 STATUS_ROW_RE = re.compile(r"^\|\s*(?P<channel>[^|]+?)\s*\|.*\|\s*(?P<version>[^|]+?)\s*\|$")
+TARGET_OPTIONS = {
+    "android": ("android", "option_android_version"),
+    "html5": ("html5", "option_html5_version"),
+    "ios": ("ios", "option_ios_version"),
+    "linux": ("linux", "option_linux_version"),
+    "mac": ("mac", "option_mac_version"),
+    "tvos": ("tvos", "option_tvos_version"),
+    "windows": ("windows", "option_windows_version"),
+}
 
 
 class ReleaseError(RuntimeError):
@@ -43,12 +52,12 @@ def load_config(path: str) -> tuple[dict, Path]:
             name: {
                 "id": index + 1,
                 "channel": name,
-                "build_path": f"../Builds/{name}",
-                "options_ini": f"../Builds/{name}/options.ini",
+                "build_path": f"Builds/{name}",
+                "options_ini": f"Builds/{name}/options.ini",
                 "buildnumber_file": (
-                    f"../Builds/{name}/html5game/buildnumber.txt"
+                    f"Builds/{name}/html5game/buildnumber.txt"
                     if name == "html"
-                    else f"../Builds/{name}/buildnumber.txt"
+                    else f"Builds/{name}/buildnumber.txt"
                 ),
                 "gm_target": "html5" if name == "html" else name,
                 "gm_runtime": "vm",
@@ -56,14 +65,15 @@ def load_config(path: str) -> tuple[dict, Path]:
             }
             for index, name in enumerate(platforms)
         }
-    config.setdefault("project", str(next(base.parent.glob("*.yyp"), "")))
-    config.setdefault("version_state", "config.jsonc")
+    projects = list(base.glob("*.yyp")) or list(base.parent.glob("*.yyp"))
+    config.setdefault("project", str(projects[0] if projects else ""))
+    config.setdefault("version_state", "itch-deploy/config.jsonc")
     config.setdefault("server_state", ".gmcu-release/html-server.json")
     config.setdefault(
         "html",
         {
             "platform": "html",
-            "directory": "../Builds/html",
+            "directory": "Builds/html",
             "entrypoint": "index.html",
             "port": 8000,
         },
@@ -130,6 +140,25 @@ def platform_config(config: dict, name: str) -> dict:
 
 def run(command: list[str], *, capture: bool = False, check: bool = True) -> subprocess.CompletedProcess:
     return subprocess.run(command, text=True, capture_output=capture, check=check)
+
+
+def git_run(base: Path, args: list[str], *, capture: bool = False) -> subprocess.CompletedProcess:
+    """Run Git in the consumer repository."""
+    try:
+        return run(["git", "-C", str(base), *args], capture=capture)
+    except subprocess.CalledProcessError as exc:
+        detail = exc.stderr.strip() if exc.stderr else str(exc)
+        raise ReleaseError(f"Git {' '.join(args)} failed: {detail}") from exc
+
+
+def require_clean_main(base: Path) -> None:
+    """Require the consumer repository to be on main with no local changes."""
+    branch = git_run(base, ["branch", "--show-current"], capture=True).stdout.strip()
+    if branch != "main":
+        raise ReleaseError(f"Release requires branch 'main'; current branch is '{branch or 'detached HEAD'}'")
+    status = git_run(base, ["status", "--short"], capture=True).stdout.strip()
+    if status:
+        raise ReleaseError("Release requires a clean Git working tree")
 
 
 def butler_status(config: dict) -> str:
@@ -212,18 +241,58 @@ def update_options_ini(path: Path, version: str) -> None:
     path.write_text("".join(lines), encoding="utf-8")
 
 
-def generate_version(config: dict, base: Path, platform_name: str) -> str:
+def source_options_path(base: Path, platform: dict) -> tuple[Path, str]:
+    """Resolve the GameMaker source options file and version field for a target."""
+    target = platform["gm_target"]
+    try:
+        directory, field = TARGET_OPTIONS[target]
+    except KeyError as exc:
+        raise ReleaseError(f"GameMaker source version update is unsupported for target '{target}'") from exc
+    return base / "options" / directory / f"options_{directory}.yy", field
+
+
+def update_source_version(path: Path, field: str, version: str) -> None:
+    """Update one GameMaker target version without reserializing the options file."""
+    if not path.is_file():
+        raise ReleaseError(f"GameMaker options file not found: {path}")
+    text = path.read_text(encoding="utf-8")
+    pattern = re.compile(rf'("{re.escape(field)}"\s*:\s*")[^"]*(")')
+    updated, count = pattern.subn(rf"\g<1>{version}\g<2>", text, count=1)
+    if count != 1:
+        raise ReleaseError(f"Version field '{field}' not found in {path}")
+    path.write_text(updated, encoding="utf-8")
+
+
+def snapshot_files(paths: list[Path]) -> dict[Path, bytes | None]:
+    """Capture files that must be restored when an upload fails."""
+    return {path: path.read_bytes() if path.exists() else None for path in paths}
+
+
+def restore_files(snapshot: dict[Path, bytes | None]) -> None:
+    """Restore a release metadata snapshot."""
+    for path, content in snapshot.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+
+def generate_version(config: dict, base: Path, platform_name: str) -> tuple[str, Path, Path]:
+    """Generate and persist the next release version for one platform."""
     platform = platform_config(config, platform_name)
     version, state, state_path = next_version(config, base, platform_name)
     options_ini = resolve(base, platform["options_ini"])
     buildnumber = resolve(base, platform["buildnumber_file"])
+    source_options, source_field = source_options_path(base, platform)
     buildnumber.parent.mkdir(parents=True, exist_ok=True)
     state_path.parent.mkdir(parents=True, exist_ok=True)
     update_options_ini(options_ini, version)
+    update_source_version(source_options, source_field, version)
     buildnumber.write_text(version, encoding="utf-8")
     state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
     print(f"Generated version: {version}")
-    return version
+    return version, state_path, source_options
 
 
 def export_build(config: dict, base: Path, platform_name: str, serve: bool) -> None:
@@ -420,6 +489,12 @@ def stop_html(config: dict, base: Path) -> None:
     state_path.unlink(missing_ok=True)
 
 
+def html_server_running(config: dict, base: Path) -> bool:
+    """Return whether the registered HTML server process is alive."""
+    state = read_server_state(server_state_path(config, base))
+    return bool(state and pid_alive(int(state["pid"])))
+
+
 def confirm_tested(yes_tested: bool) -> None:
     if yes_tested:
         return
@@ -430,26 +505,147 @@ def confirm_tested(yes_tested: bool) -> None:
         raise ReleaseError("Deployment cancelled; test the export before publishing")
 
 
-def deploy(config: dict, base: Path, platform_name: str, yes_tested: bool) -> None:
-    confirm_tested(yes_tested)
+def confirm_release() -> bool:
+    """Ask for a simple interactive release confirmation."""
+    return input("Publish this tested build to itch.io? [y/N]: ").strip().lower() == "y"
+
+
+def recovery_commands(version: str, state_path: Path, source_options: Path) -> str:
+    """Build the Git commands needed to complete release bookkeeping."""
+    tag = f"releases/v{version}"
+    return "\n".join(
+        [
+            "The itch.io upload succeeded, but Git release bookkeeping failed.",
+            "Complete it manually:",
+            f"  git add {state_path} {source_options}",
+            f'  git commit -m "Release v{version}"',
+            f"  git tag {tag}",
+            "  git push origin main",
+            f"  git push origin {tag}",
+        ]
+    )
+
+
+def commit_release(base: Path, version: str, state_path: Path, source_options: Path) -> None:
+    """Commit and tag only the tracked release metadata."""
+    paths = [str(state_path.relative_to(base)), str(source_options.relative_to(base))]
+    git_run(base, ["add", "--", *paths])
+    git_run(base, ["commit", "-m", f"Release v{version}"])
+    git_run(base, ["tag", f"releases/v{version}"])
+
+
+def maybe_push_release(base: Path, version: str) -> None:
+    """Optionally push the release commit and tag."""
+    if input("Push the release commit and tag to origin? [y/N]: ").strip().lower() != "y":
+        print("Release commit and tag remain local.")
+        return
+    git_run(base, ["push", "origin", "main"])
+    git_run(base, ["push", "origin", f"releases/v{version}"])
+
+
+def deploy(
+    config: dict,
+    base: Path,
+    platform_name: str,
+    yes_tested: bool,
+    *,
+    simple_confirm: bool = False,
+    push_prompt: bool = True,
+) -> None:
+    """Publish a tested build, then commit and tag its release metadata."""
+    require_clean_main(base)
     platform = platform_config(config, platform_name)
     build_path = resolve(base, platform["build_path"])
     if not build_path.exists():
         raise ReleaseError(f"Export not found: {build_path}")
-    version = generate_version(config, base, platform_name)
-    itch = config["itch"]
+    if simple_confirm:
+        if not confirm_release():
+            print("Deployment cancelled.")
+            return
+    else:
+        confirm_tested(yes_tested)
+    options_ini = resolve(base, platform["options_ini"])
+    buildnumber = resolve(base, platform["buildnumber_file"])
+    state_path = resolve(base, config["version_state"])
+    source_options, _ = source_options_path(base, platform)
     butler = find_butler(config)
-    target = f"{itch['username']}/{itch['project']}:{platform['channel']}"
-    run([butler, "push", str(build_path), target, "--userversion", version])
+    snapshot = snapshot_files([options_ini, buildnumber, state_path, source_options])
+    try:
+        version, state_path, source_options = generate_version(config, base, platform_name)
+        itch = config["itch"]
+        target = f"{itch['username']}/{itch['project']}:{platform['channel']}"
+        run([butler, "push", str(build_path), target, "--userversion", version])
+    except (ReleaseError, FileNotFoundError, OSError, subprocess.CalledProcessError):
+        restore_files(snapshot)
+        raise
     print(f"Deployment successful: {target} v{version}")
+    try:
+        commit_release(base, version, state_path, source_options)
+        if push_prompt:
+            maybe_push_release(base, version)
+    except ReleaseError as exc:
+        print(recovery_commands(version, state_path, source_options), file=sys.stderr)
+        raise exc
+
+
+def choose_platform(config: dict) -> str | None:
+    """Select a configured release platform from an interactive menu."""
+    names = list(config["platforms"])
+    if len(names) == 1:
+        return names[0]
+    print("\nChoose a platform:")
+    for index, name in enumerate(names, start=1):
+        print(f"  {index}. {name}")
+    answer = input("Platform number (blank to cancel): ").strip()
+    if not answer:
+        return None
+    if not answer.isdigit() or not 1 <= int(answer) <= len(names):
+        print("Invalid platform.")
+        return None
+    return names[int(answer) - 1]
+
+
+def interactive_menu(config: dict, base: Path) -> None:
+    """Run the zero-argument release menu intended for consumer launchers."""
+    while True:
+        print("\nRelease")
+        print("=======")
+        actions: list[tuple[str, str]] = []
+        html = config["html"]
+        html_entrypoint = resolve(base, html["directory"]) / html.get("entrypoint", "index.html")
+        if html_server_running(config, base):
+            actions.append(("stop", "Stop HTML server"))
+        elif html_entrypoint.is_file():
+            actions.append(("serve", "Serve HTML build"))
+        else:
+            print("HTML build unavailable. Export it from GameMaker before serving.")
+        actions.append(("deploy", "Publish to itch.io"))
+        actions.append(("exit", "Exit"))
+        for index, (_, label) in enumerate(actions, start=1):
+            print(f"  {index}. {label}")
+        answer = input("Choose an option: ").strip()
+        if not answer.isdigit() or not 1 <= int(answer) <= len(actions):
+            print("Invalid option.")
+            continue
+        action = actions[int(answer) - 1][0]
+        if action == "exit":
+            return
+        if action == "serve":
+            serve_html(config, base, None, True)
+        elif action == "stop":
+            stop_html(config, base)
+        elif action == "deploy":
+            platform_name = choose_platform(config)
+            if platform_name:
+                deploy(config, base, platform_name, False, simple_confirm=True)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    for name in ("status", "version", "export", "serve-html", "stop-html", "deploy"):
+    for name in ("menu", "status", "version", "export", "serve-html", "stop-html", "deploy"):
         sub = subparsers.add_parser(name)
-        sub.add_argument("--config", required=True)
+        sub.add_argument("--config", default="itch-config.json")
         if name in ("version", "export", "deploy"):
             sub.add_argument("--platform", required=True)
         if name == "export":
@@ -468,6 +664,8 @@ def main(argv: list[str] | None = None) -> int:
         config, base = load_config(args.config)
         if args.command == "status":
             print(butler_status(config), end="")
+        elif args.command == "menu":
+            interactive_menu(config, base)
         elif args.command == "version":
             generate_version(config, base, args.platform)
         elif args.command == "export":
