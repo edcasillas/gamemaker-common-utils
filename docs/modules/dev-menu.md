@@ -96,13 +96,22 @@ Dynamic root-page example:
 
 ```gml
 function build_root_items() {
-    return [
-        // Opens another page whose id is "gameplay".
-        gmcu_dev_menu_submenu("Gameplay", "gameplay"),
+    // Dynamic pages are useful when the visible rows depend on current state.
+    // This row list changes depending on whether a run is active.
+    if(global.run_in_progress) {
+        return [
+            gmcu_dev_menu_action("Resume run", function() {
+                show_debug_message("Resume");
+            }),
+            gmcu_dev_menu_action("Abort run", function() {
+                show_debug_message("Abort");
+            })
+        ];
+    }
 
-        // Runs a callback immediately when the row is activated.
-        gmcu_dev_menu_action("Reload current room", function() {
-            room_restart();
+    return [
+        gmcu_dev_menu_action("Start run", function() {
+            show_debug_message("Start");
         })
     ];
 }
@@ -113,6 +122,7 @@ gmcu_dev_menu_init({
         // - id: "main"
         // - title: "Dev Menu"
         // - build_items_func: build_root_items
+        // The menu calls build_root_items() to rebuild the visible rows.
         gmcu_dev_menu_dynamic_page("main", "Dev Menu", build_root_items),
 
         // Secondary page opened by the submenu above.
@@ -125,6 +135,15 @@ gmcu_dev_menu_init({
     ]
 });
 ```
+
+In this example the root page is dynamic because it does not always show the
+same rows:
+
+- when `global.run_in_progress` is false, it shows `Start run`
+- when `global.run_in_progress` is true, it shows `Resume run` and `Abort run`
+
+Use a dynamic page when the menu content itself should change with current game
+state. Use a static page when the same rows should always be present.
 
 `gmcu_dev_menu_init` creates the persistent object, or reconfigures and returns
 the existing instance. Outside `DevBuild` it returns `noone`.
