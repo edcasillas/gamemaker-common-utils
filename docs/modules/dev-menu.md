@@ -38,7 +38,12 @@ Initialize the singleton:
 ```gml
 var _config = {
     pages: [
+        // gmcu_dev_menu_page(id, title, items)
+        // "main" is the root page id. Submenus can open this page by id.
+        // "Dev Menu" is the visible page title shown in the header.
         gmcu_dev_menu_page("main", "Dev Menu", [
+            // gmcu_dev_menu_action(label, callback)
+            // This creates one selectable row in the page.
             gmcu_dev_menu_action("Run action", function() {
                 show_debug_message("Action");
             })
@@ -46,6 +51,7 @@ var _config = {
     ]
 };
 
+// Creates the persistent singleton the first time, or reconfigures it later.
 gmcu_dev_menu_init(_config);
 ```
 
@@ -55,7 +61,9 @@ Minimal non-modal example:
 gmcu_dev_menu_init({
     block_game_instances: false,
     pages: [
+        // Root page shown when the menu opens.
         gmcu_dev_menu_page("main", "Dev Menu", [
+            // A single action row that restarts the current room.
             gmcu_dev_menu_action("Restart room", function() {
                 room_restart();
             })
@@ -69,7 +77,10 @@ Dynamic root-page example:
 ```gml
 function build_root_items() {
     return [
+        // Opens another page whose id is "gameplay".
         gmcu_dev_menu_submenu("Gameplay", "gameplay"),
+
+        // Runs a callback immediately when the row is activated.
         gmcu_dev_menu_action("Reload current room", function() {
             room_restart();
         })
@@ -78,8 +89,16 @@ function build_root_items() {
 
 gmcu_dev_menu_init({
     pages: [
+        // Root page:
+        // - id: "main"
+        // - title: "Dev Menu"
+        // - items: [] because this page is dynamic
+        // - get_items: build_root_items
         gmcu_dev_menu_page("main", "Dev Menu", [], build_root_items),
+
+        // Secondary page opened by the submenu above.
         gmcu_dev_menu_page("gameplay", "Gameplay", [
+            // Toggle rows ask for the current value and a setter callback.
             gmcu_dev_menu_toggle("God mode", function() { return global.god_mode; }, function(_value) {
                 global.god_mode = _value;
             })
