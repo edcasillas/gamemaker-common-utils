@@ -91,6 +91,21 @@ function gmcu_dev_menu_dynamic_page(_id, _title, _build_items_func) {
 }
 
 /**
+ * @description Appends an item to the root page, supporting both static and dynamic roots.
+ * @param {Struct} _config Dev Menu config being assembled.
+ * @param {Struct} _item Root-page item to append.
+ */
+function gmcu_dev_menu_add_root_item(_config, _item) {
+	if (array_length(_config.pages) == 0) return;
+
+	var _root_page = _config.pages[0];
+	if (!variable_struct_exists(_root_page, "root_items")) {
+		_root_page.root_items = [];
+	}
+	array_push(_root_page.root_items, _item);
+}
+
+/**
  * @description Returns the default open/close trigger for the Dev Menu singleton.
  * @returns {Bool} True on the Step where F1 was pressed.
  */
@@ -168,7 +183,7 @@ function gmcu_dev_menu_add_rooms(_config, _settings = {}) {
 	}
 
 	array_push(_config.pages, gmcu_dev_menu_static_page("gmcu_rooms", "Rooms", _items));
-	array_push(_config.pages[0].items, gmcu_dev_menu_submenu("Rooms", "gmcu_rooms"));
+	gmcu_dev_menu_add_root_item(_config, gmcu_dev_menu_submenu("Rooms", "gmcu_rooms"));
 	return _config;
 }
 
@@ -185,7 +200,7 @@ function gmcu_dev_menu_add_languages(_config, _settings) {
 	_page.get_current = _settings.get_current;
 	_page.set_language = _settings.set_language;
 	array_push(_config.pages, _page);
-	array_push(_config.pages[0].items, gmcu_dev_menu_submenu("Language", "gmcu_languages"));
+	gmcu_dev_menu_add_root_item(_config, gmcu_dev_menu_submenu("Language", "gmcu_languages"));
 	return _config;
 }
 
@@ -198,6 +213,6 @@ function gmcu_dev_menu_add_logs(_config) {
 	var _page = gmcu_dev_menu_static_page("gmcu_logs", "Logs");
 	_page.type = "logs";
 	array_push(_config.pages, _page);
-	array_push(_config.pages[0].items, gmcu_dev_menu_submenu("Logs", "gmcu_logs"));
+	gmcu_dev_menu_add_root_item(_config, gmcu_dev_menu_submenu("Logs", "gmcu_logs"));
 	return _config;
 }

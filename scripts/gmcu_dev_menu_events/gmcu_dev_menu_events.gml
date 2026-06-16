@@ -1,0 +1,2 @@
+#macro GMCU_EVENT_DEV_MENU_OPENED "GMCU_EVENT_DEV_MENU_OPENED" // Event args unused.
+#macro GMCU_EVENT_DEV_MENU_CLOSED "GMCU_EVENT_DEV_MENU_CLOSED" // Event args unused.

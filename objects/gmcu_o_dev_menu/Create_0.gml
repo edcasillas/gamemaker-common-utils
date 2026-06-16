@@ -22,7 +22,7 @@ universal_cursor_available = false;
 universal_cursor_items = [];
 
 /**
- * @description Applies Dev Menu pages, callbacks, input behavior, and visual theme defaults.
+ * @description Applies Dev Menu pages, trigger behavior, and visual theme defaults.
  * @param {Struct} _config Declarative Dev Menu configuration.
  */
 function configure(_config) {
@@ -51,9 +51,6 @@ function configure(_config) {
 	}
 	if (!variable_struct_exists(config, "trigger_pressed")) {
 		config.trigger_pressed = gmcu_dev_menu_default_trigger;
-	}
-	if (!variable_struct_exists(config, "block_game_instances")) {
-		config.block_game_instances = true;
 	}
 	if (!variable_struct_exists(config, "theme")) config.theme = {};
 	var _theme = config.theme;
@@ -150,6 +147,16 @@ function current_items() {
 			array_push(_items, gmcu_dev_menu_submenu("Universal Cursor", "gmcu_universal_cursor"));
 		}
 	}
+	if (_page.id == pages[0].id && variable_struct_exists(_page, "root_items")) {
+		var _root_items = [];
+		for (var _i = 0; _i < array_length(_items); _i++) {
+			array_push(_root_items, _items[_i]);
+		}
+		_items = _root_items;
+		for (var _j = 0; _j < array_length(_page.root_items); _j++) {
+			array_push(_items, _page.root_items[_j]);
+		}
+	}
 	return _items;
 }
 
@@ -242,7 +249,7 @@ function refresh_universal_cursor_items() {
 }
 
 /**
- * @description Opens the modal Dev Menu and snapshots optional diagnostic modules.
+ * @description Opens the Dev Menu and publishes the opened event.
  */
 function open_menu() {
 	if (is_open || is_undefined(config)) return;
@@ -252,34 +259,24 @@ function open_menu() {
 	page_stack = [pages[0].id];
 	selected_index = 0;
 	scroll_offset = 0;
-	if (config.block_game_instances) {
-		instance_deactivate_all(true);
-		instance_activate_object(gmcu_o_notification_from_top);
-	}
 	try {
-		if (variable_struct_exists(config, "on_open")) config.on_open();
-		if (variable_struct_exists(config, "pause")) config.pause();
+		gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_OPENED);
 	} catch (_exception) {
 		gmcu_log_exception(_exception, "gmcu_o_dev_menu.open_menu");
 	}
 }
 
 /**
- * @description Closes the menu and restores instance activation when configured as modal.
- * @param {Bool} _notify Whether resume/on_close callbacks should run.
+ * @description Closes the menu and publishes the closed event.
+ * @param {Bool} _notify Whether the closed event should be dispatched.
  */
 function close_menu(_notify = true) {
 	if (!is_open) return;
 	is_open = false;
 	page_stack = [];
-	if (config.block_game_instances) { // TODO Do we really need a configuration to block game instances? 
-		instance_activate_all();
-	}
 	if (_notify) {
 		try {
-			// TODO Why do we have 2 different configurations here? resume and on_close? aren't they the same?
-			if (variable_struct_exists(config, "resume")) config.resume();
-			if (variable_struct_exists(config, "on_close")) config.on_close();
+			gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_CLOSED);
 		} catch (_exception) {
 			gmcu_log_exception(_exception, "gmcu_o_dev_menu.close_menu");
 		}

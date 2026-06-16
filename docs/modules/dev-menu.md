@@ -13,8 +13,6 @@ The consumer owns a plain `config` struct. That struct tells the singleton:
 
 - which pages exist
 - how the menu should open
-- whether opening it is modal or non-modal
-- which lifecycle callbacks should run
 - how the theme should look
 
 ### Mental Model
@@ -75,23 +73,6 @@ var _config = {
 gmcu_dev_menu_init(_config);
 ```
 
-Minimal non-modal example:
-
-```gml
-gmcu_dev_menu_init({
-    block_game_instances: false,
-    pages: [
-        // Root page shown when the menu opens.
-        gmcu_dev_menu_static_page("main", "Dev Menu", [
-            // A single action row that restarts the current room.
-            gmcu_dev_menu_action("Restart room", function() {
-                room_restart();
-            })
-        ])
-    ]
-});
-```
-
 Dynamic root-page example:
 
 ```gml
@@ -149,19 +130,14 @@ state. Use a static page when the same rows should always be present.
 the existing instance. Outside `DevBuild` it returns `noone`.
 
 The default trigger is F1. Supply `trigger_pressed` in the config to replace
-it. Optional `pause`, `resume`, `on_open`, and `on_close` callbacks let the
-consumer own simulation policy.
+it.
 
-By default, opening the menu deactivates all other instances and closing it
-reactivates them. This makes the overlay modal and prevents gameplay, UI,
-mouse, keyboard, gamepad, and EventBus consumers from receiving input while it
-is open. Set `block_game_instances: false` only when the consumer implements
-its own complete input and simulation blocking policy.
+Opening and closing the menu dispatch these Event Bus events:
 
-In-game notification instances remain active while the menu is open so
-exceptions caught by menu callbacks can still appear above the overlay.
-Callbacks invoked by the menu are exception-isolated: failures are reported
-through Logging instead of escaping the menu Step event.
+- `GMCU_EVENT_DEV_MENU_OPENED`
+- `GMCU_EVENT_DEV_MENU_CLOSED`
+
+Consumers that care about menu lifecycle should subscribe to those events.
 
 ## API
 
@@ -175,17 +151,6 @@ through Logging instead of escaping the menu Step event.
 - `trigger_pressed`
   Optional callback returning true on the Step where the menu should open or
   close. Default: `gmcu_dev_menu_default_trigger()`, which checks `F1`.
-- `block_game_instances`
-  Optional bool. `true` makes the menu modal by deactivating other instances on
-  open and reactivating them on close. Default: `true`.
-- `pause`
-  Optional callback run after opening the menu.
-- `resume`
-  Optional callback run when the menu closes.
-- `on_open`
-  Optional callback run when the menu opens.
-- `on_close`
-  Optional callback run when the menu closes.
 - `theme`
   Optional struct overriding overlay/panel/text/log colors and font.
 
@@ -215,6 +180,13 @@ through Logging instead of escaping the menu Step event.
 - `gmcu_ui_overlay_blocks_pointer_input()`
   Returns whether overlay UI currently owns gameplay pointer input.
 
+### Lifecycle Events
+
+- `GMCU_EVENT_DEV_MENU_OPENED`
+  Dispatched when the menu finishes opening.
+- `GMCU_EVENT_DEV_MENU_CLOSED`
+  Dispatched when the menu closes.
+
 ### Built-In Page Adapters
 
 - `gmcu_dev_menu_add_rooms(_config, _settings = {})`
@@ -242,9 +214,9 @@ When [`LayeredGUI`](layered-gui.md) is also imported, the root page
 automatically includes `Layered GUI` while its manager exists in the current
 room. The page shows priority, object name, optional diagnostic name, and
 instance id in actual draw order. Its rows use the same clipboard interaction
-as logs. The snapshot is taken before the menu deactivates gameplay instances
-and refreshes each time the menu opens. The integration resolves the optional
-manager by asset name, so Dev Menu does not require LayeredGUI.
+as logs. The snapshot refreshes each time the menu opens. The integration
+resolves the optional manager by asset name, so Dev Menu does not require
+LayeredGUI.
 
 When [`UniversalCursor`](universal-cursor.md) is imported, the root page also
 adds `Universal Cursor` while its singleton exists. The page lists object name,
@@ -277,6 +249,8 @@ The flow is:
 4. When that callback returns true:
    - if the menu is closed, it calls `open_menu()`
    - if the menu is open, it calls `close_menu()`
+5. `open_menu()` dispatches `GMCU_EVENT_DEV_MENU_OPENED`.
+6. `close_menu()` dispatches `GMCU_EVENT_DEV_MENU_CLOSED`.
 
 That same `Step` event also handles menu navigation while `is_open` is true:
 
