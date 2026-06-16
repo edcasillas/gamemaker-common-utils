@@ -32,7 +32,8 @@ left analog stick moves it freely. Left click, Enter, and the first gamepad
 face button call the same press and release callbacks.
 
 The system cursor is hidden while the universal cursor is shown. Its sprite is
-drawn through [`LayeredGUI`](layered-gui.md) at priority `-1000`.
+drawn through [`LayeredGUI`](layered-gui.md) at
+`GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR`.
 
 ## Basic Setup
 
@@ -108,10 +109,10 @@ subscriber as:
 hover marker | object name | diagnostic name | instance id
 ```
 
-`*` marks the subscriber that was hovered when the menu opened. The snapshot
-is taken before the modal menu deactivates gameplay instances. Select a row and
-press Enter, the gamepad confirmation button, or click it to copy the complete
-row to the clipboard. No consumer configuration is required.
+`*` marks the subscriber that was hovered when the menu opened. The snapshot is
+taken from live instances each time the menu opens. Select a row and press
+Enter, the gamepad confirmation button, or click it to copy the complete row
+to the clipboard. No consumer configuration is required.
 
 ## Position And Hit Testing
 

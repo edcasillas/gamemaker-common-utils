@@ -81,7 +81,7 @@ function navigate(_direction) {
     }
 }
 	
-gmcu_layered_gui_subscribe(-1000);
+gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR);
 function on_draw_gui() {
 	draw_sprite(sprite_index, 0, gui_x, gui_y);
 }

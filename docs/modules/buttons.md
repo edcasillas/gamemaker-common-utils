@@ -33,8 +33,8 @@ Create a project-owned child of:
 
 - `gmcu_o_base_button_gui` for menus, HUD controls, and other Draw GUI
   interfaces. It subscribes to [`UniversalCursor`](universal-cursor.md) and
-  [`LayeredGUI`](layered-gui.md), draws at GUI priority `0`, and passes
-  `button_id` to both diagnostic pages.
+  [`LayeredGUI`](layered-gui.md), draws at
+  `GMCU_GUI_PRIORITY_DEFAULT`, and passes `button_id` to both diagnostic pages.
 - `gmcu_o_base_button_game` for controls drawn in the normal Draw event. It
   subscribes to [`UniversalCursor`](universal-cursor.md) and draws normally,
   but does not use LayeredGUI.

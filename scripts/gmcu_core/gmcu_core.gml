@@ -12,6 +12,13 @@
 #macro GMCU_LAYER_DEPTH_MIN -16000
 #macro GMCU_LAYER_DEPTH_MAX 16000
 
+// Common GUI draw priorities for LayeredGUI.
+// Larger values draw earlier; lower values draw later and appear on top.
+#macro GMCU_GUI_PRIORITY_DEFAULT 0
+#macro GMCU_GUI_PRIORITY_LEADERBOARD_OVERLAY -900
+#macro GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR -1000
+#macro GMCU_GUI_PRIORITY_DEV_MENU -2000
+
 #macro GMCU_ANY_INPUT (keyboard_check_released(vk_anykey) || mouse_check_button_released(mb_left))
 #macro GMCU_INT_MAX 2147483648
 

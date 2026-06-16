@@ -46,6 +46,8 @@ whether to open, close, or keep navigating the current page.
 - [`Drawing`](drawing.md): Protects overlay draw state.
 - [`Logging`](logging.md): Reports callback failures and supplies log history.
 - [`InputHub`](input-hub.md): Supplies keyboard/gamepad navigation.
+- [`LayeredGUI`](layered-gui.md): Owns final overlay draw order when present,
+  so the Dev Menu renders above gameplay GUI.
 - Optional [`LayeredGUI`](layered-gui.md): Supplies subscriber diagnostics when
   its manager exists in the current room.
 - Optional [`UniversalCursor`](universal-cursor.md): Supplies interactable and
@@ -180,6 +182,13 @@ Consumers that care about menu lifecycle should subscribe to those events.
 - `gmcu_ui_overlay_blocks_pointer_input()`
   Returns whether overlay UI currently owns gameplay pointer input.
 
+### GUI Ordering
+
+When [`LayeredGUI`](layered-gui.md) is available, the Dev Menu subscribes at
+`GMCU_GUI_PRIORITY_DEV_MENU`, which places it above the common gameplay GUI
+layers defined in [`Core`](core.md). If LayeredGUI is not present, the menu
+falls back to its own `Draw GUI` event.
+
 ### Lifecycle Events
 
 - `GMCU_EVENT_DEV_MENU_OPENED`
@@ -215,14 +224,15 @@ automatically includes `Layered GUI` while its manager exists in the current
 room. The page shows priority, object name, optional diagnostic name, and
 instance id in actual draw order. Its rows use the same clipboard interaction
 as logs. The snapshot refreshes each time the menu opens. The integration
-resolves the optional manager by asset name, so Dev Menu does not require
-LayeredGUI.
+resolves the optional manager by asset name, so Dev Menu does not require the
+diagnostic page dependency even though it uses LayeredGUI for draw ordering.
 
 When [`UniversalCursor`](universal-cursor.md) is imported, the root page also
 adds `Universal Cursor` while its singleton exists. The page lists object name,
 optional diagnostic name, instance id, and the subscriber that was hovered
-when the menu opened. Its rows are copyable. The optional cursor is resolved
-by asset name, so Dev Menu does not require UniversalCursor.
+when the menu opened. Its rows are copyable. The snapshot is taken from live
+instances because the Dev Menu is non-modal. The optional cursor is resolved by
+asset name, so Dev Menu does not require UniversalCursor.
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.

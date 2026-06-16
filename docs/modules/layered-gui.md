@@ -10,7 +10,7 @@ Subscribe in Create, define `on_draw_gui`, and unsubscribe in Clean Up:
 
 ```gml
 // Create
-gmcu_layered_gui_subscribe(0, "play_button");
+gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, "play_button");
 
 function on_draw_gui() {
 	draw_self();
@@ -24,6 +24,14 @@ Every subscriber must define `on_draw_gui` as a function on the instance.
 Larger priority values draw earlier, so lower values appear later and can draw
 over higher-priority subscribers. Subscribers with equal priorities keep their
 subscription order.
+
+Use the shared GUI priority constants from [`Core`](core.md) instead of raw
+numbers when a known layer already exists:
+
+- `GMCU_GUI_PRIORITY_DEFAULT`
+- `GMCU_GUI_PRIORITY_LEADERBOARD_OVERLAY`
+- `GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR`
+- `GMCU_GUI_PRIORITY_DEV_MENU`
 
 The optional second argument is a human-readable diagnostic name. GameMaker
 does not expose Room Editor instance names from a runtime instance id, so pass
@@ -50,11 +58,10 @@ in their actual draw order as:
 priority | object name | diagnostic name | instance id
 ```
 
-The list is captured immediately before the modal menu deactivates gameplay
-instances and refreshes each time the menu opens. Invalid references are shown
-without interrupting the menu. Select a row and press Enter, the gamepad
-confirmation button, or click it to copy the complete row to the clipboard. No
-consumer configuration is required.
+The list is captured from the live subscriber set each time the menu opens.
+Invalid references are shown without interrupting the menu. Select a row and
+press Enter, the gamepad confirmation button, or click it to copy the complete
+row to the clipboard. No consumer configuration is required.
 
 ## Resources
 
@@ -96,8 +103,9 @@ function on_draw_gui() {
 
 ## Contributing
 
-Use project-level conventions for priority ranges and preserve the descending
-ordering contract when changing the manager.
+Use shared GUI priority constants for known layers and preserve the descending
+ordering contract when changing the manager. Add a new shared constant before
+introducing another widely reused priority.
 
 For editable submodule use, keep the consumer `.yyp` paths local and symlink
 the local resource folders to `vendor/gamemaker-common-utils`.
