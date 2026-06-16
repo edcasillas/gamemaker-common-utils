@@ -1,3 +1,5 @@
+// TODO All of these functions need documentation. Besides the descriptions of the parameters and return values, we also need better examples of how to use them in practice. For example, the config object that is used to configure the Dev Menu instance needs a description of its fields and what they do, as well as an example of how to create one.
+
 function gmcu_dev_menu_action(_label, _action, _enabled = undefined) {
 	return {
 		type: "action",

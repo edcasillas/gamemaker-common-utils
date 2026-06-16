@@ -3,9 +3,10 @@ if (instance_number(object_index) > 1) {
 	return;
 }
 
+// TODO Need comments besides all of the following:
 persistent = true;
 is_open = false;
-config = undefined;
+config = undefined; // TODO Besides the description of the config object itself, we need a description of the fields it needs. The documentation lacks better examples.
 pages = [];
 page_stack = [];
 selected_index = 0;
@@ -262,11 +263,12 @@ function close_menu(_notify = true) {
 	if (!is_open) return;
 	is_open = false;
 	page_stack = [];
-	if (config.block_game_instances) {
+	if (config.block_game_instances) { // TODO Do we really need a configuration to block game instances? 
 		instance_activate_all();
 	}
 	if (_notify) {
 		try {
+			// TODO Why do we have 2 different configurations here? resume and on_close? aren't they the same?
 			if (variable_struct_exists(config, "resume")) config.resume();
 			if (variable_struct_exists(config, "on_close")) config.on_close();
 		} catch (_exception) {
