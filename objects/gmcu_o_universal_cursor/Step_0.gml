@@ -58,6 +58,10 @@ for (var _i = 0; _i < ds_list_size(interactables); _i++) {
         ds_list_add(_invalid_indices, _i); // Mark index for removal
         continue;
     }
+
+	if (variable_instance_exists(_interactable, "is_interactable") && !_interactable.is_interactable) {
+		continue;
+	}
 	
 	// Define interactable boundaries based on its GUI position and dimensions
 	var _interactable_x = _interactable.x - (_interactable.sprite_width / 2);

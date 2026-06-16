@@ -51,6 +51,12 @@ function navigate(_direction) {
 	// Loop through all interactables to find the best one based on direction
     for (var _i = 0; _i < ds_list_size(interactables); _i++) {
         var _interactable = interactables[| _i].instance;
+		if (_interactable == noone || !instance_exists(_interactable)) {
+			continue;
+		}
+		if (variable_instance_exists(_interactable, "is_interactable") && !_interactable.is_interactable) {
+			continue;
+		}
         
         if (_interactable != hovered_interactable) { // Ignore currently hovered interactable
             var _dx = _interactable.x - gui_x;
@@ -64,11 +70,17 @@ function navigate(_direction) {
                 case GMCU_DIRECTION_ANGLE.RIGHT: if (_dx > 0 && abs(_dx) > abs(_dy) && abs(_dx) < _min_dist) { _min_dist = abs(_dx); _best_interactable = _interactable; } break;
             }
         }
-    }
+	}
 	
 	// If no interactable was found in the specified direction, default to the first interactable if none is selected
 	if(_best_interactable == noone && hovered_interactable == noone && ds_list_size(interactables) > 0) {
-		_best_interactable = interactables[| 0].instance;
+		for (var _j = 0; _j < ds_list_size(interactables); _j++) {
+			var _fallback = interactables[| _j].instance;
+			if (_fallback == noone || !instance_exists(_fallback)) continue;
+			if (variable_instance_exists(_fallback, "is_interactable") && !_fallback.is_interactable) continue;
+			_best_interactable = _fallback;
+			break;
+		}
 	}
     
 	// Update cursor position to the selected interactable's position

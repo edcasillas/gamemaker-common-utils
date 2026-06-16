@@ -141,10 +141,9 @@ Do not use the default implementation unchanged when:
 - Navigation needs explicit neighbors, wrapping, disabled-item filtering, or
   overlapping-control precedence.
 
-The cursor does not inspect a variable such as `is_interactable`. Subscribers
-own that policy inside their callbacks, or must unsubscribe while disabled.
-Common Utils buttons keep their callbacks registered and ignore interaction
-when their `is_interactable` property is false.
+The cursor ignores subscribers whose `is_interactable` property exists and is
+`false`. That keeps disabled gameplay buttons out of hover, navigation, and
+activation without forcing them to unsubscribe.
 
 ## Lifecycle
 
