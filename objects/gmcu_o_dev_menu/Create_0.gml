@@ -3,20 +3,19 @@ if (instance_number(object_index) > 1) {
 	return;
 }
 
-// TODO Need comments besides all of the following:
 persistent = true;
 is_open = false;
-config = undefined; // TODO Besides the description of the config object itself, we need a description of the fields it needs. The documentation lacks better examples.
+config = undefined; // Consumer-owned configuration passed through gmcu_dev_menu_init.
 pages = [];
-page_stack = [];
-selected_index = 0;
-scroll_offset = 0;
+page_stack = []; // Page id stack; root page lives at index 0.
+selected_index = 0; // Index inside the current visible items array.
+scroll_offset = 0; // First visible row index for long pages.
 row_height = 28;
 header_height = 54;
 panel_margin = 24;
 last_mouse_x = -1;
 last_mouse_y = -1;
-mouse_active = false;
+mouse_active = false; // True after the mouse moves; false after d-pad/keyboard navigation.
 layered_gui_available = false;
 layered_gui_items = [];
 universal_cursor_available = false;
@@ -79,6 +78,10 @@ function get_page(_id) {
 	return undefined;
 }
 
+/**
+ * @description Returns the page currently being shown by the menu stack.
+ * @returns {Struct|Undefined}
+ */
 function current_page() {
 	if (array_length(page_stack) == 0) return pages[0];
 	return get_page(page_stack[array_length(page_stack) - 1]);
@@ -259,6 +262,10 @@ function open_menu() {
 	}
 }
 
+/**
+ * @description Closes the menu and restores instance activation when configured as modal.
+ * @param {Bool} _notify Whether resume/on_close callbacks should run.
+ */
 function close_menu(_notify = true) {
 	if (!is_open) return;
 	is_open = false;
@@ -277,6 +284,10 @@ function close_menu(_notify = true) {
 	}
 }
 
+/**
+ * @description Pushes a page id onto the navigation stack.
+ * @param {String} _page_id Page to open.
+ */
 function push_page(_page_id) {
 	if (is_undefined(get_page(_page_id))) return;
 	array_push(page_stack, _page_id);
@@ -284,6 +295,9 @@ function push_page(_page_id) {
 	scroll_offset = 0;
 }
 
+/**
+ * @description Returns to the previous page, or closes the menu from the root page.
+ */
 function go_back() {
 	if (array_length(page_stack) <= 1) {
 		close_menu();
@@ -294,11 +308,20 @@ function go_back() {
 	scroll_offset = 0;
 }
 
+/**
+ * @description Returns whether an item is currently interactive.
+ * @param {Struct} _item Visible menu item.
+ * @returns {Bool}
+ */
 function item_enabled(_item) {
 	if (!variable_struct_exists(_item, "enabled") || is_undefined(_item.enabled)) return true;
 	return _item.enabled();
 }
 
+/**
+ * @description Activates the selected item, using direction for value rows.
+ * @param {Real} _direction -1 for left, 1 for right/default activation.
+ */
 function activate_item(_direction = 1) {
 	var _items = current_items();
 	if (selected_index < 0 || selected_index >= array_length(_items)) return;
@@ -355,6 +378,10 @@ function activate_item(_direction = 1) {
 	}
 }
 
+/**
+ * @description Moves selection by a signed row delta with wraparound.
+ * @param {Real} _delta Signed row delta.
+ */
 function move_selection(_delta) {
 	var _items = current_items();
 	var _count = array_length(_items);

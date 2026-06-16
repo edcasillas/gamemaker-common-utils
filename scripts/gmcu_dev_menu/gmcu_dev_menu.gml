@@ -1,5 +1,10 @@
-// TODO All of these functions need documentation. Besides the descriptions of the parameters and return values, we also need better examples of how to use them in practice. For example, the config object that is used to configure the Dev Menu instance needs a description of its fields and what they do, as well as an example of how to create one.
-
+/**
+ * @description Creates a clickable/selectable row that runs a callback when activated.
+ * @param {String} _label Visible row label.
+ * @param {Function} _action Callback executed on activation.
+ * @param {Function|Undefined} _enabled Optional predicate; false disables the row.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_action(_label, _action, _enabled = undefined) {
 	return {
 		type: "action",
@@ -9,6 +14,12 @@ function gmcu_dev_menu_action(_label, _action, _enabled = undefined) {
 	};
 }
 
+/**
+ * @description Creates a row that opens another Dev Menu page.
+ * @param {String} _label Visible row label.
+ * @param {String} _page_id Target page id.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_submenu(_label, _page_id) {
 	return {
 		type: "submenu",
@@ -17,6 +28,13 @@ function gmcu_dev_menu_submenu(_label, _page_id) {
 	};
 }
 
+/**
+ * @description Creates a boolean row that toggles through getter/setter callbacks.
+ * @param {String} _label Visible row label.
+ * @param {Function} _get_value Returns the current boolean value.
+ * @param {Function} _set_value Receives the next boolean value.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_toggle(_label, _get_value, _set_value) {
 	return {
 		type: "toggle",
@@ -26,6 +44,13 @@ function gmcu_dev_menu_toggle(_label, _get_value, _set_value) {
 	};
 }
 
+/**
+ * @description Creates a value row that changes with left/right input.
+ * @param {String} _label Visible row label.
+ * @param {Function} _get_value Returns the current visible value.
+ * @param {Function} _change_value Receives -1 or 1 from left/right activation.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_value(_label, _get_value, _change_value) {
 	return {
 		type: "value",
@@ -35,6 +60,14 @@ function gmcu_dev_menu_value(_label, _get_value, _change_value) {
 	};
 }
 
+/**
+ * @description Creates a Dev Menu page definition.
+ * @param {String} _id Stable page id used by submenus.
+ * @param {String} _title Page header text.
+ * @param {Array<Struct>} _items Static page items.
+ * @param {Function|Undefined} _get_items Optional dynamic item provider.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_page(_id, _title, _items = [], _get_items = undefined) {
 	return {
 		id: _id,
@@ -44,9 +77,11 @@ function gmcu_dev_menu_page(_id, _title, _items = [], _get_items = undefined) {
 	};
 }
 
-function gmcu_dev_menu_default_trigger() {
-	return keyboard_check_pressed(vk_f1);
-}
+/**
+ * @description Returns the default open/close trigger for the Dev Menu singleton.
+ * @returns {Bool} True on the Step where F1 was pressed.
+ */
+function gmcu_dev_menu_default_trigger() { return keyboard_check_pressed(vk_f1); }
 
 /**
  * @description Returns whether the shared Dev Menu instance is currently open.
@@ -65,6 +100,11 @@ function gmcu_ui_overlay_blocks_pointer_input() {
 	return gmcu_dev_menu_is_open();
 }
 
+/**
+ * @description Creates or reconfigures the persistent Dev Menu singleton.
+ * @param {Struct} _config Consumer-owned Dev Menu configuration.
+ * @returns {gmcu_o_dev_menu|Real} The singleton instance, or noone outside DevBuild.
+ */
 function gmcu_dev_menu_init(_config) {
 	if (!GMCU_IS_DEV_BUILD) return noone;
 
@@ -76,6 +116,12 @@ function gmcu_dev_menu_init(_config) {
 	return _instance;
 }
 
+/**
+ * @description Adds a generated room-navigation page and root submenu entry.
+ * @param {Struct} _config Dev Menu config being assembled.
+ * @param {Struct} _settings Optional room adapter callbacks and filters.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_add_rooms(_config, _settings = {}) {
 	var _filter = variable_struct_exists(_settings, "filter")
 		? _settings.filter
@@ -113,6 +159,12 @@ function gmcu_dev_menu_add_rooms(_config, _settings = {}) {
 	return _config;
 }
 
+/**
+ * @description Adds a generated language-selection page and root submenu entry.
+ * @param {Struct} _config Dev Menu config being assembled.
+ * @param {Struct} _settings Language provider callbacks.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_add_languages(_config, _settings) {
 	var _page = gmcu_dev_menu_page("gmcu_languages", "Language");
 	_page.type = "languages";
@@ -124,6 +176,11 @@ function gmcu_dev_menu_add_languages(_config, _settings) {
 	return _config;
 }
 
+/**
+ * @description Adds the built-in log viewer page and root submenu entry.
+ * @param {Struct} _config Dev Menu config being assembled.
+ * @returns {Struct}
+ */
 function gmcu_dev_menu_add_logs(_config) {
 	var _page = gmcu_dev_menu_page("gmcu_logs", "Logs");
 	_page.type = "logs";
