@@ -56,8 +56,3 @@ flowchart LR
 
 In `DevBuild`, `gmcu_log_error` and `gmcu_log_exception` may use this module
 without making Logging depend directly on it.
-
-## Contributing
-
-Keep the three resource paths local under their `gmcu_` names and symlink their
-folders to Common Utils.

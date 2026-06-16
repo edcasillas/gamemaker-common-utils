@@ -72,12 +72,3 @@ flowchart LR
 | `gmcu_set_notification_handler(_handler)` | Function | Registers or clears the optional visual notification handler used by [`Logging`](logging.md). |
 | `global.gmcu_notifications_enabled` | Global | Whether a notification handler is currently registered. |
 | `global.gmcu_notification_handler` | Global | Registered notification callback, or `undefined` when disabled. |
-
-## Contributing
-
-For editable submodule use, keep this consumer `.yyp` path local:
-
-- `scripts/gmcu_core/gmcu_core.yy`
-
-Then symlink `scripts/gmcu_core` to the matching folder under
-`vendor/gamemaker-common-utils`.

@@ -230,6 +230,3 @@ function on_released() {}
 
 Cursor sprites, menu actions, disabled-state policy, sounds, visual feedback,
 and room transition policy remain in the consuming project.
-
-For editable submodule use, keep the consumer `.yyp` paths local and symlink
-the local resource folders to `vendor/gamemaker-common-utils`.

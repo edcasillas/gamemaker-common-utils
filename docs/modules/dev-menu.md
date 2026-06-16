@@ -293,8 +293,3 @@ calling `room_goto`.
 Rooms intended for direct IDE testing should also bootstrap their required
 state independently rather than assuming they were entered through normal
 progression.
-
-## Contributing
-
-Keep `scripts/gmcu_dev_menu` and `objects/gmcu_o_dev_menu` as local consumer
-paths and symlink their folders to Common Utils.

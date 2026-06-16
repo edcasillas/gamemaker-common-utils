@@ -56,8 +56,3 @@ objects whose singleton behavior is part of their identity.
 
 If an object should not be persistent, or if duplicate handling needs different
 policy, do not force that behavior through this helper.
-
-## Contributing
-
-Keep `scripts/gmcu_singleton/gmcu_singleton.yy` as the local consumer path and
-symlink its folder to Common Utils.

@@ -40,8 +40,3 @@ flowchart LR
 | --- | --- | --- |
 | `new gmcu_DrawingParameters()` | Constructor | Captures the current font, color, horizontal alignment, vertical alignment, and alpha. |
 | `gmcu_DrawingParameters.apply()` | Method | Restores the captured draw state. |
-
-## Contributing
-
-Keep `scripts/gmcu_drawing_parameters/gmcu_drawing_parameters.yy` as the local
-consumer path and symlink its folder to Common Utils.

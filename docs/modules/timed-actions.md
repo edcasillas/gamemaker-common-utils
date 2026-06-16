@@ -53,10 +53,5 @@ The first scheduled action creates `gmcu_o_timed_actions_manager`. The manager
 is persistent, rejects duplicate instances, catches callback exceptions, and
 removes completed actions. Step-scheduled callbacks emit
 `Executing scheduled action` through Logging immediately before execution.
-
-## Contributing
-
 Callbacks run from the manager's Step event. A callback scheduled for zero or a
 negative delay runs on the next manager Step.
-
-Keep the listed resource paths local and symlink their folders to Common Utils.

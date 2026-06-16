@@ -100,6 +100,10 @@ Each module page documents its resources, dependencies, API, usage, and
 consumer ownership boundaries. The implementation and migration checklist lives in
 [`docs/implementation-plan.md`](docs/implementation-plan.md).
 
+Module pages should stay concise. Do not add repeated boilerplate sections when
+the root README already owns the shared workflow, editable-submodule pattern,
+or generic contribution rules.
+
 ## Add As A Submodule
 
 From the consuming GameMaker project:
@@ -165,6 +169,10 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Open the project in GameMaker and run a smoke test.
 - Report whether only source/docs changed or whether GameMaker reserialized
   `.yy`/`.yyp` files.
+
+Generic editable-submodule guidance belongs here in the root README. Repeat it
+inside a module page only when that module has a real exception or a module-
+specific maintenance rule.
 
 ## Current Limits
 

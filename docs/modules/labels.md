@@ -60,8 +60,3 @@ Set `translate` to use `gmcu_localization_t(text)`. The resolved string is
 stored in `actual_text` and used for drawing.
 
 Fonts, colors, text keys, positions, and GUI priorities remain consumer-owned.
-
-## Contributing
-
-Keep the listed resource paths local in the consumer and symlink their folders
-to Common Utils.

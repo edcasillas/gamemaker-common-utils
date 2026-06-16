@@ -64,8 +64,3 @@ flowchart LR
 
 [`InGameNotifications`](in-game-notifications.md) can register the optional
 visual handler. Logging does not depend directly on analytics SDKs or HTML5.
-
-## Contributing
-
-Keep each `scripts/gmcu_log_*` resource path local in the consumer and symlink
-the corresponding folders to Common Utils.

@@ -67,17 +67,6 @@ uses `os_get_language()`. If lookup occurs before explicit initialization,
 file, language column, or key is missing, lookups fall back to the original key
 string.
 
-## Contributing
-
 Keep localization content in the consumer project, usually as an included file
 such as `datafiles/localization.csv`. Do not move credentials, build output, or
 project-specific translation content into Common Utils.
-
-For editable submodule use, keep the consumer `.yyp` paths local:
-
-- `scripts/gmcu_localization_init/gmcu_localization_init.yy`
-- `scripts/gmcu_localization_macros/gmcu_localization_macros.yy`
-- `scripts/gmcu_localization_t/gmcu_localization_t.yy`
-
-Then symlink those local folders to the matching folders under
-`vendor/gamemaker-common-utils`.

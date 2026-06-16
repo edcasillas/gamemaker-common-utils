@@ -314,6 +314,3 @@ adding configuration for hypothetical variants.
 
 Sprites, fonts, sounds, button ids, localized strings, child objects, menu
 layout, cursor sprite, and controller actions remain in the consuming project.
-
-For editable submodule use, keep the consumer `.yyp` paths local and symlink
-the local resource folders to `vendor/gamemaker-common-utils`.

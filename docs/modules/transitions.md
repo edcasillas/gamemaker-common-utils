@@ -100,7 +100,3 @@ properties. When complete, it dispatches `GMCU_EVENT_TRANSITION_FINISHED` with
 Audio fades, `audio_stop_all()`, music restoration, analytics, and other
 project-specific side effects do not belong to this module. Supply them through
 the optional callbacks.
-
-## Contributing
-
-Keep the listed resource paths local and symlink their folders to Common Utils.

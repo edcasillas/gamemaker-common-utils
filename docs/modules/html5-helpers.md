@@ -58,11 +58,9 @@ an HTML5 `PostBody` injection of `datafiles/disable-mobile.js`. That script
 wraps the existing `window.onload`, lets GameMaker initialize for analytics,
 then immediately replaces the mobile view with the original warning layout.
 
-## Contributing
+These functions are HTML5 extension functions. Guard calls that can execute on
+other targets with `os_browser != browser_not_a_browser`.
 
 Consumers that import the included `disable-mobile.js` opt into its fixed
 mobile-blocking policy and message. Analytics and game-state changes remain
 consumer-owned.
-
-These functions are HTML5 extension functions. Guard calls that can execute on
-other targets with `os_browser != browser_not_a_browser`.

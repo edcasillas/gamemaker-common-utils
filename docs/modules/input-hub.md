@@ -85,14 +85,3 @@ flowchart LR
 | `gmcu_o_input_hub.gmcu_gamepad_button_pressed(_button)` | Method | Returns whether the requested `gp_*` button was pressed on gamepad slot `0` this Step. |
 | `gmcu_o_input_hub.gmcu_gamepad_button_released(_button)` | Method | Returns whether the requested `gp_*` button was released on gamepad slot `0` this Step. |
 | `global.gmcu_gamepad_buttons_mapping` | Global | Readable names for `gp_*` constants used by debug output. |
-
-## Contributing
-
-For editable submodule use, keep the consumer `.yyp` paths local:
-
-- `objects/gmcu_o_input_hub/gmcu_o_input_hub.yy`
-- `scripts/gmcu_input_hub_events/gmcu_input_hub_events.yy`
-- `scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy`
-
-Then symlink those local folders to the matching folders under
-`vendor/gamemaker-common-utils`.

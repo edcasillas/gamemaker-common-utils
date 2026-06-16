@@ -135,7 +135,5 @@ text. Consumer-specific author and date values are supplied at initialization.
 | `gmcu_build_info_get_version()` | Function | Returns the current build version string. |
 | `gmcu_o_build_info_label` | Object | Optional bottom-right build label. |
 
-## Contributing
-
 Consumer repositories retain build paths, export artifacts, itch.io
 destinations, version state, credentials, and presentation values.

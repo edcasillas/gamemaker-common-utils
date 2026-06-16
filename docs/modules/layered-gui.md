@@ -111,11 +111,6 @@ function on_draw_gui() {
 
 `on_draw_gui` takes no parameters and returns no value.
 
-## Contributing
-
 Use shared GUI priority constants for known layers and preserve the descending
 ordering contract when changing the manager. Add a new shared constant before
 introducing another widely reused priority.
-
-For editable submodule use, keep the consumer `.yyp` paths local and symlink
-the local resource folders to `vendor/gamemaker-common-utils`.

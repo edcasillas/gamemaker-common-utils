@@ -59,8 +59,3 @@ flowchart LR
 | `global.gmcu_eventbus_observers_map` | Global | Internal observer registry. |
 
 Event names are owned by the module or consumer that defines their meaning.
-
-## Contributing
-
-Keep `scripts/gmcu_event_bus/gmcu_event_bus.yy` as the local consumer path and
-symlink its folder to Common Utils.
