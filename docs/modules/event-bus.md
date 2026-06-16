@@ -41,6 +41,14 @@ gmcu_eventbus_dispatch(EVENT_PAUSE_CHANGED, true);
 | [`Core`](core.md) | Supplies safe object-name diagnostics. |
 | [`Logging`](logging.md) | Reports subscriptions, dispatches, stale observers, missing callbacks, and callback exceptions. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Logging --> EventBus[EventBus]
+```
+
 ## API
 
 | Item | Kind | Description |

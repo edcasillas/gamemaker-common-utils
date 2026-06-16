@@ -38,6 +38,13 @@ gmcu_log_set_output_handler(function(_severity, _message) {
 | --- | --- |
 | [`Core`](core.md) | Supplies build configuration, context names, and the optional notification-handler registry. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+```
+
 ## API
 
 | Item | Kind | Description |

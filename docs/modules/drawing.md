@@ -27,6 +27,13 @@ _draw_state.apply();
 | --- | --- |
 | [`Core`](core.md) | Base dependency required by the draw-state helper. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Drawing[Drawing]
+```
+
 ## API
 
 | Item | Kind | Description |

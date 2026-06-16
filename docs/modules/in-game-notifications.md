@@ -36,6 +36,15 @@ Importing the module registers its handler through
 | [`Core`](core.md) | Supplies timing, depth, build policy, and handler state. |
 | [`Drawing`](drawing.md) | Restores draw state after rendering. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Drawing[Drawing]
+    Core --> Notifications[InGameNotifications]
+    Drawing --> Notifications
+```
+
 ## API
 
 | Item | Kind | Description |

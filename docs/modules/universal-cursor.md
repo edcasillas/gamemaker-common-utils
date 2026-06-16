@@ -185,6 +185,25 @@ changing between cursor-driven UI and gameplay.
 | [`Logging`](logging.md) | Reports duplicate managers, invalid subscribers, and callback failures. |
 | [`Core`](core.md) | Supplies direction constants and shared limits. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Core --> EventBus[EventBus]
+    Core --> Drawing[Drawing]
+    Core --> Notifications[InGameNotifications]
+    Drawing --> Notifications
+    Logging --> InputHub[InputHub]
+    EventBus --> InputHub
+    Notifications --> InputHub
+    Drawing --> LayeredGUI[LayeredGUI]
+    Logging --> LayeredGUI
+    InputHub --> UniversalCursor[UniversalCursor]
+    LayeredGUI --> UniversalCursor
+    Logging --> UniversalCursor
+```
+
 ## API
 
 | Item | Kind | Description |

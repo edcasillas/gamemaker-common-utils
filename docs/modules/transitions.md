@@ -44,6 +44,21 @@ gmcu_transition_to_room(
 | [`Logging`](logging.md) | Reports invalid transition configuration. |
 | [`EventBus`](event-bus.md) | Dispatches opening-curtain completion. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Drawing[Drawing]
+    Core --> Logging[Logging]
+    Core --> EventBus[EventBus]
+    Drawing --> LayeredGUI[LayeredGUI]
+    Logging --> LayeredGUI
+    Drawing --> Transitions[Transitions]
+    Logging --> Transitions
+    EventBus --> Transitions
+    LayeredGUI -. optional .-> Transitions
+```
+
 ## API
 
 | Item | Kind | Description |

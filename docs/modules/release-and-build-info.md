@@ -78,6 +78,15 @@ Butler installation. A consumer may override this with `tools.butler`.
 | `gm-cli` | Used by the export workflow when the chosen platform supports it. |
 | `butler` | Used by `status` and `deploy`. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> ReleaseBuild[Release and Build Info]
+    GmCli[gm-cli] -. CLI only .-> ReleaseBuild
+    Butler[butler] -. CLI only .-> ReleaseBuild
+```
+
 ## Consumer Configuration
 
 The normal consumer file is intentionally small:

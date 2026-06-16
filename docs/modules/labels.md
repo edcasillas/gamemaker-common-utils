@@ -33,6 +33,20 @@ translate = true;
 | [`Drawing`](drawing.md) | Protects draw state. |
 | [`Core`](core.md) | Base dependency used by the shared resources above. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Localization[Localization]
+    Core --> Drawing[Drawing]
+    Core --> Logging[Logging]
+    Drawing --> LayeredGUI[LayeredGUI]
+    Logging --> LayeredGUI
+    Localization --> Labels[Labels]
+    Drawing --> Labels
+    LayeredGUI --> Labels
+```
+
 ## API
 
 | Item | Kind | Description |

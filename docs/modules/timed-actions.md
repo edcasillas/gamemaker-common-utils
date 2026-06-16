@@ -33,6 +33,15 @@ gmcu_wait_for_steps(30, function() {
 | [`Core`](core.md) | Supplies delta-time and singleton support. |
 | [`Logging`](logging.md) | Reports execution and callback failures. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Core --> TimedActions[TimedActions]
+    Logging --> TimedActions
+```
+
 ## API
 
 | Item | Kind | Description |

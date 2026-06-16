@@ -83,6 +83,16 @@ row to the clipboard. No consumer configuration is required.
 | [`Logging`](logging.md) | Reports invalid subscribers. |
 | [`Core`](core.md) | Indirect dependency through Drawing and Logging. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Drawing[Drawing]
+    Core --> Logging[Logging]
+    Drawing --> LayeredGUI[LayeredGUI]
+    Logging --> LayeredGUI
+```
+
 ## API
 
 | Item | Kind | Description |

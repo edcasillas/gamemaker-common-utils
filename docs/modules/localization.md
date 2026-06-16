@@ -29,6 +29,15 @@ play_label = gmcu_localization_t("PLAY");
 | [`Logging`](logging.md) | Reports CSV, language, and lookup diagnostics. |
 | [`Core`](core.md) | Base dependency used directly and through Logging. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Core --> Localization[Localization]
+    Logging --> Localization
+```
+
 ## API
 
 | Item | Kind | Description |

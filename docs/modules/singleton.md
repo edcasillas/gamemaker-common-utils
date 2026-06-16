@@ -35,6 +35,14 @@ queue = ds_list_create();
 | [`Core`](core.md) | Supplies safe object-name diagnostics. |
 | [`Logging`](logging.md) | Reports duplicate singleton instances through `gmcu_log_warn`. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Logging --> Singleton[Singleton]
+```
+
 ## API
 
 | Item | Kind | Description |

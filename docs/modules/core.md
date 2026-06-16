@@ -40,6 +40,13 @@ not enable this macro automatically.
 | --- | --- |
 | None | `Core` is the base module used by the rest of Common Utils. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core]
+```
+
 ## API
 
 | Item | Kind | Description |

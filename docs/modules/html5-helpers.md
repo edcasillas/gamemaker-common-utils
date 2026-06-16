@@ -27,6 +27,13 @@ if (os_browser != browser_not_a_browser) {
 | --- | --- |
 | None | `HTML5 Helpers` is a standalone extension module. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    HTML5Helpers[HTML5 Helpers]
+```
+
 ## API
 
 | Item | Kind | Description |

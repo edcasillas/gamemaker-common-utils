@@ -36,6 +36,31 @@ whether to open, close, or keep navigating the current page.
 | [`LayeredGUI`](layered-gui.md) | Owns final overlay draw order when present, so the Dev Menu renders above gameplay GUI. Supplies subscriber diagnostics when its manager exists in the current room.|
 | [`UniversalCursor`](universal-cursor.md) (optional) | Supplies interactable and hover diagnostics while its singleton exists. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Drawing[Drawing]
+    Core --> Logging[Logging]
+    Core --> EventBus[EventBus]
+    Core --> Notifications[InGameNotifications]
+    Drawing --> Notifications
+    Logging --> InputHub[InputHub]
+    EventBus --> InputHub
+    Notifications --> InputHub
+    Drawing --> LayeredGUI[LayeredGUI]
+    Logging --> LayeredGUI
+    InputHub --> UniversalCursor[UniversalCursor]
+    LayeredGUI --> UniversalCursor
+    Logging --> UniversalCursor
+    Drawing --> DevMenu[Dev Menu]
+    Logging --> DevMenu
+    EventBus --> DevMenu
+    InputHub --> DevMenu
+    LayeredGUI --> DevMenu
+    UniversalCursor -. optional .-> DevMenu
+```
+
 ## Quickstart
 
 ```gml

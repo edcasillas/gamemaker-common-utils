@@ -221,6 +221,32 @@ that input path.
 | [`Logging`](logging.md) | Reports invalid configuration and optional input diagnostics. |
 | [`Core`](core.md) | Shared base dependency used by the modules above. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Core --> Drawing[Drawing]
+    Core --> EventBus[EventBus]
+    Core --> Localization[Localization]
+    Core --> Notifications[InGameNotifications]
+    Drawing --> Notifications
+    Logging --> InputHub[InputHub]
+    EventBus --> InputHub
+    Notifications --> InputHub
+    Drawing --> LayeredGUI[LayeredGUI]
+    Logging --> LayeredGUI
+    InputHub --> UniversalCursor[UniversalCursor]
+    LayeredGUI --> UniversalCursor
+    Logging --> UniversalCursor
+    EventBus --> Buttons[Buttons]
+    Localization --> Buttons
+    UniversalCursor --> Buttons
+    LayeredGUI --> Buttons
+    Drawing --> Buttons
+    Logging --> Buttons
+```
+
 ## API
 
 Event:

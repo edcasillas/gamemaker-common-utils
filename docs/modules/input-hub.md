@@ -56,6 +56,21 @@ direct polling when an event subscription is unnecessary.
 | [`InGameNotifications`](in-game-notifications.md) | Shows DevBuild gamepad connect and disconnect notifications. |
 | [`Core`](core.md) | Indirect base dependency used by the modules above. |
 
+## Dependency Diagram
+
+```mermaid
+flowchart LR
+    Core[Core] --> Logging[Logging]
+    Core --> EventBus[EventBus]
+    Core --> Drawing[Drawing]
+    Core --> Notifications[InGameNotifications]
+    Drawing --> Notifications
+    Logging --> EventBus
+    Logging --> InputHub[InputHub]
+    EventBus --> InputHub
+    Notifications --> InputHub
+```
+
 ## API
 
 | Item | Kind | Description |
