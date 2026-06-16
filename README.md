@@ -29,22 +29,72 @@ the submodule.
 
 Import modules in this order:
 
-1. [`Core`](docs/modules/core.md): Shared macros, foundational helpers, and singleton helper.
+1. [`Core`](docs/modules/core.md): Shared macros and foundational helpers.
 2. [`Drawing`](docs/modules/drawing.md): Temporary draw-state management.
 3. [`Logging`](docs/modules/logging.md): Severity-aware logging with optional output and telemetry handlers.
-4. [`EventBus`](docs/modules/event-bus.md): Publish-subscribe event dispatch.
-5. [`InGameNotifications`](docs/modules/in-game-notifications.md): Optional visual development notifications.
-6. [`InputHub`](docs/modules/input-hub.md): Centralized keyboard and gamepad input.
-7. [`Localization`](docs/modules/localization.md): CSV-backed translation lookup.
-8. [`LayeredGUI`](docs/modules/layered-gui.md): Priority-ordered Draw GUI callbacks.
-9. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
-10. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
-11. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
-12. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
-13. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
-14. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
-15. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
-16. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
+4. [`Singleton`](docs/modules/singleton.md): Simple persistent singleton helper for shared managers.
+5. [`EventBus`](docs/modules/event-bus.md): Publish-subscribe event dispatch.
+6. [`InGameNotifications`](docs/modules/in-game-notifications.md): Optional visual development notifications.
+7. [`InputHub`](docs/modules/input-hub.md): Centralized keyboard and gamepad input.
+8. [`Localization`](docs/modules/localization.md): CSV-backed translation lookup.
+9. [`LayeredGUI`](docs/modules/layered-gui.md): Priority-ordered Draw GUI callbacks.
+10. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
+11. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
+12. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
+13. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
+14. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
+15. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
+16. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
+17. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
+
+## Dependency Overview
+
+```mermaid
+flowchart TD
+    Core --> Drawing
+    Core --> Logging
+    Core --> EventBus
+    Core --> InputHub
+    Core --> Localization
+    Core --> HTML5
+    Core --> ReleaseBuild
+    Core --> Notifications
+    Core --> Labels
+    Core --> Transitions
+    Drawing --> Notifications
+    Drawing --> LayeredGUI
+    Logging --> Singleton
+    Logging --> EventBus
+    Logging --> InputHub
+    Logging --> TimedActions
+    Logging --> LayeredGUI
+    Logging --> UniversalCursor
+    Logging --> DevMenu
+    EventBus --> InputHub
+    EventBus --> Transitions
+    EventBus --> Buttons
+    Notifications --> InputHub
+    LayeredGUI --> UniversalCursor
+    LayeredGUI --> Buttons
+    LayeredGUI --> Labels
+    LayeredGUI --> Transitions
+    LayeredGUI --> DevMenu
+    InputHub --> UniversalCursor
+    InputHub --> DevMenu
+    UniversalCursor --> Buttons
+    Localization --> Buttons
+    Localization --> Labels
+    Drawing --> Buttons
+    Drawing --> DevMenu
+    Singleton --> DevMenu
+    Singleton --> InputHub
+    Singleton --> LayeredGUI
+    Singleton --> UniversalCursor
+    Singleton --> TimedActions
+
+    HTML5[HTML5 Helpers]
+    ReleaseBuild[Release and Build Info]
+```
 
 Each module page documents its resources, dependencies, API, usage, and
 consumer ownership boundaries. The implementation and migration checklist lives in
@@ -105,7 +155,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Confirm the consuming repo state with `git status`.
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
-  `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
+  `Singleton`, `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
   `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
   `Transitions`, `HTML5 Helpers`, and
   `Release and Build Info` if needed.
