@@ -27,7 +27,7 @@ whether to open, close, or keep navigating the current page.
 ## Dependencies
 
 | Module | Responsibility |
---------- | -----------------
+| --- | --- |
 | [`Core`](core.md) | Supplies DevBuild policy and shared constants. |
 | [`Drawing`](drawing.md) | Protects overlay draw state. |
 | [`Logging`](logging.md) | Reports callback failures and supplies log history. |
@@ -110,6 +110,11 @@ same rows:
 
 Use a dynamic page when the menu content itself should change with current game
 state. Use a static page when the same rows should always be present.
+
+HTML5 note: Dev Menu stores callbacks for later use. On HTML5, avoid callbacks
+that depend on captured local variables. Prefer named scripts or functions that
+read from stable struct fields or globals, then validate dynamic pages and
+actions in a real HTML5 runner.
 
 `gmcu_dev_menu_init` creates the persistent object, or reconfigures and returns
 the existing instance. Outside `DevBuild` it returns `noone`.
@@ -252,18 +257,6 @@ That same `Step` event also handles menu navigation while `is_open` is true:
 - `Left` / `Right` -> value change activation
 - `Enter` / `Space` / gamepad confirm -> item activation
 - mouse move / click / wheel -> hover, click, and scroll
-
-## HTML5 Callback Safety
-
-GameMaker HTML5 may lose locally captured variables from functions stored for
-later execution. Standard room, language, and log pages therefore keep their
-arguments and providers as explicit struct fields instead of closure-generated
-callbacks.
-
-Use named scripts or callbacks that do not depend on captured local variables
-for consumer actions that must work on HTML5. Validate opening every dynamic
-page and executing every deferred action in an actual HTML5 runner; a
-successful VM compile does not detect these runtime failures.
 
 ## Room Navigation
 

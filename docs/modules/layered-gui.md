@@ -4,19 +4,22 @@
 so GUI drawing can happen in a stable order from one Draw GUI manager. The
 manager is created automatically on the first subscription.
 
-## Usage
+## Quickstart
 
 Subscribe in Create, define `on_draw_gui`, and unsubscribe in Clean Up:
 
 ```gml
 // Create
+// Register this instance in the shared Draw GUI stack.
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, "play_button");
 
 function on_draw_gui() {
+	// Draw this instance in GUI space when the manager reaches its priority slot.
 	draw_self();
 }
 
 // Clean Up
+// Remove the instance before destruction so the manager keeps a valid list.
 gmcu_layered_gui_unsubscribe();
 ```
 
@@ -74,23 +77,20 @@ row to the clipboard. No consumer configuration is required.
 
 ## Dependencies
 
-- [`Drawing`](drawing.md): Restores draw state after each subscriber.
-  - [`Core`](core.md)
-- [`Logging`](logging.md): Reports invalid subscribers.
-  - [`Core`](core.md)
+| Module | Responsibility |
+| --- | --- |
+| [`Drawing`](drawing.md) | Restores draw state after each subscriber. |
+| [`Logging`](logging.md) | Reports invalid subscribers. |
+| [`Core`](core.md) | Indirect dependency through Drawing and Logging. |
 
 ## API
 
-Object:
-
-- `gmcu_o_layered_gui_manager`: The automatically created Draw GUI manager.
-
-Functions:
-
-- `gmcu_layered_gui_subscribe(_priority, _diagnostic_name = undefined)`:
-  Registers `self`; larger priorities draw earlier. The optional name appears
-  only in diagnostics.
-- `gmcu_layered_gui_unsubscribe()`: Removes `self` when subscribed.
+| Item | Kind | Description |
+| --- | --- | --- |
+| `gmcu_o_layered_gui_manager` | Object | Automatically created Draw GUI manager. |
+| `gmcu_layered_gui_subscribe(_priority, _diagnostic_name = undefined)` | Function | Registers `self`; larger priorities draw earlier. The optional name appears only in diagnostics. |
+| `gmcu_layered_gui_unsubscribe()` | Function | Removes `self` when subscribed. |
+| `on_draw_gui()` | Subscriber callback | Draws one subscriber entry when the manager reaches it. |
 
 Subscribers define:
 

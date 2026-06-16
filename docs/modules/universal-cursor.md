@@ -35,18 +35,20 @@ The system cursor is hidden while the universal cursor is shown. Its sprite is
 drawn through [`LayeredGUI`](layered-gui.md) at
 `GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR`.
 
-## Basic Setup
+## Quickstart
 
 Show the cursor when entering an interface and pass a consumer-owned sprite:
 
 ```gml
 // Menu controller Create
+// Show the shared cursor and choose the sprite it should draw.
 gmcu_universal_cursor_show(spr_cursor);
 ```
 
 Hide it when leaving the interface:
 
 ```gml
+// Stop cursor drawing/input for this interface.
 gmcu_universal_cursor_hide();
 ```
 
@@ -58,6 +60,7 @@ gmcu_universal_cursor_hide();
 Subscribe from Create after the instance is initialized:
 
 ```gml
+// Register this control so the shared cursor can hover and activate it.
 gmcu_universal_cursor_subscribe("play_button");
 
 function on_hover_enter() {
@@ -83,6 +86,7 @@ function on_released() {
 Unsubscribe from Clean Up:
 
 ```gml
+// Remove the control before destruction.
 gmcu_universal_cursor_unsubscribe();
 ```
 
@@ -174,28 +178,25 @@ changing between cursor-driven UI and gameplay.
 
 ## Dependencies
 
-- [`InputHub`](input-hub.md): Supplies connected-gamepad and button helpers.
-  - [`Core`](core.md)
-- [`LayeredGUI`](layered-gui.md): Draws the cursor in the shared GUI order.
-  - [`Drawing`](drawing.md)
-    - [`Core`](core.md)
-  - [`Logging`](logging.md)
-    - [`Core`](core.md)
-- [`Logging`](logging.md): Reports duplicate managers, invalid subscribers, and
-  callback failures.
-  - [`Core`](core.md)
-- [`Core`](core.md): Supplies direction constants and shared limits.
+| Module | Responsibility |
+| --- | --- |
+| [`InputHub`](input-hub.md) | Supplies connected-gamepad and button helpers. |
+| [`LayeredGUI`](layered-gui.md) | Draws the cursor in the shared GUI order. |
+| [`Logging`](logging.md) | Reports duplicate managers, invalid subscribers, and callback failures. |
+| [`Core`](core.md) | Supplies direction constants and shared limits. |
 
 ## API
 
-- `gmcu_universal_cursor_show(_sprite_index)`: Shows the universal cursor using
-  the supplied sprite and hides the system cursor.
-- `gmcu_universal_cursor_hide(_restore_system_cursor = true)`: Hides the
-  universal cursor and optionally restores the default system cursor.
-- `gmcu_universal_cursor_subscribe(_diagnostic_name = undefined)`: Registers
-  `self` for hover, navigation, and activation. The optional name appears only
-  in diagnostics.
-- `gmcu_universal_cursor_unsubscribe()`: Removes `self` when registered.
+| Item | Kind | Description |
+| --- | --- | --- |
+| `gmcu_universal_cursor_show(_sprite_index)` | Function | Shows the universal cursor using the supplied sprite and hides the system cursor. |
+| `gmcu_universal_cursor_hide(_restore_system_cursor = true)` | Function | Hides the universal cursor and optionally restores the default system cursor. |
+| `gmcu_universal_cursor_subscribe(_diagnostic_name = undefined)` | Function | Registers `self` for hover, navigation, and activation. The optional name appears only in diagnostics. |
+| `gmcu_universal_cursor_unsubscribe()` | Function | Removes `self` when registered. |
+| `on_hover_enter()` | Subscriber callback | Called when the cursor starts hovering the subscriber. |
+| `on_hover_leave()` | Subscriber callback | Called when the cursor stops hovering the subscriber. |
+| `on_pressed()` | Subscriber callback | Called when activation input begins on the subscriber. |
+| `on_released()` | Subscriber callback | Called when activation input ends on the subscriber. |
 
 Subscriber callbacks take no parameters and return no value:
 

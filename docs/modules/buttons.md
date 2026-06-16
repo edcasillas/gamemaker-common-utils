@@ -67,6 +67,35 @@ before choosing the game-space variant for camera-based interfaces.
 The base Create event destroys a button with an empty `button_id` or no sprite,
 and logs the reason.
 
+## Quickstart
+
+```gml
+// Child object Create
+event_inherited();
+if (!created) return;
+
+// Give the shared module a stable id for diagnostics and events.
+button_id = "play";
+
+// Optional text shown on top of the button sprite.
+text = "PLAY";
+```
+
+```gml
+// Menu controller Create
+gmcu_universal_cursor_show(spr_cursor);
+gmcu_eventbus_subscribe(GMCU_EVENT_BUTTON_PRESSED);
+
+on_event = function(_event_name, _event_args) {
+	if (_event_name != GMCU_EVENT_BUTTON_PRESSED) return;
+
+	// Handle button ids here instead of hardcoding behavior into the shared button.
+	if (_event_args == "play") {
+		start_game();
+	}
+};
+```
+
 ## Handling Activation
 
 Subscribe a controller through [`EventBus`](event-bus.md):
@@ -182,29 +211,15 @@ that input path.
 
 ## Dependencies
 
-- [`EventBus`](event-bus.md): Dispatches button activation to consumer
-  controllers.
-- [`Localization`](localization.md): Resolves optional localized text.
-- [`UniversalCursor`](universal-cursor.md): Supplies mouse, keyboard, and
-  gamepad hover and activation.
-  - [`InputHub`](input-hub.md)
-    - [`Core`](core.md)
-  - [`LayeredGUI`](layered-gui.md)
-    - [`Drawing`](drawing.md)
-      - [`Core`](core.md)
-    - [`Logging`](logging.md)
-      - [`Core`](core.md)
-- [`LayeredGUI`](layered-gui.md): Draws GUI buttons in shared GUI order.
-  - [`Drawing`](drawing.md)
-    - [`Core`](core.md)
-  - [`Logging`](logging.md)
-    - [`Core`](core.md)
-- [`Drawing`](drawing.md): Restores draw state after rendering button text.
-  - [`Core`](core.md)
-- [`Logging`](logging.md): Reports invalid configuration and optional input
-  diagnostics.
-  - [`Core`](core.md)
-- [`Core`](core.md)
+| Module | Responsibility |
+| --- | --- |
+| [`EventBus`](event-bus.md) | Dispatches button activation to consumer controllers. |
+| [`Localization`](localization.md) | Resolves optional localized text. |
+| [`UniversalCursor`](universal-cursor.md) | Supplies mouse, keyboard, and gamepad hover and activation. |
+| [`LayeredGUI`](layered-gui.md) | Draws GUI buttons in shared GUI order. |
+| [`Drawing`](drawing.md) | Restores draw state after rendering button text. |
+| [`Logging`](logging.md) | Reports invalid configuration and optional input diagnostics. |
+| [`Core`](core.md) | Shared base dependency used by the modules above. |
 
 ## API
 
