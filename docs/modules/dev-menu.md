@@ -15,22 +15,6 @@ The consumer owns a plain `config` struct. That struct tells the singleton:
 - how the menu should open
 - how the theme should look
 
-### Mental Model
-
-```mermaid
-flowchart TD
-    A[Consumer builds config] --> B[gmcu_dev_menu_init config]
-    B --> C[gmcu_o_dev_menu singleton]
-    C --> D[configure config]
-    D --> E[Store pages, trigger, theme, behavior]
-    E --> F[Each Step: config.trigger_pressed]
-    F -->|true while closed| G[open_menu]
-    F -->|true while open| H[close_menu]
-    G --> I[Menu is_open = true]
-    I --> J[Consume Esc, arrows, enter, mouse, wheel]
-    J --> K[Navigate pages or activate items]
-```
-
 The important detail is that the trigger callback only answers a yes/no
 question. The menu object itself calls that callback every Step and decides
 whether to open, close, or keep navigating the current page.
@@ -42,18 +26,17 @@ whether to open, close, or keep navigating the current page.
 
 ## Dependencies
 
-- [`Core`](core.md): Supplies DevBuild policy and shared constants.
-- [`Drawing`](drawing.md): Protects overlay draw state.
-- [`Logging`](logging.md): Reports callback failures and supplies log history.
-- [`InputHub`](input-hub.md): Supplies keyboard/gamepad navigation.
-- [`LayeredGUI`](layered-gui.md): Owns final overlay draw order when present,
-  so the Dev Menu renders above gameplay GUI.
-- Optional [`LayeredGUI`](layered-gui.md): Supplies subscriber diagnostics when
-  its manager exists in the current room.
-- Optional [`UniversalCursor`](universal-cursor.md): Supplies interactable and
-  hover diagnostics while its singleton exists.
+| Module | Responsibility |
+--------- | -----------------
+| [`Core`](core.md) | Supplies DevBuild policy and shared constants. |
+| [`Drawing`](drawing.md) | Protects overlay draw state. |
+| [`Logging`](logging.md) | Reports callback failures and supplies log history. |
+| [`InputHub`](input-hub.md) | Supplies keyboard/gamepad navigation. |
+| [`EventBus`](event-bus.md) | Used to dispatch events on menu opened / closed. |
+| [`LayeredGUI`](layered-gui.md) | Owns final overlay draw order when present, so the Dev Menu renders above gameplay GUI. Supplies subscriber diagnostics when its manager exists in the current room.|
+| [`UniversalCursor`](universal-cursor.md) (optional) | Supplies interactable and hover diagnostics while its singleton exists. |
 
-Initialize the singleton:
+## Quickstart
 
 ```gml
 var _config = {
