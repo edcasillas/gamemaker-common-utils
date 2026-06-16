@@ -17,6 +17,26 @@ The consumer owns a plain `config` struct. That struct tells the singleton:
 - which lifecycle callbacks should run
 - how the theme should look
 
+### Mental Model
+
+```mermaid
+flowchart TD
+    A[Consumer builds config] --> B[gmcu_dev_menu_init config]
+    B --> C[gmcu_o_dev_menu singleton]
+    C --> D[configure config]
+    D --> E[Store pages, trigger, theme, behavior]
+    E --> F[Each Step: config.trigger_pressed]
+    F -->|true while closed| G[open_menu]
+    F -->|true while open| H[close_menu]
+    G --> I[Menu is_open = true]
+    I --> J[Consume Esc, arrows, enter, mouse, wheel]
+    J --> K[Navigate pages or activate items]
+```
+
+The important detail is that the trigger callback only answers a yes/no
+question. The menu object itself calls that callback every Step and decides
+whether to open, close, or keep navigating the current page.
+
 ## Resources
 
 - `scripts/gmcu_dev_menu`
@@ -38,10 +58,10 @@ Initialize the singleton:
 ```gml
 var _config = {
     pages: [
-        // gmcu_dev_menu_page(id, title, items)
+        // gmcu_dev_menu_static_page(id, title, items)
         // "main" is the root page id. Submenus can open this page by id.
         // "Dev Menu" is the visible page title shown in the header.
-        gmcu_dev_menu_page("main", "Dev Menu", [
+        gmcu_dev_menu_static_page("main", "Dev Menu", [
             // gmcu_dev_menu_action(label, callback)
             // This creates one selectable row in the page.
             gmcu_dev_menu_action("Run action", function() {
@@ -62,7 +82,7 @@ gmcu_dev_menu_init({
     block_game_instances: false,
     pages: [
         // Root page shown when the menu opens.
-        gmcu_dev_menu_page("main", "Dev Menu", [
+        gmcu_dev_menu_static_page("main", "Dev Menu", [
             // A single action row that restarts the current room.
             gmcu_dev_menu_action("Restart room", function() {
                 room_restart();
@@ -92,12 +112,11 @@ gmcu_dev_menu_init({
         // Root page:
         // - id: "main"
         // - title: "Dev Menu"
-        // - items: [] because this page is dynamic
-        // - get_items: build_root_items
-        gmcu_dev_menu_page("main", "Dev Menu", [], build_root_items),
+        // - build_items_func: build_root_items
+        gmcu_dev_menu_dynamic_page("main", "Dev Menu", build_root_items),
 
         // Secondary page opened by the submenu above.
-        gmcu_dev_menu_page("gameplay", "Gameplay", [
+        gmcu_dev_menu_static_page("gameplay", "Gameplay", [
             // Toggle rows ask for the current value and a setter callback.
             gmcu_dev_menu_toggle("God mode", function() { return global.god_mode; }, function(_value) {
                 global.god_mode = _value;
@@ -153,9 +172,10 @@ through Logging instead of escaping the menu Step event.
 
 ### Page Builders
 
-- `gmcu_dev_menu_page(_id, _title, _items = [], _get_items = undefined)`
-  Creates a page definition. Use `_items` for static rows and `_get_items` for
-  dynamic rows.
+- `gmcu_dev_menu_static_page(_id, _title, _items = [])`
+  Creates a page with a fixed item array.
+- `gmcu_dev_menu_dynamic_page(_id, _title, _build_items_func)`
+  Creates a page whose rows are rebuilt by a function.
 - `gmcu_dev_menu_action(_label, _action, _enabled = undefined)`
   Creates a row that runs a callback.
 - `gmcu_dev_menu_submenu(_label, _page_id)`
@@ -215,6 +235,14 @@ by asset name, so Dev Menu does not require UniversalCursor.
 
 Keyboard, gamepad, mouse hover, click, and wheel input are supported. Mobile
 gestures can later be implemented through a custom `trigger_pressed` callback.
+
+Static vs dynamic pages:
+
+- Static page: use `gmcu_dev_menu_static_page(...)` when the row list is fixed.
+- Dynamic page: use `gmcu_dev_menu_dynamic_page(...)` when the row list, labels,
+  or enabled state must be rebuilt from current game state.
+
+`_build_items_func` must be a function that returns an array of Dev Menu items.
 
 ## Input Flow
 

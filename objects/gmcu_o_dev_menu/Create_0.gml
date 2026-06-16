@@ -29,7 +29,7 @@ function configure(_config) {
 	config = _config;
 	pages = variable_struct_exists(config, "pages") ? config.pages : [];
 	if (array_length(pages) == 0) {
-		pages = [gmcu_dev_menu_page("main", "Dev Menu")];
+		pages = [gmcu_dev_menu_static_page("main", "Dev Menu")];
 	}
 	var _has_layered_gui_page = false;
 	var _has_universal_cursor_page = false;
@@ -42,11 +42,11 @@ function configure(_config) {
 		}
 	}
 	if (!_has_layered_gui_page) {
-		array_push(pages, gmcu_dev_menu_page("gmcu_layered_gui", "Layered GUI"));
+		array_push(pages, gmcu_dev_menu_static_page("gmcu_layered_gui", "Layered GUI"));
 		pages[array_length(pages) - 1].type = "layered_gui";
 	}
 	if (!_has_universal_cursor_page) {
-		array_push(pages, gmcu_dev_menu_page("gmcu_universal_cursor", "Universal Cursor"));
+		array_push(pages, gmcu_dev_menu_static_page("gmcu_universal_cursor", "Universal Cursor"));
 		pages[array_length(pages) - 1].type = "universal_cursor";
 	}
 	if (!variable_struct_exists(config, "trigger_pressed")) {
@@ -88,7 +88,7 @@ function current_page() {
 }
 
 /**
- * @description Builds the visible item array for the current static or generated Dev Menu page.
+ * @description Builds the visible item array for the current static or dynamic Dev Menu page.
  * @returns {Array<Struct>} Items ready for navigation and rendering.
  */
 function current_items() {
@@ -134,7 +134,9 @@ function current_items() {
 				return universal_cursor_items;
 		}
 	}
-	var _items = !is_undefined(_page.get_items) ? _page.get_items() : _page.items;
+	var _items = variable_struct_exists(_page, "build_items_func")
+		? _page.build_items_func()
+		: _page.items;
 	if (_page.id == pages[0].id && (layered_gui_available || universal_cursor_available)) {
 		var _root_items = [];
 		for (var _i = 0; _i < array_length(_items); _i++) {

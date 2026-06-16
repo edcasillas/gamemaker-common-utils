@@ -61,19 +61,32 @@ function gmcu_dev_menu_value(_label, _get_value, _change_value) {
 }
 
 /**
- * @description Creates a Dev Menu page definition.
+ * @description Creates a Dev Menu page with a fixed array of items.
  * @param {String} _id Stable page id used by submenus.
  * @param {String} _title Page header text.
  * @param {Array<Struct>} _items Static page items.
- * @param {Function|Undefined} _get_items Optional dynamic item provider.
  * @returns {Struct}
  */
-function gmcu_dev_menu_page(_id, _title, _items = [], _get_items = undefined) {
+function gmcu_dev_menu_static_page(_id, _title, _items = []) {
 	return {
 		id: _id,
 		title: _title,
-		items: _items,
-		get_items: _get_items
+		items: _items
+	};
+}
+
+/**
+ * @description Creates a Dev Menu page whose items are rebuilt by a callback.
+ * @param {String} _id Stable page id used by submenus.
+ * @param {String} _title Page header text.
+ * @param {Function} _build_items_func Callback returning the current item array.
+ * @returns {Struct}
+ */
+function gmcu_dev_menu_dynamic_page(_id, _title, _build_items_func) {
+	return {
+		id: _id,
+		title: _title,
+		build_items_func: _build_items_func
 	};
 }
 
@@ -154,7 +167,7 @@ function gmcu_dev_menu_add_rooms(_config, _settings = {}) {
 		});
 	}
 
-	array_push(_config.pages, gmcu_dev_menu_page("gmcu_rooms", "Rooms", _items));
+	array_push(_config.pages, gmcu_dev_menu_static_page("gmcu_rooms", "Rooms", _items));
 	array_push(_config.pages[0].items, gmcu_dev_menu_submenu("Rooms", "gmcu_rooms"));
 	return _config;
 }
@@ -166,7 +179,7 @@ function gmcu_dev_menu_add_rooms(_config, _settings = {}) {
  * @returns {Struct}
  */
 function gmcu_dev_menu_add_languages(_config, _settings) {
-	var _page = gmcu_dev_menu_page("gmcu_languages", "Language");
+	var _page = gmcu_dev_menu_static_page("gmcu_languages", "Language");
 	_page.type = "languages";
 	_page.get_languages = _settings.get_languages;
 	_page.get_current = _settings.get_current;
@@ -182,7 +195,7 @@ function gmcu_dev_menu_add_languages(_config, _settings) {
  * @returns {Struct}
  */
 function gmcu_dev_menu_add_logs(_config) {
-	var _page = gmcu_dev_menu_page("gmcu_logs", "Logs");
+	var _page = gmcu_dev_menu_static_page("gmcu_logs", "Logs");
 	_page.type = "logs";
 	array_push(_config.pages, _page);
 	array_push(_config.pages[0].items, gmcu_dev_menu_submenu("Logs", "gmcu_logs"));
