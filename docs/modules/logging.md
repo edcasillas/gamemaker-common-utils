@@ -3,13 +3,14 @@
 `Logging` provides severity-aware output, a bounded development log buffer,
 optional target output, and optional telemetry forwarding.
 
-## Usage
+## Quickstart
 
 Call `gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`, `gmcu_log_error`, or
 `gmcu_log_exception`. Without adapters, messages use
 `show_debug_message`.
 
 ```gml
+// Basic severity-based logging.
 gmcu_log_info("Game initialized");
 gmcu_log_error("Save failed");
 ```
@@ -17,6 +18,7 @@ gmcu_log_error("Save failed");
 Register output or telemetry adapters only when the consumer needs them:
 
 ```gml
+// Optional output adapter for another target or console.
 gmcu_log_set_output_handler(function(_severity, _message) {
     target_console_write(_severity, _message);
 });
@@ -32,25 +34,26 @@ gmcu_log_set_output_handler(function(_severity, _message) {
 
 ## Dependencies
 
-- [`Core`](core.md): Supplies build configuration, context names, and the
-  optional notification-handler registry.
+| Module | Responsibility |
+| --- | --- |
+| [`Core`](core.md) | Supplies build configuration, context names, and the optional notification-handler registry. |
 
 ## API
 
-- `gmcu_log_debug(_message, _local_only = false)`: Writes debug output when
-  `GMCU_ENABLE_DEBUG_LOG` is enabled.
-- `gmcu_log_info(_message)`, `gmcu_log_warn(_message)`: Write informational or
-  warning output.
-- `gmcu_log_error(_message, _show_notification = true)`: Writes an error and
-  optionally requests a visual notification.
-- `gmcu_log_exception(_exception, _tag = "", _show_notification = true)`:
-  Formats and reports an exception.
-- `gmcu_log_set_output_handler(_handler)`: Replaces target output.
-- `gmcu_log_set_telemetry_handler(_handler)`: Sets optional telemetry
-  forwarding.
-- `gmcu_log_buffer_get()`, `gmcu_log_buffer_clear()`, and
-  `gmcu_log_buffer_set_capacity(_capacity)`: Manage the Dev Menu log buffer.
-- `GMCU_LOG_LEVEL_*` and `GMCU_ENABLE_*_LOG`: Severity and build-policy macros.
+| Item | Kind | Description |
+| --- | --- | --- |
+| `gmcu_log_debug(_message, _local_only = false)` | Function | Writes debug output when `GMCU_ENABLE_DEBUG_LOG` is enabled. |
+| `gmcu_log_info(_message)` | Function | Writes informational output. |
+| `gmcu_log_warn(_message)` | Function | Writes warning output. |
+| `gmcu_log_error(_message, _show_notification = true)` | Function | Writes an error and optionally requests a visual notification. |
+| `gmcu_log_exception(_exception, _tag = "", _show_notification = true)` | Function | Formats and reports an exception. |
+| `gmcu_log_set_output_handler(_handler)` | Function | Replaces target output. |
+| `gmcu_log_set_telemetry_handler(_handler)` | Function | Sets optional telemetry forwarding. |
+| `gmcu_log_buffer_get()` | Function | Returns the bounded Dev Menu log buffer. |
+| `gmcu_log_buffer_clear()` | Function | Clears the bounded Dev Menu log buffer. |
+| `gmcu_log_buffer_set_capacity(_capacity)` | Function | Changes the bounded Dev Menu log buffer capacity. |
+| `GMCU_LOG_LEVEL_*` | Macros | Severity constants stored in the log buffer. |
+| `GMCU_ENABLE_*_LOG` | Macros | Build-policy macros that control which severities are emitted. |
 
 [`InGameNotifications`](in-game-notifications.md) can register the optional
 visual handler. Logging does not depend directly on analytics SDKs or HTML5.

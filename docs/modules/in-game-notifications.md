@@ -3,11 +3,15 @@
 `InGameNotifications` displays queued, animated messages and connects optional
 visual error reporting to [`Logging`](logging.md).
 
-## Usage
+## Quickstart
 
 Pass text for defaults or customize a settings instance:
 
 ```gml
+// Use the default look with a custom message.
+gmcu_show_notification("Gamepad connected");
+
+// Or customize the presentation before showing it.
 var _settings = new gmcu_InGameNotificationSettings("Gamepad connected");
 _settings.back_color = c_gray;
 gmcu_show_notification(_settings);
@@ -27,17 +31,19 @@ Importing the module registers its handler through
 
 ## Dependencies
 
-- [`Core`](core.md): Supplies timing, depth, build policy, and handler state.
-- [`Drawing`](drawing.md): Restores draw state after rendering.
-  - [`Core`](core.md)
+| Module | Responsibility |
+| --- | --- |
+| [`Core`](core.md) | Supplies timing, depth, build policy, and handler state. |
+| [`Drawing`](drawing.md) | Restores draw state after rendering. |
 
 ## API
 
-- `new gmcu_InGameNotificationSettings(_text)`: Creates editable presentation
-  settings.
-- `gmcu_show_notification(_text_or_settings)`: Queues a notification.
-- `gmcu_o_notification_from_top`: Runtime notification object.
-- `global.gmcu_in_game_notifications_tail`: Tail of the active queue.
+| Item | Kind | Description |
+| --- | --- | --- |
+| `new gmcu_InGameNotificationSettings(_text)` | Constructor | Creates editable notification presentation settings. |
+| `gmcu_show_notification(_text_or_settings)` | Function | Queues a notification from text or a settings instance. |
+| `gmcu_o_notification_from_top` | Object | Runtime notification object. |
+| `global.gmcu_in_game_notifications_tail` | Global | Tail of the active notification queue. |
 
 In `DevBuild`, `gmcu_log_error` and `gmcu_log_exception` may use this module
 without making Logging depend directly on it.

@@ -3,10 +3,18 @@
 `Localization` loads translations from a consumer-owned CSV included file and
 returns localized text for the active language.
 
-## Usage
+## Quickstart
 
 Call `gmcu_localization_init()` during startup, or let
 `gmcu_localization_t(_key)` lazily load the default `localization.csv`.
+
+```gml
+// Startup initialization with the default included CSV.
+gmcu_localization_init();
+
+// Later lookups use the active language.
+play_label = gmcu_localization_t("PLAY");
+```
 
 ## Resources
 
@@ -16,25 +24,20 @@ Call `gmcu_localization_init()` during startup, or let
 
 ## Dependencies
 
-- [`Logging`](logging.md): Reports CSV, language, and lookup diagnostics.
-  - [`Core`](core.md)
-- [`Core`](core.md)
+| Module | Responsibility |
+| --- | --- |
+| [`Logging`](logging.md) | Reports CSV, language, and lookup diagnostics. |
+| [`Core`](core.md) | Base dependency used directly and through Logging. |
 
 ## API
 
-Macros:
-
-- `GMCU_LOCALIZATION_IS_INITIALIZED`
-
-Functions:
-
-- `gmcu_localization_init(_lang_code = undefined, _csv_file_name = "localization.csv")`
-- `gmcu_localization_t(_str)`
-
-Globals:
-
-- `global.gmcu_language`
-- `global.gmcu_loc_map`
+| Item | Kind | Description |
+| --- | --- | --- |
+| `GMCU_LOCALIZATION_IS_INITIALIZED` | Macro | Whether localization has already been initialized. |
+| `gmcu_localization_init(_lang_code = undefined, _csv_file_name = "localization.csv")` | Function | Loads the CSV and selects the active language. |
+| `gmcu_localization_t(_str)` | Function | Returns the localized string for a key, or the original key on fallback. |
+| `global.gmcu_language` | Global | Active language code chosen by initialization. |
+| `global.gmcu_loc_map` | Global | Loaded localization map. |
 
 ## CSV Format
 

@@ -4,21 +4,32 @@ This module separates export, testing, versioning, and publication by design.
 An export is never published automatically: test the exact artifact first,
 then invoke `deploy` explicitly.
 
-## Usage
+## Quickstart
 
 Run the shared tool from a consumer repository:
 
 ```sh
+# Export and immediately serve the configured HTML platform.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
   export --config itch-deploy/itch-config.json --platform html --serve
+
+# Serve an existing HTML export without rebuilding it.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
   serve-html --config itch-deploy/itch-config.json --open
+
+# Stop the background HTML server.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
   stop-html --config itch-deploy/itch-config.json
+
+# Inspect resolved paths, versions, and server status.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
   status --config itch-deploy/itch-config.json
+
+# Bump the tracked platform version without deploying.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
   version --config itch-deploy/itch-config.json --platform html
+
+# Deploy an already tested export.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
   deploy --config itch-deploy/itch-config.json --platform html
 ```
@@ -61,9 +72,11 @@ Butler installation. A consumer may override this with `tools.butler`.
 
 ## Dependencies
 
-- [`Core`](core.md): Supplies build configuration policy to runtime resources.
-- External tools such as `gm-cli` and Butler are required only for the
-  corresponding CLI commands.
+| Dependency | Responsibility |
+| --- | --- |
+| [`Core`](core.md) | Supplies build configuration policy to runtime resources. |
+| `gm-cli` | Used by the export workflow when the chosen platform supports it. |
+| `butler` | Used by `status` and `deploy`. |
 
 ## Consumer Configuration
 
@@ -105,6 +118,13 @@ Optional fields are `version_prefix`, `separator`, and `build_file`. Missing
 
 The shared label preserves Fantasma's bottom-right black background and white
 text. Consumer-specific author and date values are supplied at initialization.
+
+| Item | Kind | Description |
+| --- | --- | --- |
+| `tools/release/gmcu_release.py` | CLI | Export, serve, inspect, version, and deploy builds. |
+| `gmcu_build_info_init(_options)` | Function | Initializes runtime build metadata. |
+| `gmcu_build_info_get_version()` | Function | Returns the current build version string. |
+| `gmcu_o_build_info_label` | Object | Optional bottom-right build label. |
 
 ## Contributing
 

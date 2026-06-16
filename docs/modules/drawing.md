@@ -3,14 +3,16 @@
 `Drawing` captures and restores GameMaker draw state so reusable UI code does
 not leak font, color, alignment, or alpha changes into later drawing.
 
-## Usage
+## Quickstart
 
 Create a snapshot before temporary draw changes and call `apply()` afterward:
 
 ```gml
+// Capture the current draw state before changing it.
 var _draw_state = new gmcu_DrawingParameters();
 draw_set_color(c_red);
 draw_text(32, 32, "Warning");
+// Restore the previous font, color, alignment, and alpha.
 _draw_state.apply();
 ```
 
@@ -21,13 +23,16 @@ _draw_state.apply();
 
 ## Dependencies
 
-- [`Core`](core.md): Must be registered first as the Common Utils foundation.
+| Module | Responsibility |
+| --- | --- |
+| [`Core`](core.md) | Base dependency required by the draw-state helper. |
 
 ## API
 
-- `new gmcu_DrawingParameters()`: Captures the current font, color, horizontal
-  alignment, vertical alignment, and alpha.
-- `gmcu_DrawingParameters.apply()`: Restores the captured draw state.
+| Item | Kind | Description |
+| --- | --- | --- |
+| `new gmcu_DrawingParameters()` | Constructor | Captures the current font, color, horizontal alignment, vertical alignment, and alpha. |
+| `gmcu_DrawingParameters.apply()` | Method | Restores the captured draw state. |
 
 ## Contributing
 
