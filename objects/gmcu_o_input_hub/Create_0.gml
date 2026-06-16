@@ -40,6 +40,14 @@ h_axis = 0;
 v_axis = 0;
 
 /**
+ * @description Returns whether a UI overlay currently owns gameplay input.
+ * @returns {Bool} True when gameplay consumers should observe no input.
+ */
+function gmcu_gameplay_input_blocked() {
+	return gmcu_dev_menu_is_open();
+}
+
+/**
  * @description Returns the current combined keyboard or gamepad direction.
  * @returns {Real|Undefined} GameMaker direction angle, or undefined when idle.
  */
@@ -93,6 +101,7 @@ function gmcu_get_four_way_direction() {
  * @returns {Bool} True when a connected gamepad released the button.
  */
 function gmcu_gamepad_button_released(_button) {
+	if(gmcu_gameplay_input_blocked()) return false;
 	return gmcu_has_connected_gamepad() && gamepad_button_check_released(0, _button);
 }
 
@@ -102,5 +111,6 @@ function gmcu_gamepad_button_released(_button) {
  * @returns {Bool} True when a connected gamepad pressed the button.
  */
 function gmcu_gamepad_button_pressed(_button) {
+	if(gmcu_gameplay_input_blocked()) return false;
 	return gmcu_has_connected_gamepad() && gamepad_button_check_pressed(0, _button);
 }

@@ -1,5 +1,13 @@
 if(!visible) return; // Skip processing inputs if cursor is not visible.
 
+if(gmcu_ui_overlay_blocks_pointer_input()) {
+	if(hovered_interactable != noone) {
+		hovered_interactable.on_hover_leave();
+	}
+	hovered_interactable = noone;
+	return;
+}
+
 // Get the current mouse position in GUI space
 var _current_mouse_x = device_mouse_x_to_gui(0);
 var _current_mouse_y = device_mouse_y_to_gui(0);

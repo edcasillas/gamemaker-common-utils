@@ -4,6 +4,12 @@ var _right = keyboard_check(vk_right);
 var _up = keyboard_check(vk_up);
 var _down = keyboard_check(vk_down);
 
+if(gmcu_gameplay_input_blocked()) {
+	h_axis = 0;
+	v_axis = 0;
+	return;
+}
+
 h_axis = _right - _left; // Will be 1 for right, -1 for left
 v_axis = _up - _down; // Will be 1 for up, -1 for down
 

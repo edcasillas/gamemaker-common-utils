@@ -46,6 +46,23 @@ function gmcu_dev_menu_default_trigger() {
 	return keyboard_check_pressed(vk_f1);
 }
 
+/**
+ * @description Returns whether the shared Dev Menu instance is currently open.
+ * @returns {Bool} True when the Dev Menu owns gameplay input.
+ */
+function gmcu_dev_menu_is_open() {
+	var _instance = instance_find(gmcu_o_dev_menu, 0);
+	return _instance != noone && _instance.is_open;
+}
+
+/**
+ * @description Returns whether overlay UI should block gameplay pointer interaction.
+ * @returns {Bool} True when gameplay mouse/cursor clicks should be ignored.
+ */
+function gmcu_ui_overlay_blocks_pointer_input() {
+	return gmcu_dev_menu_is_open();
+}
+
 function gmcu_dev_menu_init(_config) {
 	if (!GMCU_IS_DEV_BUILD) return noone;
 
