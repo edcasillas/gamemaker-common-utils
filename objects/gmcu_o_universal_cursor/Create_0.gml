@@ -1,9 +1,6 @@
-if(instance_number(object_index) > 1) {
-	gmcu_log_warn("[GMCU UniversalCursor] Instance already exists. Deleting duplicate.");
-	instance_destroy();
+if (gmcu_singleton()) {
 	return;
 }
-persistent = true;
 
 // Initialize last known mouse positions
 last_mouse_x = device_mouse_x(0);

@@ -1,10 +1,6 @@
-if (instance_number(object_index) > 1) {
-	gmcu_log_warn("[GMCU TimedActions] Manager already exists. Deleting duplicate.");
-	instance_destroy();
+if (gmcu_singleton()) {
 	return;
 }
-
-persistent = true;
 wait_steps_list = ds_list_create();
 wait_seconds_list = ds_list_create();
 

@@ -29,7 +29,7 @@ the submodule.
 
 Import modules in this order:
 
-1. [`Core`](docs/modules/core.md): Shared macros and foundational helpers.
+1. [`Core`](docs/modules/core.md): Shared macros, foundational helpers, and singleton helper.
 2. [`Drawing`](docs/modules/drawing.md): Temporary draw-state management.
 3. [`Logging`](docs/modules/logging.md): Severity-aware logging with optional output and telemetry handlers.
 4. [`EventBus`](docs/modules/event-bus.md): Publish-subscribe event dispatch.

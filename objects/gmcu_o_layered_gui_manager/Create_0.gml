@@ -1,9 +1,6 @@
-if(instance_number(object_index) > 1) {
-	gmcu_log_warn("[GMCU LayeredGUI] Instance already exists. Deleting duplicate.");
-	instance_destroy();
+if (gmcu_singleton()) {
 	return;
 }
-persistent = true;
 
 // List to hold subscribers in sorted order
 subscribers = ds_list_create();

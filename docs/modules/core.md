@@ -1,7 +1,7 @@
 # Core
 
-`Core` provides the shared macros, runtime helpers, and notification-handler
-state used by other Common Utils modules.
+`Core` provides the shared macros, runtime helpers, singleton helper, and
+notification-handler state used by other Common Utils modules.
 
 ## Quickstart
 
@@ -22,6 +22,16 @@ Use `GMCU_DELTA_TIME_SECONDS` for elapsed-time calculations expressed in seconds
 ```gml
 // Delta time converted to seconds.
 remaining_seconds -= GMCU_DELTA_TIME_SECONDS;
+```
+
+Use `gmcu_singleton()` in a Create event when an object should remain as one
+persistent shared manager:
+
+```gml
+// Destroy duplicates and keep the surviving instance persistent.
+if (gmcu_singleton()) {
+	return;
+}
 ```
 
 Select the `DevBuild` GameMaker configuration when development-only behavior
@@ -62,6 +72,7 @@ not enable this macro automatically.
 | `GMCU_IS_DEV_BUILD` | Macro | `true` only when the GameMaker `DevBuild` configuration is selected. |
 | `gmcu_get_current_object_name()` | Function | Returns the current instance object name with a safe fallback. |
 | `gmcu_get_current_room_name()` | Function | Returns the current room name with a safe fallback. |
+| `gmcu_singleton()` | Function | Destroys later duplicates of the current object and marks the surviving instance as persistent. |
 | `gmcu_set_notification_handler(_handler)` | Function | Registers or clears the optional visual notification handler used by [`Logging`](logging.md). |
 | `global.gmcu_notifications_enabled` | Global | Whether a notification handler is currently registered. |
 | `global.gmcu_notification_handler` | Global | Registered notification callback, or `undefined` when disabled. |

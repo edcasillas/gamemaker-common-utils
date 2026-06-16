@@ -1,9 +1,6 @@
-if (instance_number(object_index) > 1) {
-	instance_destroy();
+if (gmcu_singleton()) {
 	return;
 }
-
-persistent = true;
 is_open = false;
 config = undefined; // Consumer-owned configuration passed through gmcu_dev_menu_init.
 pages = [];

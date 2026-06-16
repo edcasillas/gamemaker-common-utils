@@ -82,6 +82,7 @@
     {"id":{"name":"gmcu_log_info","path":"scripts/gmcu_log_info/gmcu_log_info.yy",},},
     {"id":{"name":"gmcu_log_warn","path":"scripts/gmcu_log_warn/gmcu_log_warn.yy",},},
     {"id":{"name":"gmcu_show_notification","path":"scripts/gmcu_show_notification/gmcu_show_notification.yy",},},
+    {"id":{"name":"gmcu_singleton","path":"scripts/gmcu_singleton/gmcu_singleton.yy",},},
     {"id":{"name":"gmcu_transition_events","path":"scripts/gmcu_transition_events/gmcu_transition_events.yy",},},
     {"id":{"name":"gmcu_transition_to_room","path":"scripts/gmcu_transition_to_room/gmcu_transition_to_room.yy",},},
     {"id":{"name":"gmcu_transition_types","path":"scripts/gmcu_transition_types/gmcu_transition_types.yy",},},

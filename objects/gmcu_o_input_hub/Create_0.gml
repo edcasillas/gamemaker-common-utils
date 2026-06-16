@@ -1,9 +1,6 @@
-if(instance_number(object_index) > 1) {
-	gmcu_log_warn("[GMCU InputHub] Instance already exists. Deleting duplicate.");
-	instance_destroy();
+if (gmcu_singleton()) {
 	return;
 }
-persistent = true;
 gamepads = [];
 gamepad_buttons = [
 gp_face1, //	Top button 1 (this maps to the "A" on an Xbox controller and the cross on a PS controller)

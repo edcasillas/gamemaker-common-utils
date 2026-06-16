@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_singleton",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_singleton",
+  "parent":{
+    "name":"Core",
+    "path":"folders/CommonUtils/Core.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
