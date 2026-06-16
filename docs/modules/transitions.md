@@ -22,6 +22,8 @@ and optional callbacks.
 - [`Core`](core.md): Supplies timing and layer-depth constants.
 - [`Drawing`](drawing.md): Protects transition draw state.
   - [`Core`](core.md)
+- Optional [`LayeredGUI`](layered-gui.md): Owns transition overlay ordering
+  when present, using `GMCU_GUI_PRIORITY_TRANSITION_OVERLAY`.
 - [`Logging`](logging.md): Reports invalid transition configuration.
   - [`Core`](core.md)
 - [`EventBus`](event-bus.md): Dispatches opening-curtain completion.
@@ -47,6 +49,13 @@ The optional `_options` struct supports:
 `on_progress` receives values from `0` to `1`.
 `on_transition_ended` runs immediately before the transition instance is
 destroyed and `room_goto()` is called.
+
+## GUI Ordering
+
+When [`LayeredGUI`](layered-gui.md) is available, transition overlays subscribe
+at `GMCU_GUI_PRIORITY_TRANSITION_OVERLAY`. That keeps them above normal GUI and
+the universal cursor, but below the Dev Menu. If LayeredGUI is not present,
+they fall back to their own `Draw GUI` events.
 
 ## Opening Curtain
 
