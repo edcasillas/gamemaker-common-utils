@@ -107,6 +107,70 @@ function gmcu_log_buffer_ensure_initialized() {
 }
 
 /**
+ * @description Initializes or repairs the built-in Dev Menu log severity filter state.
+ */
+function gmcu_log_viewer_filters_ensure_initialized() {
+	if (!variable_global_exists("gmcu_log_viewer_filters") || !is_struct(global.gmcu_log_viewer_filters)) {
+		gmcu_log_viewer_filters_reset();
+		return;
+	}
+
+	var _filters = global.gmcu_log_viewer_filters;
+	if (!variable_struct_exists(_filters, GMCU_LOG_LEVEL_DEBUG)) _filters[$ GMCU_LOG_LEVEL_DEBUG] = true;
+	if (!variable_struct_exists(_filters, GMCU_LOG_LEVEL_INFO)) _filters[$ GMCU_LOG_LEVEL_INFO] = true;
+	if (!variable_struct_exists(_filters, GMCU_LOG_LEVEL_WARN)) _filters[$ GMCU_LOG_LEVEL_WARN] = true;
+	if (!variable_struct_exists(_filters, GMCU_LOG_LEVEL_ERROR)) _filters[$ GMCU_LOG_LEVEL_ERROR] = true;
+	if (!variable_struct_exists(_filters, GMCU_LOG_LEVEL_EXCEPTION)) _filters[$ GMCU_LOG_LEVEL_EXCEPTION] = true;
+}
+
+/**
+ * @description Resets the built-in Dev Menu log severity filters to show every severity.
+ * @returns {Struct} Current severity filter struct.
+ */
+function gmcu_log_viewer_filters_reset() {
+	global.gmcu_log_viewer_filters = {
+		debug: true,
+		info: true,
+		warn: true,
+		error: true,
+		exception: true
+	};
+	return global.gmcu_log_viewer_filters;
+}
+
+/**
+ * @description Returns the built-in Dev Menu log severity filters.
+ * @returns {Struct} Filter flags keyed by GMCU_LOG_LEVEL_* values.
+ */
+function gmcu_log_viewer_filters_get() {
+	gmcu_log_viewer_filters_ensure_initialized();
+	return global.gmcu_log_viewer_filters;
+}
+
+/**
+ * @description Returns whether a given log severity should be visible in the built-in Dev Menu log page.
+ * @param {string} _level Common Utils log severity.
+ * @returns {Bool} True when entries of this severity should be shown.
+ */
+function gmcu_log_viewer_filters_is_level_visible(_level) {
+	var _filters = gmcu_log_viewer_filters_get();
+	if (!variable_struct_exists(_filters, _level)) return true;
+	return _filters[$ _level];
+}
+
+/**
+ * @description Toggles one built-in Dev Menu log severity filter.
+ * @param {string} _level Common Utils log severity.
+ * @returns {Bool} New enabled state for the severity.
+ */
+function gmcu_log_viewer_filters_toggle_level(_level) {
+	var _filters = gmcu_log_viewer_filters_get();
+	if (!variable_struct_exists(_filters, _level)) return true;
+	_filters[$ _level] = !_filters[$ _level];
+	return _filters[$ _level];
+}
+
+/**
  * @description Appends a structured entry to the bounded development log ring buffer.
  * @param {string} _level Common Utils log severity.
  * @param {string} _message Fully formatted log message.

@@ -1,6 +1,6 @@
-if (gmcu_singleton()) {
-	return;
-}
+/// @description Singleton / Initialization / Functions
+if (gmcu_singleton(true, "GMCU DevMenu")) { return; }
+
 is_open = false;
 config = undefined; // Consumer-owned configuration passed through gmcu_dev_menu_init.
 pages = [];
@@ -17,6 +17,18 @@ layered_gui_available = false;
 layered_gui_items = [];
 universal_cursor_available = false;
 universal_cursor_items = [];
+log_filter_levels = [
+	GMCU_LOG_LEVEL_DEBUG,
+	GMCU_LOG_LEVEL_INFO,
+	GMCU_LOG_LEVEL_WARN,
+	GMCU_LOG_LEVEL_ERROR,
+	GMCU_LOG_LEVEL_EXCEPTION
+];
+log_filter_chip_index = 0;
+cursor_was_available = false;
+cursor_was_visible = false;
+cursor_was_system_hidden = false;
+cursor_sprite_before_open = noone;
 
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEV_MENU, "Dev Menu");
 
@@ -90,11 +102,57 @@ function on_draw_gui() {
 			}
 		}
 		draw_set_color(_enabled ? _text_color : _theme.muted_color);
-		var _label = _item.label;
-		if (_item.type == "submenu") _label += " >";
-		if (_item.type == "toggle") _label += ": " + (_item.get_value() ? "ON" : "OFF");
-		if (_item.type == "value") _label += ": " + string(_item.get_value());
-		draw_text(_panel_x + 18, (_y1 + _y2) * 0.5, _label);
+		if (_item.type == "log_filters") {
+			var _label_x = _panel_x + 18;
+			draw_text(_label_x, (_y1 + _y2) * 0.5, _item.label);
+
+			var _chip_x = _label_x + 108;
+			for (var _chip_i = 0; _chip_i < array_length(log_filter_levels); _chip_i++) {
+				var _level = log_filter_levels[_chip_i];
+				var _chip_label = string_upper(_level);
+				var _chip_enabled = gmcu_log_viewer_filters_is_level_visible(_level);
+				var _chip_width = string_width(_chip_label) + 16;
+				var _chip_x2 = _chip_x + _chip_width;
+				var _focused_chip = _index == selected_index && _chip_i == log_filter_chip_index;
+				var _chip_fill = _chip_enabled ? _theme.panel_color : _theme.overlay_color;
+				var _chip_text_color = _theme.muted_color;
+
+				switch (_level) {
+					case GMCU_LOG_LEVEL_INFO:
+						_chip_text_color = _theme.log_info_color;
+						break;
+					case GMCU_LOG_LEVEL_WARN:
+						_chip_text_color = _theme.log_warn_color;
+						break;
+					case GMCU_LOG_LEVEL_ERROR:
+					case GMCU_LOG_LEVEL_EXCEPTION:
+						_chip_text_color = _theme.log_error_color;
+						break;
+					default:
+						_chip_text_color = _theme.log_debug_color;
+						break;
+				}
+
+				if (_focused_chip) {
+					draw_set_color(_theme.chip_selected_color);
+					draw_rectangle(_chip_x - 2, _y1 + 3, _chip_x2 + 2, _y2 - 3, false);
+				}
+
+				draw_set_color(_chip_fill);
+				draw_rectangle(_chip_x, _y1 + 5, _chip_x2, _y2 - 5, false);
+				draw_set_color(_chip_enabled ? _chip_text_color : _theme.muted_color);
+				draw_set_halign(fa_center);
+				draw_text((_chip_x + _chip_x2) * 0.5, (_y1 + _y2) * 0.5, _chip_label);
+				draw_set_halign(fa_left);
+				_chip_x = _chip_x2 + 8;
+			}
+		} else {
+			var _label = _item.label;
+			if (_item.type == "submenu") _label += " >";
+			if (_item.type == "toggle") _label += ": " + (_item.get_value() ? "ON" : "OFF");
+			if (_item.type == "value") _label += ": " + string(_item.get_value());
+			draw_text(_panel_x + 18, (_y1 + _y2) * 0.5, _label);
+		}
 	}
 
 	draw_set_color(_theme.muted_color);
@@ -147,6 +205,7 @@ function configure(_config) {
 	if (!variable_struct_exists(_theme, "overlay_alpha")) _theme.overlay_alpha = 0.82;
 	if (!variable_struct_exists(_theme, "panel_color")) _theme.panel_color = make_color_rgb(20, 24, 32);
 	if (!variable_struct_exists(_theme, "selected_color")) _theme.selected_color = make_color_rgb(55, 90, 145);
+	if (!variable_struct_exists(_theme, "chip_selected_color")) _theme.chip_selected_color = make_color_rgb(34, 120, 92);
 	if (!variable_struct_exists(_theme, "text_color")) _theme.text_color = c_white;
 	if (!variable_struct_exists(_theme, "muted_color")) _theme.muted_color = make_color_rgb(160, 165, 175);
 	if (!variable_struct_exists(_theme, "log_debug_color")) _theme.log_debug_color = c_white;
@@ -200,12 +259,16 @@ function current_items() {
 				return _language_items;
 			case "logs":
 				var _log_items = [{
+					type: "log_filters",
+					label: "Severity"
+				}, {
 					type: "clear_logs",
 					label: "Clear logs"
 				}];
 				var _logs = gmcu_log_buffer_get();
 				for (var _j = array_length(_logs) - 1; _j >= 0; _j--) {
 					var _entry = _logs[_j];
+					if (!gmcu_log_viewer_filters_is_level_visible(_entry.level)) continue;
 					array_push(_log_items, {
 						type: "copy_text",
 						label: _entry.message,
@@ -344,10 +407,29 @@ function open_menu() {
 	if (is_open || is_undefined(config)) return;
 	refresh_layered_gui_items();
 	refresh_universal_cursor_items();
+	gmcu_log_viewer_filters_ensure_initialized();
+	cursor_was_available = instance_exists(gmcu_o_universal_cursor);
+	if (instance_exists(gmcu_o_universal_cursor)) {
+		cursor_was_visible = gmcu_o_universal_cursor.visible;
+		cursor_sprite_before_open = gmcu_o_universal_cursor.sprite_index;
+		cursor_was_system_hidden = cursor_was_visible && cursor_sprite_before_open != noone;
+		gmcu_o_universal_cursor.visible = true;
+		if (gmcu_o_universal_cursor.sprite_index != noone) {
+			window_set_cursor(cr_none);
+		} else {
+			window_set_cursor(cr_default);
+		}
+	} else {
+		cursor_was_visible = false;
+		cursor_sprite_before_open = noone;
+		cursor_was_system_hidden = false;
+		window_set_cursor(cr_default);
+	}
 	is_open = true;
 	page_stack = [pages[0].id];
 	selected_index = 0;
 	scroll_offset = 0;
+	log_filter_chip_index = 0;
 	try {
 		gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_OPENED);
 	} catch (_exception) {
@@ -363,6 +445,13 @@ function close_menu(_notify = true) {
 	if (!is_open) return;
 	is_open = false;
 	page_stack = [];
+	if (cursor_was_available && instance_exists(gmcu_o_universal_cursor)) {
+		gmcu_o_universal_cursor.visible = cursor_was_visible;
+		gmcu_o_universal_cursor.sprite_index = cursor_sprite_before_open;
+		window_set_cursor(cursor_was_system_hidden ? cr_none : cr_default);
+	} else {
+		window_set_cursor(cr_default);
+	}
 	if (_notify) {
 		try {
 			gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_CLOSED);
@@ -381,6 +470,7 @@ function push_page(_page_id) {
 	array_push(page_stack, _page_id);
 	selected_index = 0;
 	scroll_offset = 0;
+	log_filter_chip_index = 0;
 }
 
 /**
@@ -394,6 +484,7 @@ function go_back() {
 	array_pop(page_stack);
 	selected_index = 0;
 	scroll_offset = 0;
+	log_filter_chip_index = 0;
 }
 
 /**
@@ -417,6 +508,9 @@ function activate_item(_direction = 1) {
 	if (!item_enabled(_item)) return;
 
 	switch (_item.type) {
+		case "log_filters":
+			gmcu_log_viewer_filters_toggle_level(log_filter_levels[log_filter_chip_index]);
+			break;
 		case "action":
 			try {
 				_item.action();
@@ -475,4 +569,8 @@ function move_selection(_delta) {
 	var _count = array_length(_items);
 	if (_count == 0) return;
 	selected_index = (selected_index + _delta + _count) mod _count;
+	var _item = _items[selected_index];
+	if (_item.type == "log_filters") {
+		log_filter_chip_index = clamp(log_filter_chip_index, 0, array_length(log_filter_levels) - 1);
+	}
 }

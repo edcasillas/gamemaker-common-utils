@@ -59,8 +59,14 @@ flowchart LR
 | `gmcu_log_buffer_get()` | Function | Returns the bounded Dev Menu log buffer. |
 | `gmcu_log_buffer_clear()` | Function | Clears the bounded Dev Menu log buffer. |
 | `gmcu_log_buffer_set_capacity(_capacity)` | Function | Changes the bounded Dev Menu log buffer capacity. |
+| `gmcu_log_viewer_filters_get()` | Function | Returns the built-in Dev Menu log severity filter state. |
+| `gmcu_log_viewer_filters_is_level_visible(_level)` | Function | Returns whether the built-in Dev Menu viewer should show a severity. |
+| `gmcu_log_viewer_filters_toggle_level(_level)` | Function | Toggles one built-in Dev Menu viewer severity. |
+| `gmcu_log_viewer_filters_reset()` | Function | Restores the built-in Dev Menu viewer to show all severities. |
 | `GMCU_LOG_LEVEL_*` | Macros | Severity constants stored in the log buffer. |
 | `GMCU_ENABLE_*_LOG` | Macros | Build-policy macros that control which severities are emitted. |
 
 [`InGameNotifications`](in-game-notifications.md) can register the optional
 visual handler. Logging does not depend directly on analytics SDKs or HTML5.
+The built-in Dev Menu log viewer can filter buffered entries by severity
+without changing what gets written to the buffer.

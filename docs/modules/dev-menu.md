@@ -229,6 +229,12 @@ and errors or exceptions are red. Override these theme fields when needed:
 - `log_warn_color`
 - `log_error_color`
 
+The built-in `Logs` page starts with one compact `Severity` row. It exposes
+inline chips for `DEBUG`, `INFO`, `WARN`, `ERROR`, and `EXCEPTION`, then shows
+`Clear logs`, then the filtered entries. With keyboard or gamepad, select the
+row, use left/right to move between chips, and press Enter / confirm to toggle
+the focused chip. Mouse clicks toggle chips directly.
+
 Log rows are copyable. Select one and press Enter, the gamepad confirmation
 button, or click it to copy the complete message to the clipboard.
 
