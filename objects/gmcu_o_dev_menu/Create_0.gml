@@ -1,5 +1,5 @@
 /// @description Singleton / Initialization / Functions
-if (gmcu_singleton(true, "GMCU DevMenu")) { return; }
+if (gmcu_singleton()) { return; }
 
 is_open = false;
 config = undefined; // Consumer-owned configuration passed through gmcu_dev_menu_init.

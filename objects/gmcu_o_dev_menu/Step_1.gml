@@ -1,4 +1,8 @@
 /// @description Handle Inputs
+
+// TODO Is this logic replicating the logic in the universal cursor?
+// If so, maybe we should extract functions and just call them in both places.
+
 if (is_undefined(config)) return;
 
 if (config.trigger_pressed()) {
