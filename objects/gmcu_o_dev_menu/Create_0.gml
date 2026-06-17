@@ -15,7 +15,7 @@ last_mouse_y = -1;
 mouse_active = false; // True after the mouse moves; false after d-pad/keyboard navigation.
 layered_gui_available = false;
 layered_gui_items = [];
-universal_cursor_available = false;
+universal_cursor_available = false; // True when the consumer uses the Universal Cursor module.
 universal_cursor_items = [];
 log_filter_levels = [
 	GMCU_LOG_LEVEL_DEBUG,
@@ -29,6 +29,7 @@ cursor_was_available = false;
 cursor_was_visible = false;
 cursor_was_system_hidden = false;
 cursor_sprite_before_open = noone;
+system_cursor_behind = cr_none; // Snapshot of the system cursor before opening the menu. Will be restored when closing it.
 
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEV_MENU, "Dev Menu");
 
@@ -405,6 +406,8 @@ function refresh_universal_cursor_items() {
  */
 function open_menu() {
 	if (is_open || is_undefined(config)) return;
+	
+	// TODO The dev menu no longer has a "modal" mode. Do we need these snapshot?
 	refresh_layered_gui_items();
 	refresh_universal_cursor_items();
 	gmcu_log_viewer_filters_ensure_initialized();
@@ -425,11 +428,20 @@ function open_menu() {
 		cursor_was_system_hidden = false;
 		window_set_cursor(cr_default);
 	}
+	
+	// Force the system cursor to show while the dev menu is open.
+	system_cursor_behind = window_get_cursor();
+	window_set_cursor(cr_default);
+	
 	is_open = true;
 	page_stack = [pages[0].id];
 	selected_index = 0;
 	scroll_offset = 0;
 	log_filter_chip_index = 0;
+	
+	// TODO Do we really need to wrap dispatch with try/catch?
+	// gmcu_eventbus_dispatch is supposed to be an exception-safe method.
+	// Callers should be able to just call gmcu_eventbus_dispatch to KEEP IT SIMPLE, STUPID!
 	try {
 		gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_OPENED);
 	} catch (_exception) {
@@ -452,6 +464,10 @@ function close_menu(_notify = true) {
 	} else {
 		window_set_cursor(cr_default);
 	}
+	
+	// Restores the cursor to what is was before opening the menu.
+	window_set_cursor(system_cursor_behind);
+	
 	if (_notify) {
 		try {
 			gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_CLOSED);

@@ -9,7 +9,7 @@ if (config.trigger_pressed()) {
 if (!is_open) return;
 
 var _has_gamepad = instance_exists(gmcu_o_input_hub) && gmcu_o_input_hub.gmcu_has_connected_gamepad();
-if (keyboard_check_released(vk_escape) || (_has_gamepad && gamepad_button_check_pressed(0, gp_face2))) {
+if (keyboard_check_pressed(vk_escape) || (_has_gamepad && gamepad_button_check_pressed(0, gp_face2))) {
 	go_back();
 	return;
 }
