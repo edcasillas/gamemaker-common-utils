@@ -79,3 +79,7 @@ flowchart LR
 visual handler. Logging does not depend directly on analytics SDKs or HTML5.
 The built-in Dev Menu log viewer can filter buffered entries by severity
 without changing what gets written to the buffer.
+
+Unhandled fatal-crash boilerplate lives in
+[`Crash Handling`](crash-handling.md). Logging does not expose a public fatal
+severity.

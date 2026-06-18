@@ -44,6 +44,7 @@
   "resources":[
     {"id":{"name":"gmcu_html5_helpers","path":"extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy",},},
     {"id":{"name":"gmcu_html5_use_browser_console_for_logging","path":"scripts/gmcu_html5_use_browser_console_for_logging/gmcu_html5_use_browser_console_for_logging.yy",},},
+    {"id":{"name":"gmcu_install_unhandled_exception_handler","path":"scripts/gmcu_install_unhandled_exception_handler/gmcu_install_unhandled_exception_handler.yy",},},
     {"id":{"name":"gmcu_o_base_button_game","path":"objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy",},},
     {"id":{"name":"gmcu_o_base_button_gui","path":"objects/gmcu_o_base_button_gui/gmcu_o_base_button_gui.yy",},},
     {"id":{"name":"gmcu_o_base_button","path":"objects/gmcu_o_base_button/gmcu_o_base_button.yy",},},

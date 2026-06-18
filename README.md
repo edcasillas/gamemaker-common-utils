@@ -32,20 +32,21 @@ Import modules in this order:
 1. [`Core`](docs/modules/core.md): Shared macros and foundational helpers.
 2. [`Drawing`](docs/modules/drawing.md): Temporary draw-state management.
 3. [`Logging`](docs/modules/logging.md): Severity-aware logging with optional output and telemetry handlers.
-4. [`Singleton`](docs/modules/singleton.md): Simple persistent singleton helper for shared managers.
-5. [`EventBus`](docs/modules/event-bus.md): Publish-subscribe event dispatch.
-6. [`InGameNotifications`](docs/modules/in-game-notifications.md): Optional visual development notifications.
-7. [`InputHub`](docs/modules/input-hub.md): Centralized keyboard and gamepad input.
-8. [`Localization`](docs/modules/localization.md): CSV-backed translation lookup.
-9. [`LayeredGUI`](docs/modules/layered-gui.md): Priority-ordered Draw GUI callbacks.
-10. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
-11. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
-12. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
-13. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
-14. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
-15. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
-16. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
-17. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
+4. [`Crash Handling`](docs/modules/crash-handling.md): Shared unhandled-exception boilerplate with one optional terminal callback.
+5. [`Singleton`](docs/modules/singleton.md): Simple persistent singleton helper for shared managers.
+6. [`EventBus`](docs/modules/event-bus.md): Publish-subscribe event dispatch.
+7. [`InGameNotifications`](docs/modules/in-game-notifications.md): Optional visual development notifications.
+8. [`InputHub`](docs/modules/input-hub.md): Centralized keyboard and gamepad input.
+9. [`Localization`](docs/modules/localization.md): CSV-backed translation lookup.
+10. [`LayeredGUI`](docs/modules/layered-gui.md): Priority-ordered Draw GUI callbacks.
+11. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
+12. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
+13. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
+14. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
+15. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
+16. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
+17. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
+18. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
 
 ## Dependency Overview
 
@@ -53,6 +54,7 @@ Import modules in this order:
 flowchart TD
     Core --> Drawing
     Core --> Logging
+    Logging --> CrashHandling
     Core --> EventBus
     Core --> InputHub
     Core --> Localization
@@ -93,6 +95,7 @@ flowchart TD
     Singleton --> TimedActions
 
     HTML5[HTML5 Helpers]
+    CrashHandling[Crash Handling]
     ReleaseBuild[Release and Build Info]
 ```
 
@@ -159,10 +162,10 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Confirm the consuming repo state with `git status`.
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
-  `Singleton`, `EventBus`, optional `InGameNotifications`, `InputHub`, `Localization`,
-  `LayeredGUI`, `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then
-  `Transitions`, `HTML5 Helpers`, and
-  `Release and Build Info` if needed.
+  optional `Crash Handling`, `Singleton`, `EventBus`, optional
+  `InGameNotifications`, `InputHub`, `Localization`, `LayeredGUI`,
+  `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then `Transitions`,
+  `HTML5 Helpers`, and `Release and Build Info` if needed.
 - Keep `.yyp` paths local and symlink local folders to this submodule.
 - Check for name conflicts before replacing local resources.
 - Run `git diff --check`.
@@ -186,6 +189,10 @@ specific maintenance rule.
   analytics SDK. Consumers can also register an output handler; HTML5 consumers
   can use `gmcu_html5_use_browser_console_for_logging()` to preserve browser
   severity without rewriting the adapter in each project.
+- Crash handling is shared boilerplate, but terminal actions remain
+  consumer-owned. Consumers can install the shared unhandled-exception flow and
+  run one project-specific terminal callback without coupling Common Utils to a
+  specific analytics provider.
 - Provider integrations such as GameAnalytics and GlobalStats.io remain
   consumer-owned. GameAnalytics can connect to Logging through
   `gmcu_log_set_telemetry_handler`; GlobalStats.io clients may use Logging and

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_install_unhandled_exception_handler",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_install_unhandled_exception_handler",
+  "parent":{
+    "name":"Logging",
+    "path":"folders/CommonUtils/Logging.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
