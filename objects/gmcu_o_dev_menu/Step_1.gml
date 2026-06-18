@@ -14,6 +14,7 @@ if (!is_open) return;
 
 var _has_gamepad = instance_exists(gmcu_o_input_hub) && gmcu_o_input_hub.gmcu_has_connected_gamepad();
 if (keyboard_check_pressed(vk_escape) || (_has_gamepad && gamepad_button_check_pressed(0, gp_face2))) {
+	consume_escape_release = keyboard_check(vk_escape);
 	go_back();
 	return;
 }
