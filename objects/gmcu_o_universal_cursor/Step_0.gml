@@ -21,13 +21,18 @@ if(_current_mouse_x != last_mouse_x || _current_mouse_y != last_mouse_y) {
 }
 
 // Handle directional navigation (arrow keys or D-Pad)
-if (keyboard_check_pressed(vk_up) || gamepad_button_check_pressed(0, gp_padu)) {
+var _has_input_hub = instance_exists(gmcu_o_input_hub);
+if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padu))) {
     navigate(GMCU_DIRECTION_ANGLE.UP);
-} else if (keyboard_check_pressed(vk_down) || gamepad_button_check_pressed(0, gp_padd)) {
+} else if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_down))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padd))) {
     navigate(GMCU_DIRECTION_ANGLE.DOWN);
-} else if (keyboard_check_pressed(vk_left) || gamepad_button_check_pressed(0, gp_padl)) {
+} else if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padl))) {
     navigate(GMCU_DIRECTION_ANGLE.LEFT);
-} else if (keyboard_check_pressed(vk_right) || gamepad_button_check_pressed(0, gp_padr)) {
+} else if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padr))) {
     navigate(GMCU_DIRECTION_ANGLE.RIGHT);
 }
 
@@ -121,13 +126,16 @@ if(!_is_hovering) {
 // Check for interaction events if hovering over an interactable
 if(_is_hovering && hovered_interactable != noone) {
 	// Trigger on_pressed for different input methods
-	var _has_gamepad = instance_exists(gmcu_o_input_hub) && gmcu_o_input_hub.gmcu_has_connected_gamepad();
-	if (mouse_check_button_pressed(mb_left) || keyboard_check_pressed(vk_enter) || (_has_gamepad && gamepad_button_check_pressed(0, gp_face1))) {
+	if (mouse_check_button_pressed(mb_left)
+		|| (_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_enter))
+		|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face1))) {
 		hovered_interactable.on_pressed();
 	}
 	
 	// Trigger on_released for different input methods
-	if (mouse_check_button_released(mb_left) || keyboard_check_released(vk_enter) || (_has_gamepad && gamepad_button_check_released(0, gp_face1))) {
+	if (mouse_check_button_released(mb_left)
+		|| (_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_released(vk_enter))
+		|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_released(gp_face1))) {
 		hovered_interactable.on_released();
 	}
 }

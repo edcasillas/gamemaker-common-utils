@@ -121,18 +121,6 @@ function gmcu_dev_menu_is_open() {
 }
 
 /**
- * @description Returns and clears whether the last Dev Menu close already consumed the current Escape release.
- * @returns {Bool} True once after closing the menu with Escape.
- */
-function gmcu_dev_menu_consume_escape_release() {
-	var _instance = instance_find(gmcu_o_dev_menu, 0);
-	if (_instance == noone) return false;
-	if (!_instance.consume_escape_release) return false;
-	_instance.consume_escape_release = false;
-	return true;
-}
-
-/**
  * @description Returns whether overlay UI should block gameplay pointer interaction.
  * @returns {Bool} True when gameplay mouse/cursor clicks should be ignored.
  */

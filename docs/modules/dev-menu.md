@@ -19,6 +19,10 @@ The important detail is that the trigger callback only answers a yes/no
 question. The menu object itself calls that callback every Step and decides
 whether to open, close, or keep navigating the current page.
 
+Once the menu is open, monitored keyboard/gamepad navigation comes from
+[`InputHub`](input-hub.md). Raw mouse movement, wheel, and clicks remain local
+to the Dev Menu.
+
 ## Resources
 
 - `scripts/gmcu_dev_menu`
@@ -31,7 +35,7 @@ whether to open, close, or keep navigating the current page.
 | [`Core`](core.md) | Supplies DevBuild policy and shared constants. |
 | [`Drawing`](drawing.md) | Protects overlay draw state. |
 | [`Logging`](logging.md) | Reports callback failures and supplies log history. |
-| [`InputHub`](input-hub.md) | Supplies keyboard/gamepad navigation. |
+| [`InputHub`](input-hub.md) | Owns monitored keyboard/gamepad hardware input and routes Dev Menu interactions to the menu. |
 | [`EventBus`](event-bus.md) | Used to dispatch events on menu opened / closed. |
 | [`LayeredGUI`](layered-gui.md) | Owns final overlay draw order when present, so the Dev Menu renders above gameplay GUI. Supplies subscriber diagnostics when its manager exists in the current room.|
 | [`UniversalCursor`](universal-cursor.md) (optional) | Supplies interactable and hover diagnostics while its singleton exists. |

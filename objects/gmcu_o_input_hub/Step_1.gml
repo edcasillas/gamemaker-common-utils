@@ -1,48 +1,97 @@
-// Check keyboard directional inputs
-var _left = keyboard_check(vk_left);
-var _right = keyboard_check(vk_right);
-var _up = keyboard_check(vk_up);
-var _down = keyboard_check(vk_down);
+for (var _keyboard_i = 0; _keyboard_i < array_length(monitored_keyboard_keys); _keyboard_i++) {
+	var _keyboard_key = monitored_keyboard_keys[_keyboard_i];
+	var _keyboard_state = keyboard_input_state(_keyboard_key);
+	_keyboard_state.pressed_gameplay = false;
+	_keyboard_state.released_gameplay = false;
+	_keyboard_state.pressed_dev_menu = false;
+	_keyboard_state.released_dev_menu = false;
 
-if(gmcu_gameplay_input_blocked()) {
-	h_axis = 0;
-	v_axis = 0;
-	return;
-}
-
-h_axis = _right - _left; // Will be 1 for right, -1 for left
-v_axis = _up - _down; // Will be 1 for up, -1 for down
-
-// Check gamepad inputs
-if(array_length(gamepads) == 0) { return; }
-
-// Check directional inputs only if no keyboard inputs were received.
-if(h_axis == 0 && v_axis == 0) {
-	_left = gamepad_button_check(0, gp_padl);
-	_right = gamepad_button_check(0, gp_padr);
-	_up = gamepad_button_check(0, gp_padu);
-	_down = gamepad_button_check(0, gp_padd);
-
-	h_axis = _right - _left; // Will be 1 for right, -1 for left
-	v_axis = _up - _down; // Will be 1 for up, -1 for down
-
-	if (array_length(gamepads) > 0)
-	{	
-		if(h_axis == 0) h_axis = gamepad_axis_value(gamepads[0], gp_axislh);
-		if(v_axis == 0) v_axis = gamepad_axis_value(gamepads[0], gp_axislv);
+	var _keyboard_is_down = keyboard_check(_keyboard_key);
+	if (_keyboard_is_down && !_keyboard_state.is_down) {
+		_keyboard_state.is_down = true;
+		_keyboard_state.owner = current_input_owner();
+		if (_keyboard_state.owner == GMCU_INPUT_OWNER_DEV_MENU) {
+			_keyboard_state.pressed_dev_menu = true;
+		} else {
+			_keyboard_state.pressed_gameplay = true;
+			gmcu_eventbus_dispatch(GMCU_EVENT_KEYBOARD_KEY_PRESSED, _keyboard_key);
+		}
+	}
+	if (!_keyboard_is_down && _keyboard_state.is_down) {
+		_keyboard_state.is_down = false;
+		if (_keyboard_state.owner == GMCU_INPUT_OWNER_DEV_MENU) {
+			_keyboard_state.released_dev_menu = true;
+		} else {
+			_keyboard_state.released_gameplay = true;
+			gmcu_eventbus_dispatch(GMCU_EVENT_KEYBOARD_KEY_RELEASED, _keyboard_key);
+		}
 	}
 }
 
-// Check press and released gamepad buttons, and dispatch proper events.
-for(var _i = 0; _i < array_length(gamepad_buttons); _i++) {
-	var _button_code = gamepad_buttons[_i];
-	var _button_name = global.gmcu_gamepad_buttons_mapping[$ string(_button_code)];
-	if(gamepad_button_check_pressed(0, _button_code)) {
-		gmcu_log_debug("Button " + _button_name + " pressed", true);
-		gmcu_eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED, _button_code);
+var _left = input_state_down(keyboard_input_state(vk_left), GMCU_INPUT_OWNER_GAMEPLAY);
+var _right = input_state_down(keyboard_input_state(vk_right), GMCU_INPUT_OWNER_GAMEPLAY);
+var _up = input_state_down(keyboard_input_state(vk_up), GMCU_INPUT_OWNER_GAMEPLAY);
+var _down = input_state_down(keyboard_input_state(vk_down), GMCU_INPUT_OWNER_GAMEPLAY);
+h_axis = _right - _left;
+v_axis = _up - _down;
+
+for (var _gamepad_i = 0; _gamepad_i < array_length(gamepad_buttons); _gamepad_i++) {
+	var _button_code = gamepad_buttons[_gamepad_i];
+	var _button_state = gamepad_input_state(_button_code);
+	_button_state.pressed_gameplay = false;
+	_button_state.released_gameplay = false;
+	_button_state.pressed_dev_menu = false;
+	_button_state.released_dev_menu = false;
+}
+
+var _has_gamepad = gmcu_has_connected_gamepad();
+if (_has_gamepad) {
+	for (var _button_i = 0; _button_i < array_length(gamepad_buttons); _button_i++) {
+		var _button_code = gamepad_buttons[_button_i];
+		var _button_name = global.gmcu_gamepad_buttons_mapping[$ string(_button_code)];
+		var _button_state = gamepad_input_state(_button_code);
+		var _button_is_down = gamepad_button_check(0, _button_code);
+
+		if (_button_is_down && !_button_state.is_down) {
+			_button_state.is_down = true;
+			_button_state.owner = current_input_owner();
+			if (_button_state.owner == GMCU_INPUT_OWNER_DEV_MENU) {
+				_button_state.pressed_dev_menu = true;
+			} else {
+				_button_state.pressed_gameplay = true;
+				gmcu_log_debug("Button " + _button_name + " pressed", true);
+				gmcu_eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_PRESSED, _button_code);
+			}
+		}
+
+		if (!_button_is_down && _button_state.is_down) {
+			_button_state.is_down = false;
+			if (_button_state.owner == GMCU_INPUT_OWNER_DEV_MENU) {
+				_button_state.released_dev_menu = true;
+			} else {
+				_button_state.released_gameplay = true;
+				gmcu_log_debug("Button " + _button_name + " released", true);
+				gmcu_eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_RELEASED, _button_code);
+			}
+		}
 	}
-	if(gamepad_button_check_released(0, _button_code)) {
-		gmcu_log_debug("Button " + _button_name + " released", true);
-		gmcu_eventbus_dispatch(GMCU_EVENT_GAMEPAD_BUTTON_RELEASED, _button_code);
+}
+
+if (h_axis == 0 && v_axis == 0) {
+	_left = input_state_down(gamepad_input_state(gp_padl), GMCU_INPUT_OWNER_GAMEPLAY);
+	_right = input_state_down(gamepad_input_state(gp_padr), GMCU_INPUT_OWNER_GAMEPLAY);
+	_up = input_state_down(gamepad_input_state(gp_padu), GMCU_INPUT_OWNER_GAMEPLAY);
+	_down = input_state_down(gamepad_input_state(gp_padd), GMCU_INPUT_OWNER_GAMEPLAY);
+
+	h_axis = _right - _left;
+	v_axis = _up - _down;
+
+	if (_has_gamepad) {
+		if (h_axis == 0 && current_input_owner() == GMCU_INPUT_OWNER_GAMEPLAY) {
+			h_axis = gamepad_axis_value(gamepads[0], gp_axislh);
+		}
+		if (v_axis == 0 && current_input_owner() == GMCU_INPUT_OWNER_GAMEPLAY) {
+			v_axis = gamepad_axis_value(gamepads[0], gp_axislv);
+		}
 	}
 }

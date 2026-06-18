@@ -17,7 +17,6 @@ layered_gui_available = false;
 layered_gui_items = [];
 universal_cursor_available = false; // True when the consumer uses the Universal Cursor module.
 universal_cursor_items = [];
-consume_escape_release = false; // True when Escape closed the menu and gameplay should ignore the matching Key Release event.
 log_filter_levels = [
 	GMCU_LOG_LEVEL_DEBUG,
 	GMCU_LOG_LEVEL_INFO,
@@ -407,7 +406,6 @@ function refresh_universal_cursor_items() {
  */
 function open_menu() {
 	if (is_open || is_undefined(config)) return;
-	consume_escape_release = false;
 	
 	// TODO The dev menu no longer has a "modal" mode. Do we need these snapshot?
 	refresh_layered_gui_items();

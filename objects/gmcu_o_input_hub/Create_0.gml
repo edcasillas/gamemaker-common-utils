@@ -2,6 +2,15 @@ if (gmcu_singleton()) {
 	return;
 }
 gamepads = [];
+monitored_keyboard_keys = [
+	vk_escape,
+	vk_enter,
+	vk_space,
+	vk_left,
+	vk_right,
+	vk_up,
+	vk_down
+];
 gamepad_buttons = [
 gp_face1, //	Top button 1 (this maps to the "A" on an Xbox controller and the cross on a PS controller)
 gp_face2, //	Top button 2 (this maps to the "B" on an Xbox controller and the circle on a PS controller)
@@ -35,13 +44,88 @@ gp_padr, //	D-pad right
 
 h_axis = 0;
 v_axis = 0;
+keyboard_input_states = {};
+gamepad_input_states = {};
 
 /**
- * @description Returns whether a UI overlay currently owns gameplay input.
- * @returns {Bool} True when gameplay consumers should observe no input.
+ * @description Builds the default routed-input state for one monitored key or button.
+ * @returns {Struct} Fresh interaction state.
  */
-function gmcu_gameplay_input_blocked() {
-	return gmcu_dev_menu_is_open();
+function create_input_state() {
+	return {
+		is_down: false,
+		owner: GMCU_INPUT_OWNER_GAMEPLAY,
+		pressed_gameplay: false,
+		released_gameplay: false,
+		pressed_dev_menu: false,
+		released_dev_menu: false
+	};
+}
+
+/**
+ * @description Returns the owner that should receive a newly pressed interaction this Step.
+ * @returns {String} `dev_menu` when the Dev Menu is open, otherwise `gameplay`.
+ */
+function current_input_owner() {
+	if (gmcu_dev_menu_is_open()) return GMCU_INPUT_OWNER_DEV_MENU;
+	return GMCU_INPUT_OWNER_GAMEPLAY;
+}
+
+/**
+ * @description Returns the routed input state for one monitored keyboard key.
+ * @param {Real} _key GameMaker vk_* key constant.
+ * @returns {Struct|Undefined} State struct, or undefined when the key is not monitored.
+ */
+function keyboard_input_state(_key) {
+	var _key_str = string(_key);
+	if (!variable_struct_exists(keyboard_input_states, _key_str)) return undefined;
+	return keyboard_input_states[$ _key_str];
+}
+
+/**
+ * @description Returns the routed input state for one monitored gamepad button.
+ * @param {Real} _button GameMaker gp_* button constant.
+ * @returns {Struct|Undefined} State struct, or undefined when the button is not monitored.
+ */
+function gamepad_input_state(_button) {
+	var _button_str = string(_button);
+	if (!variable_struct_exists(gamepad_input_states, _button_str)) return undefined;
+	return gamepad_input_states[$ _button_str];
+}
+
+/**
+ * @description Returns whether the requested routed press edge is available for the given owner.
+ * @param {Struct|Undefined} _state Routed interaction state.
+ * @param {String} _owner Owner requesting the interaction.
+ * @returns {Bool} True when the owner owns the press edge this Step.
+ */
+function input_state_pressed(_state, _owner) {
+	if (is_undefined(_state)) return false;
+	if (_owner == GMCU_INPUT_OWNER_DEV_MENU) return _state.pressed_dev_menu;
+	return _state.pressed_gameplay;
+}
+
+/**
+ * @description Returns whether the requested routed release edge is available for the given owner.
+ * @param {Struct|Undefined} _state Routed interaction state.
+ * @param {String} _owner Owner requesting the interaction.
+ * @returns {Bool} True when the owner owns the release edge this Step.
+ */
+function input_state_released(_state, _owner) {
+	if (is_undefined(_state)) return false;
+	if (_owner == GMCU_INPUT_OWNER_DEV_MENU) return _state.released_dev_menu;
+	return _state.released_gameplay;
+}
+
+/**
+ * @description Returns whether the routed held state is active for the given owner.
+ * @param {Struct|Undefined} _state Routed interaction state.
+ * @param {String} _owner Owner requesting the interaction.
+ * @returns {Bool} True when the interaction is currently held by this owner.
+ */
+function input_state_down(_state, _owner) {
+	if (is_undefined(_state)) return false;
+	return _state.is_down && _state.owner == _owner;
 }
 
 /**
@@ -62,6 +146,26 @@ function gmcu_get_direction() {
  */
 function gmcu_has_connected_gamepad() {
 	return array_length(gamepads) > 0;
+}
+
+/**
+ * @description Checks whether a monitored keyboard key was released for the requested owner this Step.
+ * @param {Real} _key GameMaker vk_* key constant.
+ * @param {String} _owner Optional owner name. Defaults to gameplay.
+ * @returns {Bool} True when the owner received the release edge this Step.
+ */
+function gmcu_keyboard_key_released(_key, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	return input_state_released(keyboard_input_state(_key), _owner);
+}
+
+/**
+ * @description Checks whether a monitored keyboard key was pressed for the requested owner this Step.
+ * @param {Real} _key GameMaker vk_* key constant.
+ * @param {String} _owner Optional owner name. Defaults to gameplay.
+ * @returns {Bool} True when the owner received the press edge this Step.
+ */
+function gmcu_keyboard_key_pressed(_key, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	return input_state_pressed(keyboard_input_state(_key), _owner);
 }
 
 /**
@@ -95,19 +199,27 @@ function gmcu_get_four_way_direction() {
 /**
  * @description Checks whether a gamepad button was released on gamepad slot 0 this Step.
  * @param {Real} _button GameMaker gp_* button constant.
+ * @param {String} _owner Optional owner name. Defaults to gameplay.
  * @returns {Bool} True when a connected gamepad released the button.
  */
-function gmcu_gamepad_button_released(_button) {
-	if(gmcu_gameplay_input_blocked()) return false;
-	return gmcu_has_connected_gamepad() && gamepad_button_check_released(0, _button);
+function gmcu_gamepad_button_released(_button, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	return input_state_released(gamepad_input_state(_button), _owner);
 }
 
 /**
  * @description Checks whether a gamepad button was pressed on gamepad slot 0 this Step.
  * @param {Real} _button GameMaker gp_* button constant.
+ * @param {String} _owner Optional owner name. Defaults to gameplay.
  * @returns {Bool} True when a connected gamepad pressed the button.
  */
-function gmcu_gamepad_button_pressed(_button) {
-	if(gmcu_gameplay_input_blocked()) return false;
-	return gmcu_has_connected_gamepad() && gamepad_button_check_pressed(0, _button);
+function gmcu_gamepad_button_pressed(_button, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	return input_state_pressed(gamepad_input_state(_button), _owner);
+}
+
+for (var _i = 0; _i < array_length(monitored_keyboard_keys); _i++) {
+	keyboard_input_states[$ string(monitored_keyboard_keys[_i])] = create_input_state();
+}
+
+for (var _j = 0; _j < array_length(gamepad_buttons); _j++) {
+	gamepad_input_states[$ string(gamepad_buttons[_j])] = create_input_state();
 }
