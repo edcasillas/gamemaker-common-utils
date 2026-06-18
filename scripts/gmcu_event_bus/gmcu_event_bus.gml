@@ -52,7 +52,10 @@ function gmcu_eventbus_unsubscribe(_event_name) {
 function gmcu_eventbus_dispatch(_event_name, _event_args = undefined) {
 	gmcu_eventbus_ensure_initialized();
 
-	var _event_log_str = "'" + string(_event_name) + "'(" + string(_event_args) + ")";
+	var _event_log_str = "'" + string(_event_name) + "'";
+	if (!is_undefined(_event_args)) {
+		_event_log_str += "(" + string(_event_args) + ")";
+	}
 	gmcu_log_debug("Dispatching " + _event_log_str);
 
 	if (!ds_map_exists(global.gmcu_eventbus_observers_map, _event_name)) return;
