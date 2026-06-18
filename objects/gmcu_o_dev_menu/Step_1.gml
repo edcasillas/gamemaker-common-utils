@@ -12,19 +12,17 @@ if (config.trigger_pressed()) {
 }
 if (!is_open) return;
 
-var _has_input_hub = instance_exists(gmcu_o_input_hub);
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_escape, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face2, GMCU_INPUT_OWNER_DEV_MENU))) {
+#region Keyboard + Gamepad
+
+if (check_input_pressed(vk_escape, gp_face2)) {
 	go_back();
 	return;
 }
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padu, GMCU_INPUT_OWNER_DEV_MENU))) {
+if (check_input_pressed(vk_up, gp_padu)) {
 	move_selection(-1);
 	mouse_active = false;
 }
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_down, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padd, GMCU_INPUT_OWNER_DEV_MENU))) {
+if (check_input_pressed(vk_down, gp_padd)) {
 	move_selection(1);
 	mouse_active = false;
 }
@@ -33,8 +31,8 @@ var _items = current_items();
 var _selected_item = selected_index >= 0 && selected_index < array_length(_items)
 	? _items[selected_index]
 	: undefined;
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padl, GMCU_INPUT_OWNER_DEV_MENU))) {
+	
+if (check_input_pressed(vk_left, gp_padl)) {
 	if (!is_undefined(_selected_item) && _selected_item.type == "log_filters") {
 		log_filter_chip_index = (log_filter_chip_index - 1 + array_length(log_filter_levels)) mod array_length(log_filter_levels);
 	} else {
@@ -42,8 +40,7 @@ if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left, GMCU_
 	}
 	mouse_active = false;
 }
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padr, GMCU_INPUT_OWNER_DEV_MENU))) {
+if (check_input_pressed(vk_right, gp_padr)) {
 	if (!is_undefined(_selected_item) && _selected_item.type == "log_filters") {
 		log_filter_chip_index = (log_filter_chip_index + 1) mod array_length(log_filter_levels);
 	} else {
@@ -51,12 +48,14 @@ if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right, GMCU
 	}
 	mouse_active = false;
 }
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_released(vk_enter, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_released(vk_space, GMCU_INPUT_OWNER_DEV_MENU))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face1, GMCU_INPUT_OWNER_DEV_MENU))) {
+if (check_input_released(vk_enter, gp_face1)) {
 	activate_item();
 	mouse_active = false;
 }
+
+#endregion
+
+#region Mouse
 
 var _mouse_x = device_mouse_x_to_gui(0);
 var _mouse_y = device_mouse_y_to_gui(0);
@@ -113,3 +112,5 @@ if (mouse_active) {
 		);
 	}
 }
+
+#endregion

@@ -504,6 +504,30 @@ function go_back() {
 }
 
 /**
+ * @description Returns whether the Dev Menu received the monitored key/button press this Step.
+ * @param {Real} _key GameMaker vk_* key constant.
+ * @param {Real} _button GameMaker gp_* button constant.
+ * @returns {Bool} True when the routed interaction belongs to the Dev Menu.
+ */
+function check_input_pressed(_key, _button) {
+	if (!instance_exists(gmcu_o_input_hub)) return false;
+	return gmcu_o_input_hub.gmcu_keyboard_key_pressed(_key, GMCU_INPUT_OWNER_DEV_MENU)
+		|| gmcu_o_input_hub.gmcu_gamepad_button_pressed(_button, GMCU_INPUT_OWNER_DEV_MENU);
+}
+
+/**
+ * @description Returns whether the Dev Menu received the monitored key/button release this Step.
+ * @param {Real} _key GameMaker vk_* key constant.
+ * @param {Real} _button GameMaker gp_* button constant.
+ * @returns {Bool} True when the routed interaction belongs to the Dev Menu.
+ */
+function check_input_released(_key, _button) {
+	if (!instance_exists(gmcu_o_input_hub)) return false;
+	return gmcu_o_input_hub.gmcu_keyboard_key_released(_key, GMCU_INPUT_OWNER_DEV_MENU)
+		|| gmcu_o_input_hub.gmcu_gamepad_button_released(_button, GMCU_INPUT_OWNER_DEV_MENU);
+}
+
+/**
  * @description Returns whether an item is currently interactive.
  * @param {Struct} _item Visible menu item.
  * @returns {Bool}
