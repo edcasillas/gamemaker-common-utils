@@ -24,6 +24,15 @@ gmcu_log_set_output_handler(function(_severity, _message) {
 });
 ```
 
+For HTML5 consumers already using [`HTML5 Helpers`](html5-helpers.md), prefer
+the shared adapter instead of rewriting the severity switch in each bootstrap:
+
+```gml
+if (os_browser != browser_not_a_browser) {
+    gmcu_html5_use_browser_console_for_logging();
+}
+```
+
 ## Resources
 
 - `scripts/gmcu_log_config`: Severity macros, adapters, recursion protection,

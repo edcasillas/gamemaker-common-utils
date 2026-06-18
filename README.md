@@ -184,7 +184,8 @@ specific maintenance rule.
   Consumers can register a telemetry handler to preserve
   project-specific log forwarding without coupling the shared module to an
   analytics SDK. Consumers can also register an output handler; HTML5 consumers
-  can use the HTML5 Helpers console functions to preserve browser severity.
+  can use `gmcu_html5_use_browser_console_for_logging()` to preserve browser
+  severity without rewriting the adapter in each project.
 - Provider integrations such as GameAnalytics and GlobalStats.io remain
   consumer-owned. GameAnalytics can connect to Logging through
   `gmcu_log_set_telemetry_handler`; GlobalStats.io clients may use Logging and

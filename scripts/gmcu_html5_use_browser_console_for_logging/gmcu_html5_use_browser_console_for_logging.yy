@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_html5_use_browser_console_for_logging",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_html5_use_browser_console_for_logging",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/CommonUtils/Extensions/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
