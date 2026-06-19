@@ -1,6 +1,5 @@
-if (gmcu_singleton()) {
-	return;
-}
+if (gmcu_singleton()) { return; }
+
 gamepads = [];
 monitored_keyboard_keys = [
 	vk_escape,
@@ -11,6 +10,7 @@ monitored_keyboard_keys = [
 	vk_up,
 	vk_down
 ];
+
 gamepad_buttons = [
 gp_face1, //	Top button 1 (this maps to the "A" on an Xbox controller and the cross on a PS controller)
 gp_face2, //	Top button 2 (this maps to the "B" on an Xbox controller and the circle on a PS controller)
