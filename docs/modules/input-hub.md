@@ -233,15 +233,31 @@ before that release happens.
 ## Common `gp_*` Names
 
 `global.gmcu_gamepad_buttons_mapping` includes readable labels for the common
-buttons used by debug logs. The most common constants are:
+buttons used by debug logs. The most useful discrete constants are:
 
 - `gp_face1`: primary face button (`A` on Xbox, cross on PlayStation)
 - `gp_face2`: secondary face button (`B` on Xbox, circle on PlayStation)
 - `gp_face3`: left face button (`X` on Xbox, square on PlayStation)
 - `gp_face4`: top face button (`Y` on Xbox, triangle on PlayStation)
+- `gp_shoulderl`: left shoulder button
+- `gp_shoulderlb`: left shoulder trigger
+- `gp_shoulderr`: right shoulder button
+- `gp_shoulderrb`: right shoulder trigger
+- `gp_select`: select button. On PlayStation this fires when pressing the touchpad down
 - `gp_start`: start/options button
-- `gp_select`: select/share/touchpad-click style button
-- `gp_padu`, `gp_padd`, `gp_padl`, `gp_padr`: D-pad directions
+- `gp_stickl`: left stick pressed as a button
+- `gp_stickr`: right stick pressed as a button
+- `gp_padu`: D-pad up
+- `gp_padd`: D-pad down
+- `gp_padl`: D-pad left
+- `gp_padr`: D-pad right
+- `gp_home`: home / logo button on controllers that expose it
+- `gp_touchpadbutton`: dedicated touchpad button on PlayStation controllers
+- `gp_paddler`: upper or primary right paddle on controllers that expose paddles
+- `gp_paddlel`: upper or primary left paddle on controllers that expose paddles
+- `gp_paddlerb`: lower or secondary right paddle on controllers that expose paddles
+- `gp_paddlelb`: lower or secondary left paddle on controllers that expose paddles
+- `gp_extra1` to `gp_extra6`: extra vendor-specific buttons that may map to anything
 
-This refactor supports any `vk_*` key and any discrete `gp_*` button, but only
-the inputs registered for the current game are scanned each Step.
+Input Hub supports any `vk_*` key and any discrete `gp_*` button, but only the
+inputs registered for the current game are scanned each Step.
