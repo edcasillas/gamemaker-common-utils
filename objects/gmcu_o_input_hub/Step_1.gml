@@ -1,6 +1,7 @@
-for (var _keyboard_i = 0; _keyboard_i < array_length(monitored_keyboard_keys); _keyboard_i++) {
-	var _keyboard_key = monitored_keyboard_keys[_keyboard_i];
-	var _keyboard_state = keyboard_input_state(_keyboard_key);
+var _registered_keyboard_keys = global.gmcu_registered_keyboard_keys;
+for (var _keyboard_i = 0; _keyboard_i < array_length(_registered_keyboard_keys); _keyboard_i++) {
+	var _keyboard_key = _registered_keyboard_keys[_keyboard_i];
+	var _keyboard_state = gmcu_keyboard_input_state(_keyboard_key);
 	_keyboard_state.pressed_gameplay = false;
 	_keyboard_state.released_gameplay = false;
 	_keyboard_state.pressed_dev_menu = false;
@@ -28,16 +29,17 @@ for (var _keyboard_i = 0; _keyboard_i < array_length(monitored_keyboard_keys); _
 	}
 }
 
-var _left = input_state_down(keyboard_input_state(vk_left), GMCU_INPUT_OWNER_GAMEPLAY);
-var _right = input_state_down(keyboard_input_state(vk_right), GMCU_INPUT_OWNER_GAMEPLAY);
-var _up = input_state_down(keyboard_input_state(vk_up), GMCU_INPUT_OWNER_GAMEPLAY);
-var _down = input_state_down(keyboard_input_state(vk_down), GMCU_INPUT_OWNER_GAMEPLAY);
+var _left = input_state_down(gmcu_keyboard_input_state(vk_left), GMCU_INPUT_OWNER_GAMEPLAY);
+var _right = input_state_down(gmcu_keyboard_input_state(vk_right), GMCU_INPUT_OWNER_GAMEPLAY);
+var _up = input_state_down(gmcu_keyboard_input_state(vk_up), GMCU_INPUT_OWNER_GAMEPLAY);
+var _down = input_state_down(gmcu_keyboard_input_state(vk_down), GMCU_INPUT_OWNER_GAMEPLAY);
 h_axis = _right - _left;
 v_axis = _up - _down;
 
-for (var _gamepad_i = 0; _gamepad_i < array_length(gamepad_buttons); _gamepad_i++) {
-	var _button_code = gamepad_buttons[_gamepad_i];
-	var _button_state = gamepad_input_state(_button_code);
+var _registered_gamepad_buttons = global.gmcu_registered_gamepad_buttons;
+for (var _gamepad_i = 0; _gamepad_i < array_length(_registered_gamepad_buttons); _gamepad_i++) {
+	var _button_code = _registered_gamepad_buttons[_gamepad_i];
+	var _button_state = gmcu_gamepad_input_state(_button_code);
 	_button_state.pressed_gameplay = false;
 	_button_state.released_gameplay = false;
 	_button_state.pressed_dev_menu = false;
@@ -46,10 +48,10 @@ for (var _gamepad_i = 0; _gamepad_i < array_length(gamepad_buttons); _gamepad_i+
 
 var _has_gamepad = gmcu_has_connected_gamepad();
 if (_has_gamepad) {
-	for (var _button_i = 0; _button_i < array_length(gamepad_buttons); _button_i++) {
-		var _button_code = gamepad_buttons[_button_i];
+	for (var _button_i = 0; _button_i < array_length(_registered_gamepad_buttons); _button_i++) {
+		var _button_code = _registered_gamepad_buttons[_button_i];
 		var _button_name = global.gmcu_gamepad_buttons_mapping[$ string(_button_code)];
-		var _button_state = gamepad_input_state(_button_code);
+		var _button_state = gmcu_gamepad_input_state(_button_code);
 		var _button_is_down = gamepad_button_check(0, _button_code);
 
 		if (_button_is_down && !_button_state.is_down) {
@@ -78,10 +80,10 @@ if (_has_gamepad) {
 }
 
 if (h_axis == 0 && v_axis == 0) {
-	_left = input_state_down(gamepad_input_state(gp_padl), GMCU_INPUT_OWNER_GAMEPLAY);
-	_right = input_state_down(gamepad_input_state(gp_padr), GMCU_INPUT_OWNER_GAMEPLAY);
-	_up = input_state_down(gamepad_input_state(gp_padu), GMCU_INPUT_OWNER_GAMEPLAY);
-	_down = input_state_down(gamepad_input_state(gp_padd), GMCU_INPUT_OWNER_GAMEPLAY);
+	_left = input_state_down(gmcu_gamepad_input_state(gp_padl), GMCU_INPUT_OWNER_GAMEPLAY);
+	_right = input_state_down(gmcu_gamepad_input_state(gp_padr), GMCU_INPUT_OWNER_GAMEPLAY);
+	_up = input_state_down(gmcu_gamepad_input_state(gp_padu), GMCU_INPUT_OWNER_GAMEPLAY);
+	_down = input_state_down(gmcu_gamepad_input_state(gp_padd), GMCU_INPUT_OWNER_GAMEPLAY);
 
 	h_axis = _right - _left;
 	v_axis = _up - _down;

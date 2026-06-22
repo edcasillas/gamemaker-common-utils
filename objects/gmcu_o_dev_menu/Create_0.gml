@@ -32,6 +32,18 @@ cursor_sprite_before_open = noone;
 system_cursor_behind = cr_none; // Snapshot of the system cursor before opening the menu. Will be restored when closing it.
 
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEV_MENU, "Dev Menu");
+gmcu_register_keyboard_key(vk_escape);
+gmcu_register_keyboard_key(vk_enter);
+gmcu_register_keyboard_key(vk_left);
+gmcu_register_keyboard_key(vk_right);
+gmcu_register_keyboard_key(vk_up);
+gmcu_register_keyboard_key(vk_down);
+gmcu_register_gamepad_button(gp_face1);
+gmcu_register_gamepad_button(gp_face2);
+gmcu_register_gamepad_button(gp_padl);
+gmcu_register_gamepad_button(gp_padr);
+gmcu_register_gamepad_button(gp_padu);
+gmcu_register_gamepad_button(gp_padd);
 
 /**
  * @description Draws the Dev Menu overlay through Layered GUI or direct Draw GUI fallback.

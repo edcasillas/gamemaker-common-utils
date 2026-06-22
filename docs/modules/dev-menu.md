@@ -23,6 +23,10 @@ Once the menu is open, monitored keyboard/gamepad navigation comes from
 [`InputHub`](input-hub.md). Raw mouse movement, wheel, and clicks remain local
 to the Dev Menu.
 
+The menu registers its own navigation inputs with Input Hub when the singleton
+initializes. The configurable trigger callback remains consumer-owned; the
+default trigger still checks `F1`.
+
 ## Resources
 
 - `scripts/gmcu_dev_menu`
@@ -35,7 +39,7 @@ to the Dev Menu.
 | [`Core`](core.md) | Supplies DevBuild policy and shared constants. |
 | [`Drawing`](drawing.md) | Protects overlay draw state. |
 | [`Logging`](logging.md) | Reports callback failures and supplies log history. |
-| [`InputHub`](input-hub.md) | Owns monitored keyboard/gamepad hardware input and routes Dev Menu interactions to the menu. |
+| [`InputHub`](input-hub.md) | Owns registered keyboard/gamepad hardware input and routes Dev Menu interactions to the menu. |
 | [`EventBus`](event-bus.md) | Used to dispatch events on menu opened / closed. |
 | [`LayeredGUI`](layered-gui.md) | Owns final overlay draw order when present, so the Dev Menu renders above gameplay GUI. Supplies subscriber diagnostics when its manager exists in the current room.|
 | [`UniversalCursor`](universal-cursor.md) (optional) | Supplies interactable and hover diagnostics while its singleton exists. |

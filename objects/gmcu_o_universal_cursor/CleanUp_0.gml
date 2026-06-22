@@ -1,2 +1,12 @@
+gmcu_unregister_keyboard_key(vk_enter);
+gmcu_unregister_keyboard_key(vk_left);
+gmcu_unregister_keyboard_key(vk_right);
+gmcu_unregister_keyboard_key(vk_up);
+gmcu_unregister_keyboard_key(vk_down);
+gmcu_unregister_gamepad_button(gp_face1);
+gmcu_unregister_gamepad_button(gp_padl);
+gmcu_unregister_gamepad_button(gp_padr);
+gmcu_unregister_gamepad_button(gp_padu);
+gmcu_unregister_gamepad_button(gp_padd);
 gmcu_layered_gui_unsubscribe();
 ds_list_destroy(interactables);

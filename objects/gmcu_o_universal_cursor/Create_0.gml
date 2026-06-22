@@ -14,6 +14,17 @@ gui_y = display_get_gui_height() / 2;
 hovered_interactable = noone;
 interactables = ds_list_create();
 
+gmcu_register_keyboard_key(vk_enter);
+gmcu_register_keyboard_key(vk_left);
+gmcu_register_keyboard_key(vk_right);
+gmcu_register_keyboard_key(vk_up);
+gmcu_register_keyboard_key(vk_down);
+gmcu_register_gamepad_button(gp_face1);
+gmcu_register_gamepad_button(gp_padl);
+gmcu_register_gamepad_button(gp_padr);
+gmcu_register_gamepad_button(gp_padu);
+gmcu_register_gamepad_button(gp_padd);
+
 /**
  * @description Adds an interactable instance to the cursor.
  * @param {Id.Instance} _instance Interactable instance to register.
