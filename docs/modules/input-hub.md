@@ -65,7 +65,8 @@ registered, polling returns `false` and no events are dispatched for it.
 ## Resources
 
 - `scripts/gmcu_input_hub_events`: Declares the
-  [`EventBus`](event-bus.md) event names, input-owner constants, and the
+  [`EventBus`](event-bus.md) event names and input-owner constants.
+- `scripts/gmcu_core`: Declares shared runtime macros and the
   `GMCU_DIRECTION_ANGLE` direction enum.
 - `scripts/gmcu_input_registration`: Owns the dynamic keyboard/gamepad
   registration registry used by bootstrap code, shared modules, and the runtime

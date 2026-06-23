@@ -23,6 +23,17 @@
 #macro GMCU_ANY_INPUT (keyboard_check_released(vk_anykey) || mouse_check_button_released(mb_left))
 #macro GMCU_INT_MAX 2147483648
 
+enum GMCU_DIRECTION_ANGLE {
+	RIGHT = 0,
+	UP_RIGHT = 45,
+	UP = 90,
+	UP_LEFT = 135,
+	LEFT = 180,
+	DOWN_LEFT = 225,
+	DOWN = 270,
+	DOWN_RIGHT = 315
+}
+
 global.gmcu_notifications_enabled = false;
 global.gmcu_notification_handler = undefined;
 

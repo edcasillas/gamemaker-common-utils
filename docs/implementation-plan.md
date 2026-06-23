@@ -44,8 +44,8 @@ Import modules in this order:
 6. `InputHub`
    - Portable input helper with `gmcu_`-prefixed public API.
    - Provides `gmcu_o_input_hub`, `GMCU_EVENT_GAMEPAD_BUTTON_PRESSED`,
-     `GMCU_EVENT_GAMEPAD_BUTTON_RELEASED`, `GMCU_DIRECTION_ANGLE`, and
-     gamepad direction/button helper methods.
+     `GMCU_EVENT_GAMEPAD_BUTTON_RELEASED`, and gamepad direction/button helper
+     methods.
    - Depends on `Core`, `Logging`, `EventBus`, and `InGameNotifications`.
 7. `Localization`
    - Portable CSV-backed localization helper with `gmcu_`-prefixed public API.
