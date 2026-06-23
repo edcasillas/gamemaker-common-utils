@@ -44,16 +44,12 @@ flowchart LR
 | `new gmcu_DrawingParameters()` | Constructor | Captures the current font, color, horizontal alignment, vertical alignment, and alpha. |
 | `gmcu_DrawingParameters.apply()` | Method | Restores the captured draw state. |
 
-## Example: Draw Lives As Images
+## Example: Draw Repeated Icons
 
-Use `gmcu_draw_repeated_sprite()` when a HUD wants to represent a life counter
-with repeated icons:
+Use `gmcu_draw_repeated_sprite()` when a HUD wants to represent a counter with
+repeated icons:
 
 ```gml
-if (lives < 10) {
-    gmcu_draw_repeated_sprite(32, 512, sprtGhost1Der, lives);
-} else {
-    draw_sprite(sprtGhost1Der, 0, 128, 512);
-    draw_text(168, 528, "x " + string(lives));
-}
+var _lives_count = 3;
+gmcu_draw_repeated_sprite(32, 512, spr_life_icon, _lives_count);
 ```
