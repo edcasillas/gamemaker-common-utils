@@ -15,6 +15,22 @@ function gmcu_dev_menu_action(_label, _action, _enabled = undefined) {
 }
 
 /**
+ * @description Creates a selectable row that queues a callback to run after the Dev Menu closes.
+ * @param {String} _label Visible row label and queued-action label.
+ * @param {Function} _action Callback executed after the menu closes.
+ * @param {Function|Undefined} _enabled Optional predicate; false disables the row.
+ * @returns {Struct}
+ */
+function gmcu_dev_menu_deferred_action(_label, _action, _enabled = undefined) {
+	return {
+		type: "deferred_action",
+		label: _label,
+		action: _action,
+		enabled: _enabled
+	};
+}
+
+/**
  * @description Creates a row that opens another Dev Menu page.
  * @param {String} _label Visible row label.
  * @param {String} _page_id Target page id.
@@ -107,9 +123,18 @@ function gmcu_dev_menu_add_root_item(_config, _item) {
 
 /**
  * @description Returns the default open/close trigger for the Dev Menu singleton.
- * @returns {Bool} True on the Step where F1 was pressed.
+ * @returns {Bool} True on the Step where F1 or Start was released.
  */
-function gmcu_dev_menu_default_trigger() { return keyboard_check_released(vk_f1); }
+function gmcu_dev_menu_default_trigger() {
+	var _is_open = gmcu_dev_menu_is_open();
+	var _owner = _is_open ? GMCU_INPUT_OWNER_DEV_MENU : GMCU_INPUT_OWNER_GAMEPLAY;
+	var _f1_released = keyboard_check_released(vk_f1);
+	if (instance_exists(gmcu_o_input_hub)) {
+		_f1_released = _f1_released || gmcu_o_input_hub.gmcu_keyboard_key_released(vk_f1, _owner);
+		return _f1_released || gmcu_o_input_hub.gmcu_gamepad_button_released(gp_start, _owner);
+	}
+	return _f1_released;
+}
 
 /**
  * @description Returns whether the shared Dev Menu instance is currently open.

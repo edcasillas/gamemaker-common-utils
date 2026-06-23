@@ -6,7 +6,7 @@
 if (is_undefined(config)) return;
 
 if (config.trigger_pressed()) {
-	if (is_open) close_menu(); 
+	if (is_open) close_menu();
 	else open_menu();
 	return;
 }

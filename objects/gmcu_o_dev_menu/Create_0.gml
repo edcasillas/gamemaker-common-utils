@@ -5,6 +5,7 @@ is_open = false;
 config = undefined; // Consumer-owned configuration passed through gmcu_dev_menu_init.
 pages = [];
 page_stack = []; // Page id stack; root page lives at index 0.
+remembered_page_id = "";
 selected_index = 0; // Index inside the current visible items array.
 scroll_offset = 0; // First visible row index for long pages.
 row_height = 28;
@@ -30,8 +31,10 @@ cursor_was_visible = false;
 cursor_was_system_hidden = false;
 cursor_sprite_before_open = noone;
 system_cursor_behind = cr_none; // Snapshot of the system cursor before opening the menu. Will be restored when closing it.
+deferred_actions = [];
 
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEV_MENU, "Dev Menu");
+gmcu_register_keyboard_key(vk_f1);
 gmcu_register_keyboard_key(vk_escape);
 gmcu_register_keyboard_key(vk_enter);
 gmcu_register_keyboard_key(vk_left);
@@ -40,6 +43,7 @@ gmcu_register_keyboard_key(vk_up);
 gmcu_register_keyboard_key(vk_down);
 gmcu_register_gamepad_button(gp_face1);
 gmcu_register_gamepad_button(gp_face2);
+gmcu_register_gamepad_button(gp_start);
 gmcu_register_gamepad_button(gp_padl);
 gmcu_register_gamepad_button(gp_padr);
 gmcu_register_gamepad_button(gp_padu);
@@ -170,7 +174,7 @@ function on_draw_gui() {
 
 	draw_set_color(_theme.muted_color);
 	draw_set_halign(fa_right);
-	var _help = "F1/Esc/B: Back";
+	var _help = "Esc/B: Back | F1/Start: Close";
 	if (array_length(_items) > 0
 		&& selected_index >= 0
 		&& selected_index < array_length(_items)
@@ -209,6 +213,7 @@ function configure(_config) {
 		array_push(pages, gmcu_dev_menu_static_page("gmcu_universal_cursor", "Universal Cursor"));
 		pages[array_length(pages) - 1].type = "universal_cursor";
 	}
+	ensure_deferred_queue_page();
 	if (!variable_struct_exists(config, "trigger_pressed")) {
 		config.trigger_pressed = gmcu_dev_menu_default_trigger;
 	}
@@ -226,7 +231,31 @@ function configure(_config) {
 	if (!variable_struct_exists(_theme, "log_warn_color")) _theme.log_warn_color = c_yellow;
 	if (!variable_struct_exists(_theme, "log_error_color")) _theme.log_error_color = c_red;
 	if (!variable_struct_exists(_theme, "font")) _theme.font = -1;
-	close_menu(false);
+	ensure_remembered_page();
+	close_menu(false, false);
+}
+
+/**
+ * @description Ensures the built-in queued-actions page exists once in the configured page list.
+ */
+function ensure_deferred_queue_page() {
+	for (var _i = 0; _i < array_length(pages); _i++) {
+		if (pages[_i].id == "gmcu_deferred_actions") return;
+	}
+
+	var _page = gmcu_dev_menu_static_page("gmcu_deferred_actions", "Queued Actions");
+	_page.type = "deferred_actions";
+	array_push(pages, _page);
+}
+
+/**
+ * @description Repairs the remembered reopen target so it always points at an existing page.
+ */
+function ensure_remembered_page() {
+	var _root_id = pages[0].id;
+	if (remembered_page_id == "" || is_undefined(get_page(remembered_page_id))) {
+		remembered_page_id = _root_id;
+	}
 }
 
 function get_page(_id) {
@@ -294,6 +323,8 @@ function current_items() {
 				return layered_gui_items;
 			case "universal_cursor":
 				return universal_cursor_items;
+			case "deferred_actions":
+				return build_deferred_action_items();
 		}
 	}
 	var _items = variable_struct_exists(_page, "build_items_func")
@@ -322,6 +353,40 @@ function current_items() {
 			array_push(_items, _page.root_items[_j]);
 		}
 	}
+	if (_page.id == pages[0].id && deferred_action_count() > 0) {
+		array_push(_items, gmcu_dev_menu_submenu("Queued Actions (" + string(deferred_action_count()) + ")", "gmcu_deferred_actions"));
+	}
+	return _items;
+}
+
+/**
+ * @description Builds the visible rows for the built-in deferred-action queue page.
+ * @returns {Array<Struct>} Queue-management rows in FIFO order.
+ */
+function build_deferred_action_items() {
+	var _items = [];
+	if (deferred_action_count() == 0) {
+		array_push(_items, {
+			type: "text",
+			label: "No queued actions"
+		});
+		return _items;
+	}
+
+	array_push(_items, {
+		type: "clear_deferred_actions",
+		label: "Clear queued actions"
+	});
+
+	for (var _i = 0; _i < deferred_action_count(); _i++) {
+		var _entry = deferred_actions[_i];
+		array_push(_items, {
+			type: "remove_deferred_action",
+			label: string(_i + 1) + ". " + _entry.label,
+			queue_index: _i
+		});
+	}
+
 	return _items;
 }
 
@@ -446,7 +511,11 @@ function open_menu() {
 	window_set_cursor(cr_default);
 	
 	is_open = true;
+	ensure_remembered_page();
 	page_stack = [pages[0].id];
+	if (remembered_page_id != pages[0].id) {
+		array_push(page_stack, remembered_page_id);
+	}
 	selected_index = 0;
 	scroll_offset = 0;
 	log_filter_chip_index = 0;
@@ -462,11 +531,13 @@ function open_menu() {
 }
 
 /**
- * @description Closes the menu and publishes the closed event.
+ * @description Closes the menu, optionally dispatches the closed event, and optionally flushes deferred actions.
  * @param {Bool} _notify Whether the closed event should be dispatched.
+ * @param {Bool} _flush_deferred Whether queued deferred actions should run after closing.
  */
-function close_menu(_notify = true) {
+function close_menu(_notify = true, _flush_deferred = true) {
 	if (!is_open) return;
+	remember_current_page();
 	is_open = false;
 	page_stack = [];
 	if (cursor_was_available && instance_exists(gmcu_o_universal_cursor)) {
@@ -485,6 +556,77 @@ function close_menu(_notify = true) {
 			gmcu_eventbus_dispatch(GMCU_EVENT_DEV_MENU_CLOSED);
 		} catch (_exception) {
 			gmcu_log_exception(_exception, "gmcu_o_dev_menu.close_menu");
+		}
+	}
+	if (_flush_deferred) {
+		flush_deferred_actions();
+	}
+}
+
+/**
+ * @description Remembers the page currently being shown so the next open resumes there.
+ */
+function remember_current_page() {
+	var _page = current_page();
+	if (is_undefined(_page)) return;
+	remembered_page_id = _page.id;
+}
+
+/**
+ * @description Returns the number of deferred actions currently queued.
+ * @returns {Real} Deferred queue length.
+ */
+function deferred_action_count() {
+	return array_length(deferred_actions);
+}
+
+/**
+ * @description Queues a labeled callback to run after the Dev Menu closes.
+ * @param {String} _label Visible queue label.
+ * @param {Function} _action Deferred callback.
+ */
+function enqueue_deferred_action(_label, _action) {
+	array_push(deferred_actions, {
+		label: _label,
+		action: _action
+	});
+}
+
+/**
+ * @description Removes one deferred action by queue index when it exists.
+ * @param {Real} _index Zero-based queue index.
+ */
+function remove_deferred_action(_index) {
+	if (_index < 0 || _index >= deferred_action_count()) return;
+
+	var _next_queue = [];
+	for (var _i = 0; _i < deferred_action_count(); _i++) {
+		if (_i == _index) continue;
+		array_push(_next_queue, deferred_actions[_i]);
+	}
+	deferred_actions = _next_queue;
+}
+
+/**
+ * @description Clears every deferred action currently waiting for menu close.
+ */
+function clear_deferred_actions() {
+	deferred_actions = [];
+}
+
+/**
+ * @description Executes and clears the current deferred queue in FIFO order.
+ */
+function flush_deferred_actions() {
+	if (deferred_action_count() == 0) return;
+
+	var _queued_actions = deferred_actions;
+	deferred_actions = [];
+	for (var _i = 0; _i < array_length(_queued_actions); _i++) {
+		try {
+			_queued_actions[_i].action();
+		} catch (_exception) {
+			gmcu_log_exception(_exception, "gmcu_o_dev_menu.flush_deferred_actions");
 		}
 	}
 }
@@ -570,6 +712,9 @@ function activate_item(_direction = 1) {
 				gmcu_log_exception(_exception, "gmcu_o_dev_menu.activate_item");
 			}
 			break;
+		case "deferred_action":
+			enqueue_deferred_action(_item.label, _item.action);
+			break;
 		case "room":
 			try {
 				_item.goto_room(_item.target_room);
@@ -588,6 +733,16 @@ function activate_item(_direction = 1) {
 			gmcu_log_buffer_clear();
 			selected_index = 0;
 			scroll_offset = 0;
+			break;
+		case "clear_deferred_actions":
+			clear_deferred_actions();
+			selected_index = 0;
+			scroll_offset = 0;
+			break;
+		case "remove_deferred_action":
+			remove_deferred_action(_item.queue_index);
+			selected_index = clamp(selected_index, 0, max(0, array_length(current_items()) - 1));
+			scroll_offset = clamp(scroll_offset, 0, max(0, array_length(current_items()) - 1));
 			break;
 		case "submenu":
 			push_page(_item.page_id);

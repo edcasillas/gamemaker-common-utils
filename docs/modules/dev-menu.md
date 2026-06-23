@@ -155,6 +155,10 @@ the existing instance. Outside `DevBuild` it returns `noone`.
 The default trigger is F1. Supply `trigger_pressed` in the config to replace
 it.
 
+The built-in trigger also checks gamepad `Start`. `F1` or `Start` toggles the
+menu open or closed while preserving the current page on close. `Esc` or
+gamepad cancel (`B`) navigates back one page and closes only from the root.
+
 Opening and closing the menu dispatch these Event Bus events:
 
 - `GMCU_EVENT_DEV_MENU_OPENED`
@@ -185,6 +189,8 @@ Consumers that care about menu lifecycle should subscribe to those events.
   Creates a page whose rows are rebuilt by a function.
 - `gmcu_dev_menu_action(_label, _action, _enabled = undefined)`
   Creates a row that runs a callback.
+- `gmcu_dev_menu_deferred_action(_label, _action, _enabled = undefined)`
+  Creates a row that queues a callback to run after the menu closes.
 - `gmcu_dev_menu_submenu(_label, _page_id)`
   Creates a row that opens another page.
 - `gmcu_dev_menu_toggle(_label, _get_value, _set_value)`
@@ -237,6 +243,17 @@ and errors or exceptions are red. Override these theme fields when needed:
 - `log_warn_color`
 - `log_error_color`
 
+Deferred actions are visible from a built-in `Queued Actions` page while the
+queue is non-empty. The root page adds `Queued Actions (N)` automatically. The
+queue page lists labels in FIFO order, lets testers remove one pending action,
+and includes `Clear queued actions`.
+
+Use immediate actions when the effect should happen while the tester remains in
+the menu, such as toggles, service flags, or live tuning values. Use deferred
+actions when the effect only makes sense after gameplay regains control, such
+as temporary invincibility or preview overlays that the menu would otherwise
+cover.
+
 The built-in `Logs` page starts with one compact `Severity` row. It exposes
 inline chips for `DEBUG`, `INFO`, `WARN`, `ERROR`, and `EXCEPTION`, then shows
 `Clear logs`, then the filtered entries. With keyboard or gamepad, select the
@@ -288,6 +305,7 @@ The flow is:
    - if the menu is open, it calls `close_menu()`
 5. `open_menu()` dispatches `GMCU_EVENT_DEV_MENU_OPENED`.
 6. `close_menu()` dispatches `GMCU_EVENT_DEV_MENU_CLOSED`.
+7. `close_menu()` then flushes any queued deferred actions in FIFO order.
 
 That same `Step` event also handles menu navigation while `is_open` is true:
 
@@ -296,6 +314,12 @@ That same `Step` event also handles menu navigation while `is_open` is true:
 - `Left` / `Right` -> value change activation
 - `Enter` / `Space` / gamepad confirm -> item activation
 - mouse move / click / wheel -> hover, click, and scroll
+
+Navigation state is page-based:
+
+- `F1` / `Start` closes the menu on the current page
+- reopening returns to that same page
+- row selection, scroll offset, and log-filter chip focus reset on reopen
 
 ## Room Navigation
 
