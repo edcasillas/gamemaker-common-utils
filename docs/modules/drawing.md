@@ -18,6 +18,8 @@ _draw_state.apply();
 
 ## Resources
 
+- `scripts/gmcu_draw_repeated_sprite`: Draws one sprite repeatedly in a
+  horizontal row using the sprite's native width.
 - `scripts/gmcu_drawing_parameters`: Declares the draw-state snapshot
   constructor and its restore method.
 
@@ -38,5 +40,20 @@ flowchart LR
 
 | Item | Kind | Description |
 | --- | --- | --- |
+| `gmcu_draw_repeated_sprite(_x, _y, _sprite_index, _count)` | Function | Draws one sprite repeatedly from left to right using the sprite's native width. |
 | `new gmcu_DrawingParameters()` | Constructor | Captures the current font, color, horizontal alignment, vertical alignment, and alpha. |
 | `gmcu_DrawingParameters.apply()` | Method | Restores the captured draw state. |
+
+## Example: Draw Lives As Images
+
+Use `gmcu_draw_repeated_sprite()` when a HUD wants to represent a life counter
+with repeated icons:
+
+```gml
+if (lives < 10) {
+    gmcu_draw_repeated_sprite(32, 512, sprtGhost1Der, lives);
+} else {
+    draw_sprite(sprtGhost1Der, 0, 128, 512);
+    draw_text(168, 528, "x " + string(lives));
+}
+```

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_draw_repeated_sprite",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_draw_repeated_sprite",
+  "parent":{
+    "name":"Drawing",
+    "path":"folders/CommonUtils/Drawing.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

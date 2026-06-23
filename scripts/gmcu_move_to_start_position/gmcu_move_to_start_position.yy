@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_move_to_start_position",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_move_to_start_position",
+  "parent":{
+    "name":"Core",
+    "path":"folders/CommonUtils/Core.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
