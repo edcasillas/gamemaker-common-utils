@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_http_response_data",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_http_response_data",
+  "parent":{
+    "name":"Networking",
+    "path":"folders/CommonUtils/Networking.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

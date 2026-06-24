@@ -42,11 +42,12 @@ Import modules in this order:
 11. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
 12. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
 13. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
-14. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
-15. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
-16. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
-17. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
-18. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
+14. [`Networking`](docs/modules/networking.md): Reusable GameMaker HTTP callback helpers.
+15. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.
+16. [`Transitions`](docs/modules/transitions.md): Reusable room transitions.
+17. [`HTML5 Helpers`](docs/modules/html5-helpers.md): Browser detection and HTML5 runtime helpers.
+18. [`Release and Build Info`](docs/modules/release-and-build-info.md): Export, local serving, versioning, publishing, and runtime build information.
+19. [`Dev Menu`](docs/modules/dev-menu.md): DevBuild-only diagnostic overlay.
 
 ## Dependency Overview
 
@@ -58,6 +59,7 @@ flowchart TD
     Core --> EventBus
     Core --> InputHub
     Core --> Localization
+    Core --> Networking
     Core --> HTML5
     Core --> ReleaseBuild
     Core --> Notifications
@@ -162,7 +164,7 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Confirm the consuming repo state with `git status`.
 - Add or update the submodule.
 - Register modules in dependency order: `Core`, `Drawing`, `Logging`,
-  optional `Crash Handling`, `Singleton`, `EventBus`, optional
+  `Networking`, optional `Crash Handling`, `Singleton`, `EventBus`, optional
   `InGameNotifications`, `InputHub`, `Localization`, `LayeredGUI`,
   `UniversalCursor`, `Buttons`, `Labels`, `TimedActions`, then `Transitions`,
   `HTML5 Helpers`, and `Release and Build Info` if needed.

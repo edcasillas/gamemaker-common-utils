@@ -91,7 +91,11 @@ Import modules in this order:
    - Depends on `Core`, `Drawing`, `Logging`, and `EventBus`.
    - Audio fades, audio stopping, and other project-specific room-change side
      effects remain consumer-owned through transition callbacks.
-14. `HTML5 Helpers`
+14. `Networking`
+   - Provides `gmcu_HttpResponseData`.
+   - Owns reusable wrappers for GameMaker Async HTTP callback data.
+   - Depends only on the GameMaker runtime callback map passed by the consumer.
+15. `HTML5 Helpers`
    - Provides `gmcu_html5_is_mobile_device`, `gmcu_html5_block_canvas`, and
      `gmcu_html5_console_error`.
    - Preserves Fantasma's existing `PostBody` injection and
@@ -149,8 +153,9 @@ git commit -m "Update gamemaker-common-utils pointer"
 - Register only the needed GameMaker resources in the consumer `.yyp`.
 - Preserve resource paths under the submodule instead of copying files into the
   consumer project.
-- Import modules in dependency order: `Core`, `Drawing`, `Logging`, `EventBus`,
-  `InGameNotifications` if visual notifications are needed, then `InputHub`.
+- Import modules in dependency order: `Core`, `Drawing`, `Logging`,
+  `Networking`, `EventBus`, `InGameNotifications` if visual notifications are
+  needed, then `InputHub`.
 - Check for name conflicts before replacing existing project resources:
   `gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`, `gmcu_log_error`, `gmcu_log_exception`,
   `event_bus`, `gmcu_show_notification`, `gmcu_InGameNotificationSettings`, and
