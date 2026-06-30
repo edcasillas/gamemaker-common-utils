@@ -56,7 +56,6 @@ function gmcu_label_effects_update(_label) {
 	if(is_undefined(_label.label_effects)) return;
 
 	var _remaining_effects = [];
-	var _destroy_owner = false;
 
 	for(var _i = 0; _i < array_length(_label.label_effects); _i++) {
 		var _effect = _label.label_effects[_i];
@@ -70,10 +69,6 @@ function gmcu_label_effects_update(_label) {
 				label_id: _label.id,
 				effect_kind: _effect.kind
 			});
-
-			if(!is_undefined(_effect.destroy_owner_on_complete) && _effect.destroy_owner_on_complete) {
-				_destroy_owner = true;
-			}
 		}
 
 		if(!_effect.completed) {
@@ -82,12 +77,6 @@ function gmcu_label_effects_update(_label) {
 	}
 
 	_label.label_effects = _remaining_effects;
-
-	if(_destroy_owner && instance_exists(_label)) {
-		with(_label) {
-			instance_destroy();
-		}
-	}
 }
 
 /**
