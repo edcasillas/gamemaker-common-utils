@@ -7,7 +7,6 @@ draw_alpha = 1;
 draw_offset_x = 0;
 draw_offset_y = 0;
 label_effects = [];
-on_label_effect_finished = undefined;
 
 function do_draw() {
 	var _draw_params = new gmcu_DrawingParameters();

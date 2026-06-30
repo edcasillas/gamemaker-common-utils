@@ -21,6 +21,7 @@ translate = true;
 
 - `scripts/gmcu_draw_text_outlined`
 - `scripts/gmcu_create_label_gui`
+- `scripts/gmcu_label_events`
 - `scripts/gmcu_label_effects`
 - `objects/gmcu_o_base_label`
 - `objects/gmcu_o_label_game`
@@ -55,6 +56,7 @@ flowchart LR
 | --- | --- | --- |
 | `gmcu_draw_text_outlined(_x, _y, _text, _outline_thickness = 0, _outline_color = c_white, _scale = 1)` | Function | Draws text with an optional outline. |
 | `gmcu_create_label_gui(_text, _translate, _pos_x, _pos_y, _config = {})` | Function | Creates a GUI-space label and applies runtime text settings after instance creation. |
+| `GMCU_EVENT_LABEL_EFFECT_FINISHED` | Event macro | Dispatched when a label effect completes; event args include `label_id` and `effect_kind`. |
 | `gmcu_label_add_effect(_label, _effect)` | Function | Attaches a reusable effect to a label instance. |
 | `gmcu_label_start_effect(_effect)` | Function | Starts a previously attached label effect. |
 | `gmcu_label_stop_effect(_effect)` | Function | Stops a running label effect without completing it. |
@@ -66,8 +68,7 @@ flowchart LR
 
 Set `translate` to use `gmcu_localization_t(text)`. The resolved string is
 stored in `actual_text` and used for drawing. Labels also expose `text_scale`,
-`text_valign`, `draw_alpha`, `draw_offset_x`, `draw_offset_y`,
-`label_effects`, and `on_label_effect_finished(_effect)` for runtime
-presentation work.
+`text_valign`, `draw_alpha`, `draw_offset_x`, `draw_offset_y`, and
+`label_effects` for runtime presentation work.
 
 Fonts, colors, text keys, positions, and GUI priorities remain consumer-owned.

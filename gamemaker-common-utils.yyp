@@ -77,6 +77,7 @@
     {"id":{"name":"gmcu_input_registration","path":"scripts/gmcu_input_registration/gmcu_input_registration.yy",},},
     {"id":{"name":"gmcu_install_unhandled_exception_handler","path":"scripts/gmcu_install_unhandled_exception_handler/gmcu_install_unhandled_exception_handler.yy",},},
     {"id":{"name":"gmcu_HttpResponseData","path":"scripts/gmcu_HttpResponseData/gmcu_HttpResponseData.yy",},},
+    {"id":{"name":"gmcu_label_events","path":"scripts/gmcu_label_events/gmcu_label_events.yy",},},
     {"id":{"name":"gmcu_label_effects","path":"scripts/gmcu_label_effects/gmcu_label_effects.yy",},},
     {"id":{"name":"gmcu_layered_gui_subscribe","path":"scripts/gmcu_layered_gui_subscribe/gmcu_layered_gui_subscribe.yy",},},
     {"id":{"name":"gmcu_layered_gui_unsubscribe","path":"scripts/gmcu_layered_gui_unsubscribe/gmcu_layered_gui_unsubscribe.yy",},},

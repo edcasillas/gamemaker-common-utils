@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_label_events",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_label_events",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/CommonUtils/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -47,7 +47,7 @@ function gmcu_label_effects_reset_runtime(_label) {
 }
 
 /**
- * Updates every active effect attached to a label and notifies the label when one finishes.
+ * Updates every active effect attached to a label and dispatches completion events when needed.
  * @param {Instance} _label Label instance being updated.
  */
 function gmcu_label_effects_update(_label) {
@@ -66,9 +66,10 @@ function gmcu_label_effects_update(_label) {
 
 		if(_effect.completed && !_effect.notified_complete) {
 			_effect.notified_complete = true;
-			if(!is_undefined(_label.on_label_effect_finished)) {
-				_label.on_label_effect_finished(_effect);
-			}
+			gmcu_eventbus_dispatch(GMCU_EVENT_LABEL_EFFECT_FINISHED, {
+				label_id: _label.id,
+				effect_kind: _effect.kind
+			});
 
 			if(!is_undefined(_effect.destroy_owner_on_complete) && _effect.destroy_owner_on_complete) {
 				_destroy_owner = true;
