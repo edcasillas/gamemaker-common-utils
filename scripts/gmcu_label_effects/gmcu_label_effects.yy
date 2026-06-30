@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_label_effects",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_label_effects",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/CommonUtils/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
