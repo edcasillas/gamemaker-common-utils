@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_instance_destroy",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_instance_destroy",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/CommonUtils/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

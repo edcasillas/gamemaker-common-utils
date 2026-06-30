@@ -73,6 +73,7 @@
     {"id":{"name":"gmcu_gamepad_buttons_mapping","path":"scripts/gmcu_gamepad_buttons_mapping/gmcu_gamepad_buttons_mapping.yy",},},
     {"id":{"name":"gmcu_html5_use_browser_console_for_logging","path":"scripts/gmcu_html5_use_browser_console_for_logging/gmcu_html5_use_browser_console_for_logging.yy",},},
     {"id":{"name":"gmcu_in_game_notification_settings","path":"scripts/gmcu_in_game_notification_settings/gmcu_in_game_notification_settings.yy",},},
+    {"id":{"name":"gmcu_instance_destroy","path":"scripts/gmcu_instance_destroy/gmcu_instance_destroy.yy",},},
     {"id":{"name":"gmcu_input_hub_events","path":"scripts/gmcu_input_hub_events/gmcu_input_hub_events.yy",},},
     {"id":{"name":"gmcu_input_registration","path":"scripts/gmcu_input_registration/gmcu_input_registration.yy",},},
     {"id":{"name":"gmcu_install_unhandled_exception_handler","path":"scripts/gmcu_install_unhandled_exception_handler/gmcu_install_unhandled_exception_handler.yy",},},
