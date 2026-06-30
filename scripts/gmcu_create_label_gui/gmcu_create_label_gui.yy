@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"gmcu_create_label_gui",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"gmcu_create_label_gui",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/CommonUtils/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -63,6 +63,7 @@
     {"id":{"name":"gmcu_o_universal_cursor","path":"objects/gmcu_o_universal_cursor/gmcu_o_universal_cursor.yy",},},
     {"id":{"name":"gmcu_build_info","path":"scripts/gmcu_build_info/gmcu_build_info.yy",},},
     {"id":{"name":"gmcu_button_events","path":"scripts/gmcu_button_events/gmcu_button_events.yy",},},
+    {"id":{"name":"gmcu_create_label_gui","path":"scripts/gmcu_create_label_gui/gmcu_create_label_gui.yy",},},
     {"id":{"name":"gmcu_core","path":"scripts/gmcu_core/gmcu_core.yy",},},
     {"id":{"name":"gmcu_dev_menu_events","path":"scripts/gmcu_dev_menu_events/gmcu_dev_menu_events.yy",},},
     {"id":{"name":"gmcu_dev_menu","path":"scripts/gmcu_dev_menu/gmcu_dev_menu.yy",},},

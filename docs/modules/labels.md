@@ -20,6 +20,7 @@ translate = true;
 ## Resources
 
 - `scripts/gmcu_draw_text_outlined`
+- `scripts/gmcu_create_label_gui`
 - `scripts/gmcu_label_effects`
 - `objects/gmcu_o_base_label`
 - `objects/gmcu_o_label_game`
@@ -53,6 +54,7 @@ flowchart LR
 | Item | Kind | Description |
 | --- | --- | --- |
 | `gmcu_draw_text_outlined(_x, _y, _text, _outline_thickness = 0, _outline_color = c_white, _scale = 1)` | Function | Draws text with an optional outline. |
+| `gmcu_create_label_gui(_text, _translate, _pos_x, _pos_y, _config = {})` | Function | Creates a GUI-space label and applies runtime text settings after instance creation. |
 | `gmcu_label_add_effect(_label, _effect)` | Function | Attaches a reusable effect to a label instance. |
 | `gmcu_label_start_effect(_effect)` | Function | Starts a previously attached label effect. |
 | `gmcu_label_stop_effect(_effect)` | Function | Stops a running label effect without completing it. |
