@@ -17,10 +17,10 @@ function gmcu_input_registration_create_state() {
 }
 
 /**
- * @description Ensures input registries and the optional virtual keyboard provider slot exist.
+ * @description Ensures input registries and the optional virtual gamepad provider slot exist.
  */
 function gmcu_input_registration_ensure_init() {
-	if (!variable_global_exists("gmcu_virtual_keyboard_provider")) global.gmcu_virtual_keyboard_provider = undefined;
+	if (!variable_global_exists("gmcu_virtual_gamepad_provider")) global.gmcu_virtual_gamepad_provider = undefined;
 	if (!variable_global_exists("gmcu_registered_keyboard_keys")) global.gmcu_registered_keyboard_keys = [];
 	if (!variable_global_exists("gmcu_registered_gamepad_buttons")) global.gmcu_registered_gamepad_buttons = [];
 	if (!variable_global_exists("gmcu_keyboard_input_states")) global.gmcu_keyboard_input_states = {};

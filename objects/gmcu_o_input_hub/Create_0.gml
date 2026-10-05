@@ -1,6 +1,9 @@
 if (gmcu_singleton()) { return; }
 
 gamepads = [];
+virtual_gamepad_connected = false;
+gamepad_axis_x = 0;
+gamepad_axis_y = 0;
 h_axis = 0;
 v_axis = 0;
 gmcu_input_registration_ensure_init();
@@ -66,7 +69,7 @@ function gmcu_get_direction() {
  * @returns {Bool} True when a gamepad is connected.
  */
 function gmcu_has_connected_gamepad() {
-	return array_length(gamepads) > 0;
+	return array_length(gamepads) > 0 || virtual_gamepad_connected;
 }
 
 /**
@@ -118,7 +121,7 @@ function gmcu_get_four_way_direction() {
 }
 
 /**
- * @description Checks whether a gamepad button was released on gamepad slot 0 this Step.
+ * @description Checks whether a gamepad button was released across physical and virtual gamepads this Step.
  * @param {Real} _button GameMaker gp_* button constant.
  * @param {String} _owner Optional owner name. Defaults to gameplay.
  * @returns {Bool} True when a connected gamepad released the button.
@@ -128,11 +131,27 @@ function gmcu_gamepad_button_released(_button, _owner = GMCU_INPUT_OWNER_GAMEPLA
 }
 
 /**
- * @description Checks whether a gamepad button was pressed on gamepad slot 0 this Step.
+ * @description Checks whether a gamepad button was pressed across physical and virtual gamepads this Step.
  * @param {Real} _button GameMaker gp_* button constant.
  * @param {String} _owner Optional owner name. Defaults to gameplay.
  * @returns {Bool} True when a connected gamepad pressed the button.
  */
 function gmcu_gamepad_button_pressed(_button, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
 	return input_state_pressed(gmcu_gamepad_input_state(_button), _owner);
+}
+
+/**
+ * @description Read the combined left stick for the active input owner.
+ * @param {Real} _axis gp_axislh or gp_axislv.
+ * @param {String} _owner Gameplay by default; inactive owners receive zero.
+ * @returns {Real} Axis in [-1,1], with positive Y pointing down.
+ */
+function gmcu_gamepad_axis_value(_axis, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	if (current_input_owner() != _owner) return 0;
+	switch (_axis) {
+		case gp_axislh: return gamepad_axis_x;
+		case gp_axislv: return gamepad_axis_y;
+	}
+	show_error("Input Hub supports left-stick axes only.", true);
+	return 0;
 }

@@ -263,11 +263,31 @@ buttons used by debug logs. The most useful discrete constants are:
 Input Hub supports any `vk_*` key and any discrete `gp_*` button, but only the
 inputs registered for the current game are scanned each Step.
 
-## Optional Virtual Keyboard Provider
+## Optional Virtual Gamepad Provider
 
-Set `global.gmcu_virtual_keyboard_provider` to a no-argument function returning an
-array of held registered key codes, or leave it `undefined`. Input Hub samples it
-once at Begin Step, combines it with physical keyboard state, and applies the
-same owner and edge routing. Consumers own browser/engine bridges and screen
-mappings; the provider must return an empty array when unavailable. Switching
-provider state must release keys to avoid stuck actions. No DOM events are emitted.
+Set `global.gmcu_virtual_gamepad_provider` to a no-argument function returning
+`{ connected, buttons, axis_x, axis_y }`, or leave it `undefined`. `buttons` is an
+array of held `gp_*` codes; axes are left-stick values in [-1,1], positive Y down.
+Return `{ connected: false, buttons: [], axis_x: 0, axis_y: 0 }` when unavailable.
+Consumers own device adapters; Common Utils has no browser-controller dependency.
+
+Begin Step samples the provider once and combines held buttons with the first
+tracked physical gamepad. Press/release edges describe the combined state: a
+button releases only when neither source holds it. Disconnection still releases
+held state. Virtual input uses the same `GMCU_EVENT_GAMEPAD_BUTTON_*` events and
+queries as physical input, and does not occupy a physical device index.
+
+`gmcu_has_connected_gamepad()` includes either source; `gamepads` contains only
+physical indices. `gmcu_gamepad_axis_value(axis, owner)` accepts `gp_axislh` or
+`gp_axislv`. For each axis, greater absolute magnitude wins; physical wins ties.
+Inactive owners receive zero. Each source owns its dead zone. Movement retains
+keyboard priority, then D-pad priority, then analog axes. Universal Cursor reads
+these combined axes rather than accessing hardware directly.
+
+A press retains its input owner until release. Releasing after an owner change
+clears the held state without dispatching to an inactive owner; held gameplay
+directions are suppressed while Dev Menu owns input.
+
+Run `node --test tests/input-hub-gamepad.test.cjs` in the toolbox repository.
+The harness executes Begin Step source with engine APIs stubbed and translates
+GML dynamic struct access. It does not replace validation in GameMaker.

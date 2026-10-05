@@ -44,15 +44,15 @@ if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up))
 }
 
 // Handle analog stick movement for gamepad
-if(instance_exists(gmcu_o_input_hub) && array_length(gmcu_o_input_hub.gamepads) > 0) {
-	var _axis_x = gamepad_axis_value(0, gp_axislh);
-	var _axis_y = gamepad_axis_value(0, gp_axislv);
+if (_has_input_hub) {
+	var _axis_x = gmcu_o_input_hub.gmcu_gamepad_axis_value(gp_axislh);
+	var _axis_y = gmcu_o_input_hub.gmcu_gamepad_axis_value(gp_axislv);
 
-	if (abs(_axis_x) > 0.2 || abs(_axis_y) > 0.2) {  // Deadzone check
+	if (_axis_x != 0 || _axis_y != 0) { // Each source owns its dead zone.
 	    gui_x += _axis_x * analog_speed;
 		gui_x = clamp(gui_x, 0, display_get_gui_width() - sprite_width);
 		
-	    gui_y -= _axis_y * analog_speed;
+	    gui_y += _axis_y * analog_speed;
 		gui_y = clamp(gui_y, 0, display_get_gui_height() - sprite_height);
 	}
 }
