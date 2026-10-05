@@ -2,6 +2,8 @@
 
 A collection of reusable GameMaker utilities.
 
+Contributor and agent constraints are defined in [AGENTS.md](AGENTS.md).
+
 The primary workflow is an editable Git submodule: add this repository to a
 project, use the resources from inside the submodule, improve the utilities
 from any consuming project, push those changes here, and pull them into other

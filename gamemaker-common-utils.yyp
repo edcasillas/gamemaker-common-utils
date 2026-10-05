@@ -36,13 +36,14 @@
   ],
   "ForcedPrefabProjectReferences":[],
   "IncludedFiles":[
-    {"$GMIncludedFile":"","%Name":"disable-mobile.js","CopyToMask":-1,"filePath":"datafiles","name":"disable-mobile.js","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
+    {"$GMIncludedFile":"","%Name":"disable-mobile.js","CopyToMask":32,"filePath":"datafiles","name":"disable-mobile.js","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
   ],
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{},
   "name":"gamemaker-common-utils",
   "resources":[
+    {"id":{"name":"gmcu_disable_mobile","path":"extensions/gmcu_disable_mobile/gmcu_disable_mobile.yy",},},
     {"id":{"name":"gmcu_html5_helpers","path":"extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy",},},
     {"id":{"name":"gmcu_o_base_button_game","path":"objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy",},},
     {"id":{"name":"gmcu_o_base_button_gui","path":"objects/gmcu_o_base_button_gui/gmcu_o_base_button_gui.yy",},},

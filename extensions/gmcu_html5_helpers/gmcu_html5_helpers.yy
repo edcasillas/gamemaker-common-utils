@@ -29,7 +29,7 @@
   "gradleinject":"",
   "hasConvertedCodeInjection":true,
   "helpfile":"",
-  "HTML5CodeInjection":"<GM_HTML5_PostBody>\n<script type=\"text/javascript\" src=\"html5game/disable-mobile.js\"></script>\n</GM_HTML5_PostBody>",
+  "HTML5CodeInjection":"",
   "html5Props":true,
   "IncludedResources":[],
   "installdir":"",

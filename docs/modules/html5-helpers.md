@@ -58,10 +58,45 @@ secure browser context.
 presentation, including the `⚠️` marker, message, back button, and timer
 cleanup.
 
-The extension also preserves the legacy early mobile-blocking behavior through
-an HTML5 `PostBody` injection of `datafiles/disable-mobile.js`. That script
-wraps the existing `window.onload`, lets GameMaker initialize for analytics,
-then immediately replaces the mobile view with the original warning layout.
+## Optional mobile blocking
+
+Import `extensions/gmcu_disable_mobile/gmcu_disable_mobile.yy` and register
+`datafiles/disable-mobile.js` as an HTML5 Included File to enable blocking.
+That JavaScript file is the single implementation and owns detection, warning
+text, markup, and appearance. Editable consumers link their Included File to
+this shared file rather than copying its contents.
+
+The extension supplies the `PostCanvas` injection: a synchronous `<script src>`
+that loads the Included File before the game runner. The `.yy` owns only the
+resource metadata and script reference, never the implementation. Consumers
+register the supplied resources without writing their own injection or blocker.
+The module has no dependency on `gmcu_html5_helpers`.
+
+The warning includes a Back button. Desktop browsers remain unchanged; iPadOS
+browsers using a desktop user agent are detected through touch capability.
+The game initializes behind the hidden container, allowing analytics startup;
+this is a presentation block, not a runtime shutdown.
+
+Importing `gmcu_html5_helpers` alone does not enable blocking. Consumers select
+`gmcu_disable_mobile` explicitly and omit it when mobile gameplay is supported.
+Do not activate a mobile-controller host and the blocking extension together.
+
+### Mandatory timing contract
+
+Mobile blocking is an HTML-template responsibility. The warning must be visible
+before the runner loads, independently of GameMaker initialization or asset
+loading. Showing the loading bar before the warning is a regression.
+
+Do not move this behavior into an extension Init function, GML, room events,
+`GameMaker_Init`, or runtime-readiness callbacks. Background initialization for
+analytics cannot be a prerequisite for showing the warning. This contract also
+applies to resource extraction and refactoring; changing it requires an explicit
+consumer-owner decision.
+
+Validate the injected HTML with an unavailable or deliberately delayed runner:
+the mobile warning must still appear and hide the game container. Verify desktop
+behavior is unchanged, then check a fresh consumer HTML5 export on a mobile
+browser. Tests that only call the blocker after startup do not validate timing.
 
 These functions are HTML5 extension functions. Guard calls that can execute on
 other targets with `os_browser != browser_not_a_browser`.
@@ -69,7 +104,3 @@ other targets with `os_browser != browser_not_a_browser`.
 `gmcu_html5_use_browser_console_for_logging()` is a script helper for consumers
 that already use the shared Logging module and want browser-native severity
 levels without rewriting the adapter in each game bootstrap.
-
-Consumers that import the included `disable-mobile.js` opt into its fixed
-mobile-blocking policy and message. Analytics and game-state changes remain
-consumer-owned.

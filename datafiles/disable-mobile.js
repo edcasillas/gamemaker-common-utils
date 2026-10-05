@@ -1,18 +1,8 @@
-var existingOnLoad = window.onload;
-
-// Wait for the DOM to be fully loaded
-window.onload = function () {
-  // Function to detect if the user is on a mobile device
-  function isMobileDevice() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  }
-
-  /*
-  We're going to hide the canvas, but let the game initialize in the background so it can process potential analytics.
-  */
-  if (existingOnLoad) existingOnLoad();
-
-  if(!isMobileDevice()) return;
+/** Show the mobile warning before the browser reaches the game runner script. */
+(function () {
+  var mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!mobile || document.getElementById('mobile-message')) return;
 
   // If it's a mobile device, replace the canvas with a div
   // Find the game canvas element
@@ -43,6 +33,6 @@ window.onload = function () {
   // Insert the div before the canvas
   gameDiv.parentNode.insertBefore(mobileMessage, gameDiv);
 
-  // Hide the canvas so the game doesn't run
+  // Hide gameplay while allowing runtime initialization and analytics.
   gameDiv.style.display = 'none';
-}
+})();
