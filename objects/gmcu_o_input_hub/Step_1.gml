@@ -1,3 +1,8 @@
+// Sample virtual input once before routing edges, so every key sees one screen mode.
+var _virtual_keys = [];
+if (!is_undefined(global.gmcu_virtual_keyboard_provider)) {
+	_virtual_keys = global.gmcu_virtual_keyboard_provider();
+}
 var _registered_keyboard_keys = global.gmcu_registered_keyboard_keys;
 for (var _keyboard_i = 0; _keyboard_i < array_length(_registered_keyboard_keys); _keyboard_i++) {
 	var _keyboard_key = _registered_keyboard_keys[_keyboard_i];
@@ -7,7 +12,7 @@ for (var _keyboard_i = 0; _keyboard_i < array_length(_registered_keyboard_keys);
 	_keyboard_state.pressed_dev_menu = false;
 	_keyboard_state.released_dev_menu = false;
 
-	var _keyboard_is_down = keyboard_check(_keyboard_key);
+	var _keyboard_is_down = keyboard_check(_keyboard_key) || array_contains(_virtual_keys, _keyboard_key);
 	if (_keyboard_is_down && !_keyboard_state.is_down) {
 		_keyboard_state.is_down = true;
 		_keyboard_state.owner = current_input_owner();

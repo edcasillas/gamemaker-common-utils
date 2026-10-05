@@ -262,3 +262,12 @@ buttons used by debug logs. The most useful discrete constants are:
 
 Input Hub supports any `vk_*` key and any discrete `gp_*` button, but only the
 inputs registered for the current game are scanned each Step.
+
+## Optional Virtual Keyboard Provider
+
+Set `global.gmcu_virtual_keyboard_provider` to a no-argument function returning an
+array of held registered key codes, or leave it `undefined`. Input Hub samples it
+once at Begin Step, combines it with physical keyboard state, and applies the
+same owner and edge routing. Consumers own browser/engine bridges and screen
+mappings; the provider must return an empty array when unavailable. Switching
+provider state must release keys to avoid stuck actions. No DOM events are emitted.
