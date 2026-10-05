@@ -11,6 +11,13 @@ if(gmcu_ui_overlay_blocks_pointer_input()) {
 // Get the current mouse position in GUI space
 var _current_mouse_x = device_mouse_x_to_gui(0);
 var _current_mouse_y = device_mouse_y_to_gui(0);
+if (!is_undefined(global.gmcu_gui_pointer_provider)) {
+	var _pointer = global.gmcu_gui_pointer_provider();
+	if (array_length(_pointer) == 2) {
+		_current_mouse_x = _pointer[0];
+		_current_mouse_y = _pointer[1];
+	}
+}
 
 // Update cursor position if mouse moves
 if(_current_mouse_x != last_mouse_x || _current_mouse_y != last_mouse_y) {

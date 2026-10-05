@@ -229,3 +229,13 @@ function on_released() {}
 
 Cursor sprites, menu actions, disabled-state policy, sounds, visual feedback,
 and room transition policy remain in the consuming project.
+
+## Optional GUI pointer provider
+
+A consumer can assign `global.gmcu_gui_pointer_provider` to a function returning
+`[x,y]` in GUI coordinates. Return `[]` to use native `device_mouse_*_to_gui(0)`.
+Universal Cursor samples the provider in Step and uses the result for both its
+position and interactable hit testing. Leaving the provider undefined preserves
+native input. This hook supports external canvas scaling without introducing an
+engine-adapter dependency into Common Utils. The consumer owns conversion from
+its page coordinates and viewport to GUI space.

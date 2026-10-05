@@ -2,6 +2,11 @@ if (gmcu_singleton()) {
 	return;
 }
 
+// Consumers may supply GUI coordinates for externally scaled browser canvases.
+if (!variable_global_exists("gmcu_gui_pointer_provider")) {
+	global.gmcu_gui_pointer_provider = undefined;
+}
+
 // Initialize last known mouse positions
 last_mouse_x = device_mouse_x(0);
 last_mouse_y = device_mouse_y(0);
