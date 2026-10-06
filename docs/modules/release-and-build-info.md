@@ -6,33 +6,42 @@ then invoke `deploy` explicitly.
 
 ## Quickstart
 
-Run the shared tool from a consumer repository:
+Copy `tools/release/Release.command` into the consumer repository root, make it
+executable, and provide root `itch-config.json`. Double-click the launcher for
+`Serve HTML build`, `Stop HTML server`, and `Publish to itch.io`.
+
+Run the shared tool from the consumer repository:
 
 ```sh
+# Open the same interactive menu as the launcher.
+python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py menu
+
 # Export and immediately serve the configured HTML platform.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  export --config itch-deploy/itch-config.json --platform html --serve
+  export --platform html --serve
 
 # Serve an existing HTML export without rebuilding it.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  serve-html --config itch-deploy/itch-config.json --open
+  serve-html --open
 
 # Stop the background HTML server.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  stop-html --config itch-deploy/itch-config.json
+  stop-html
 
 # Inspect resolved paths, versions, and server status.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  status --config itch-deploy/itch-config.json
+  status
 
 # Bump the tracked platform version without deploying.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  version --config itch-deploy/itch-config.json --platform html
+  version --platform html
 
 # Deploy an already tested export.
 python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  deploy --config itch-deploy/itch-config.json --platform html
+  deploy --platform html
 ```
+
+Commands default to root `itch-config.json`; `--config` supports explicit paths.
 
 `export` uses `gm-cli package` by default. As of gm-cli 2.1.0, the official CLI
 reports that HTML5 target support is still coming soon. Consumers may provide a
@@ -48,10 +57,15 @@ before registering the server. An explicit `--port` remains strict and fails
 when occupied. State and logs go under the consumer-defined `server_state`
 path; commit neither file.
 
-`deploy` asks for confirmation that the exact export was tested. Automation
-must pass `--yes-tested`. It reads the latest channel version from
-`butler status`, falls back to the consumer's versioned state file, writes
-`options.ini` and `buildnumber.txt`, then calls `butler push`.
+`deploy` requires a clean `main` and confirmation that the exact export was tested.
+Automation passes `--yes-tested`. It reads the latest channel version from Butler,
+falls back to the versioned counter, and updates generated version files plus the
+selected GameMaker target's source version. A successful upload is followed by a
+commit of only the counter and selected target options, a `releases/v<version>`
+tag, and a separate prompt to push the commit/tag.
+
+A failed upload restores the version files. If Git bookkeeping fails after upload,
+the tool prints recovery commands; it does not undo the itch.io release.
 
 Install and authenticate Butler before using `status` or `deploy`:
 
@@ -101,7 +115,7 @@ The normal consumer file is intentionally small:
 
 Platform order supplies stable IDs starting at `1`. Common Utils infers the
 consumer `.yyp`, `Builds/<platform>`, matching itch channel names,
-`options.ini`, `buildnumber.txt`, `config.jsonc`, and the HTML server defaults.
+`options.ini`, `buildnumber.txt`, `itch-deploy/config.jsonc`, and the HTML server defaults.
 Advanced projects may override those fields, but ordinary consumers should not
 repeat conventions.
 
