@@ -15,15 +15,17 @@ function fixture() {
   const keys = ['vk_left','vk_right','vk_up','vk_down'];
   const states = Object.fromEntries([...buttons,...keys].map(k=>[k,{is_down:false}]));
   const f = {owner:'gameplay', physical:false, held:new Set(), keyboard:new Set(),
-    axes:[0,0], virtual:{connected:false,buttons:[],axis_x:0,axis_y:0}, events:[], polls:0};
+    keyPressed:false, axes:[0,0], virtual:{connected:false,buttons:[],axis_x:0,axis_y:0}, events:[], polls:0};
   const context = vm.createContext({
-    ...Object.fromEntries([...buttons,...keys,'gp_axislh','gp_axislv'].map(k=>[k,k])),
+    ...Object.fromEntries([...buttons,...keys,'gp_axislh','gp_axislv','vk_anykey'].map(k=>[k,k])),
     GMCU_INPUT_OWNER_GAMEPLAY:'gameplay', GMCU_INPUT_OWNER_DEV_MENU:'dev_menu',
     GMCU_EVENT_KEYBOARD_KEY_PRESSED:'key_down',GMCU_EVENT_KEYBOARD_KEY_RELEASED:'key_up',
     GMCU_EVENT_GAMEPAD_BUTTON_PRESSED:'pad_down',GMCU_EVENT_GAMEPAD_BUTTON_RELEASED:'pad_up',
     global:{gmcu_virtual_gamepad_provider:()=>{f.polls++;return f.virtual;},
       gmcu_registered_keyboard_keys:keys,gmcu_registered_gamepad_buttons:buttons,
       gmcu_gamepad_buttons_mapping:Object.fromEntries(buttons.map(k=>[k,k]))},
+    last_input_device:undefined,prompt_axis_x:0,prompt_axis_y:0,
+    sign:Math.sign,keyboard_check_pressed:()=>f.keyPressed,
     gamepads:[3], is_undefined:v=>v===undefined,array_length:a=>a.length,
     array_contains:(a,v)=>a.includes(v),abs:Math.abs,string:String,
     current_input_owner:()=>f.owner,
@@ -72,4 +74,26 @@ test('Dev Menu owns presses and axes; releasing a gameplay hold there does not d
 test('absent virtual provider and missing physical device remain neutral',()=>{
   const f=fixture();f.context.global.gmcu_virtual_gamepad_provider=undefined;f.context.gamepads=[];f.tick();
   assert.deepEqual(f.events,[]);assert.equal(f.context.h_axis,0);assert.equal(f.context.v_axis,0);
+});
+
+test('prompt device starts from virtual availability, not idle physical connection',()=>{
+  const f=fixture();f.physical=true;f.tick();assert.equal(f.context.last_input_device,undefined);
+  f.virtual.connected=true;f.tick();assert.equal(f.context.last_input_device,'gamepad');
+  f.keyPressed=true;f.tick();assert.equal(f.context.last_input_device,'keyboard');
+  f.keyPressed=false;f.tick();assert.equal(f.context.last_input_device,'keyboard');
+  f.virtual.buttons=['gp_face1'];f.tick();assert.equal(f.context.last_input_device,'gamepad');
+  f.physical=false;f.virtual.connected=false;f.tick();assert.equal(f.context.last_input_device,'keyboard');
+});
+test('fresh analog direction switches prompts; held direction, dead-zone neutral and releases do not',()=>{
+  const f=fixture();f.physical=true;f.axes=[.5,0];f.tick();assert.equal(f.context.last_input_device,'gamepad');
+  f.keyPressed=true;f.tick();assert.equal(f.context.last_input_device,'keyboard');
+  f.keyPressed=false;f.axes=[.6,0];f.tick();assert.equal(f.context.last_input_device,'keyboard');
+  f.axes=[0,0];f.tick();assert.equal(f.context.last_input_device,'keyboard');
+  f.axes=[-.4,0];f.tick();assert.equal(f.context.last_input_device,'gamepad');
+});
+test('Dev Menu input updates prompt device without leaking game events; keyboard wins simultaneous presses',()=>{
+  const f=fixture();f.owner='dev_menu';f.virtual.connected=true;f.virtual.buttons=['gp_face1'];
+  f.keyPressed=true;f.tick();assert.equal(f.context.last_input_device,'keyboard');assert.deepEqual(f.events,[]);
+  f.keyPressed=false;f.virtual.buttons=[];f.tick();assert.equal(f.context.last_input_device,'keyboard');
+  f.virtual.buttons=['gp_face1'];f.tick();assert.equal(f.context.last_input_device,'gamepad');assert.deepEqual(f.events,[]);
 });

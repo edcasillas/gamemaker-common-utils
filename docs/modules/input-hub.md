@@ -291,3 +291,20 @@ directions are suppressed while Dev Menu owns input.
 Run `node --test tests/input-hub-gamepad.test.cjs` in the toolbox repository.
 The harness executes Begin Step source with engine APIs stubbed and translates
 GML dynamic struct access. It does not replace validation in GameMaker.
+
+## Prompt device
+
+`gmcu_o_input_hub.last_input_device` is `"keyboard"`, `"gamepad"`, or `undefined`
+before a device is selected. Consumers choose their own text or artwork; treat
+`undefined` as keyboard for a desktop default. An available virtual gamepad selects
+`"gamepad"` before the first interaction. An idle physical connection does not.
+
+Begin Step updates the field on any physical key press, registered gamepad button
+press, or a fresh nonzero left-stick direction after source dead zones. Physical
+and virtual pads share the gamepad category. Holding an axis in the same direction,
+returning to neutral, and button releases do not change it. Keyboard wins an exact
+same-frame tie. Dev Menu interactions update the field without changing input routing.
+Losing all gamepads returns a gamepad prompt to keyboard. The field describes prompt
+preference; it does not restrict accepted input or change event arguments.
+
+Read the field when rendering a prompt so switching devices updates an open screen.

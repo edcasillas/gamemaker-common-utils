@@ -7,6 +7,10 @@ virtual_gamepad_connected = _virtual_pad.connected;
 var _physical_pad = array_length(gamepads) > 0 ? gamepads[0] : -1;
 var _has_physical_pad = _physical_pad >= 0 && gamepad_is_connected(_physical_pad);
 
+var _gamepad_activity = false;
+if (is_undefined(last_input_device) && virtual_gamepad_connected) last_input_device = "gamepad";
+if (last_input_device == "gamepad" && !virtual_gamepad_connected && !_has_physical_pad) last_input_device = "keyboard";
+
 var _registered_keyboard_keys = global.gmcu_registered_keyboard_keys;
 for (var _keyboard_i = 0; _keyboard_i < array_length(_registered_keyboard_keys); _keyboard_i++) {
 	var _keyboard_key = _registered_keyboard_keys[_keyboard_i];
@@ -59,6 +63,7 @@ for (var _button_i = 0; _button_i < array_length(_registered_gamepad_buttons); _
 		|| (_virtual_pad.connected && array_contains(_virtual_pad.buttons, _button_code));
 
 	if (_button_is_down && !_button_state.is_down) {
+		_gamepad_activity = true;
 		_button_state.is_down = true;
 		_button_state.owner = current_input_owner();
 		if (_button_state.owner == GMCU_INPUT_OWNER_DEV_MENU) {
@@ -109,3 +114,16 @@ if (current_input_owner() != GMCU_INPUT_OWNER_GAMEPLAY) {
 	h_axis = 0;
 	v_axis = 0;
 }
+
+// Axes already include their source dead zones. A held direction or its release
+// does not steal prompts from a later keyboard press; a fresh direction does.
+var _prompt_x = sign(gamepad_axis_x);
+var _prompt_y = sign(gamepad_axis_y);
+_gamepad_activity = _gamepad_activity
+	|| (_prompt_x != 0 && _prompt_x != prompt_axis_x)
+	|| (_prompt_y != 0 && _prompt_y != prompt_axis_y);
+prompt_axis_x = _prompt_x;
+prompt_axis_y = _prompt_y;
+// Keyboard wins an exact same-frame tie; all physical keys count, even unregistered ones.
+if (keyboard_check_pressed(vk_anykey)) last_input_device = "keyboard";
+else if (_gamepad_activity) last_input_device = "gamepad";

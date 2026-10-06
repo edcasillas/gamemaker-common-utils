@@ -2,6 +2,10 @@ if (gmcu_singleton()) { return; }
 
 gamepads = [];
 virtual_gamepad_connected = false;
+// Prompt device stays undecided until input is used or a virtual pad is available.
+last_input_device = undefined;
+prompt_axis_x = 0;
+prompt_axis_y = 0;
 gamepad_axis_x = 0;
 gamepad_axis_y = 0;
 h_axis = 0;
