@@ -43,6 +43,7 @@ Import modules in this order:
 10. [`LayeredGUI`](docs/modules/layered-gui.md): Priority-ordered Draw GUI callbacks.
 11. [`UniversalCursor`](docs/modules/universal-cursor.md): Mouse, keyboard, and gamepad GUI cursor.
 12. [`Buttons`](docs/modules/buttons.md): Reusable localized buttons.
+    - [`Text Input`](docs/modules/text-input.md): Editor-placed textboxes and generated HTML5 keyboards.
 13. [`Labels`](docs/modules/labels.md): Reusable localized game and GUI labels.
 14. [`Networking`](docs/modules/networking.md): Reusable GameMaker HTTP callback helpers.
 15. [`TimedActions`](docs/modules/timed-actions.md): Persistent delayed callbacks.

@@ -1,7 +1,7 @@
 if(!visible) return; // Skip processing inputs if cursor is not visible.
 
 if(gmcu_ui_overlay_blocks_pointer_input()) {
-	if(hovered_interactable != noone) {
+	if(instance_exists(hovered_interactable)) {
 		hovered_interactable.on_hover_leave();
 	}
 	hovered_interactable = noone;
@@ -27,26 +27,29 @@ if(_current_mouse_x != last_mouse_x || _current_mouse_y != last_mouse_y) {
 	last_mouse_y = _current_mouse_y;
 }
 
+var _text_editing = instance_exists(text_input_owner);
+var _input_route = _text_editing ? "text_input" : GMCU_INPUT_OWNER_GAMEPLAY;
+
 // Handle directional navigation (arrow keys or D-Pad)
 var _has_input_hub = instance_exists(gmcu_o_input_hub);
-if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padu))) {
+if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padu)))) {
     navigate(GMCU_DIRECTION_ANGLE.UP);
-} else if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_down))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padd))) {
+} else if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_down))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padd)))) {
     navigate(GMCU_DIRECTION_ANGLE.DOWN);
-} else if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padl))) {
+} else if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padl)))) {
     navigate(GMCU_DIRECTION_ANGLE.LEFT);
-} else if ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right))
-	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padr))) {
+} else if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right))
+	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padr)))) {
     navigate(GMCU_DIRECTION_ANGLE.RIGHT);
 }
 
 // Handle analog stick movement for gamepad
 if (_has_input_hub) {
-	var _axis_x = gmcu_o_input_hub.gmcu_gamepad_axis_value(gp_axislh);
-	var _axis_y = gmcu_o_input_hub.gmcu_gamepad_axis_value(gp_axislv);
+	var _axis_x = gmcu_o_input_hub.gmcu_gamepad_axis_value(gp_axislh, _input_route);
+	var _axis_y = gmcu_o_input_hub.gmcu_gamepad_axis_value(gp_axislv, _input_route);
 
 	if (_axis_x != 0 || _axis_y != 0) { // Each source owns its dead zone.
 	    gui_x += _axis_x * analog_speed;
@@ -75,15 +78,19 @@ for (var _i = 0; _i < ds_list_size(interactables); _i++) {
 		continue;
 	}
 	
-	// Define interactable boundaries based on its GUI position and dimensions
-	var _interactable_x = _interactable.x - (_interactable.sprite_width / 2);
-	var _interactable_y = _interactable.y - (_interactable.sprite_height / 2);
-	var _interactable_width = _interactable.sprite_width;
-	var _interactable_height = _interactable.sprite_height;
+	// Explicit hit dimensions support procedural UI controls without a sprite.
+    if (_text_editing && !text_input_owner.accepts_cursor_target(_interactable)) continue;
+    var _hit_width = variable_instance_exists(_interactable,"hit_width") ? _interactable.hit_width : _interactable.sprite_width;
+    var _hit_height = variable_instance_exists(_interactable,"hit_height") ? _interactable.hit_height : _interactable.sprite_height;
+    // Define interactable boundaries based on its GUI position and dimensions
+	var _interactable_x = _interactable.x - (_hit_width / 2);
+	var _interactable_y = _interactable.y - (_hit_height / 2);
+	var _interactable_width = _hit_width;
+	var _interactable_height = _hit_height;
 	
     if (point_in_rectangle(gui_x, gui_y, _interactable_x, _interactable_y, _interactable_x + _interactable_width, _interactable_y + _interactable_height)) {
 		if(hovered_interactable != _interactable) { // New interactable hover detected
-			if(hovered_interactable != noone) {
+			if(instance_exists(hovered_interactable)) {
 				try {
 					hovered_interactable.on_hover_leave(); // Trigger exit event on previously hovered interactable
 				} catch(_exception) {
@@ -124,7 +131,7 @@ ds_list_destroy(_invalid_indices);
 
 // Handle hover exit if not hovering over any interactable
 if(!_is_hovering) {
-	if(hovered_interactable != noone) {
+	if(instance_exists(hovered_interactable)) {
 		hovered_interactable.on_hover_leave(); // Trigger hover exit on previously hovered interactable
 	}
 	hovered_interactable = noone;
@@ -134,15 +141,15 @@ if(!_is_hovering) {
 if(_is_hovering && hovered_interactable != noone) {
 	// Trigger on_pressed for different input methods
 	if (mouse_check_button_pressed(mb_left)
-		|| (_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_enter))
-		|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face1))) {
+		|| (!_text_editing && _has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_enter))
+		|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face1, _input_route))) {
 		hovered_interactable.on_pressed();
 	}
 	
 	// Trigger on_released for different input methods
-	if (mouse_check_button_released(mb_left)
-		|| (_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_released(vk_enter))
-		|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_released(gp_face1))) {
+	if (instance_exists(hovered_interactable) && (mouse_check_button_released(mb_left)
+		|| (!_text_editing && _has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_released(vk_enter))
+		|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_released(gp_face1, _input_route)))) {
 		hovered_interactable.on_released();
 	}
 }

@@ -1,7 +1,7 @@
 # InputHub
 
 `InputHub` owns registered keyboard and gamepad hardware input for gameplay and
-the Dev Menu. It centralizes direction state, gamepad connect/disconnect
+the Dev Menu and focused UI. It centralizes direction state, gamepad connect/disconnect
 tracking, and routed press/release interactions with `press owns release`
 semantics.
 
@@ -308,3 +308,13 @@ Losing all gamepads returns a gamepad prompt to keyboard. The field describes pr
 preference; it does not restrict accepted input or change event arguments.
 
 Read the field when rendering a prompt so switching devices updates an open screen.
+
+## Instance-owned focus
+
+`focus_owner` and `focus_route` reserve input for a live UI instance. The Dev Menu
+keeps priority; otherwise a live owner receives its named route instead of
+`gameplay`. Poll with that route through the existing optional owner parameter.
+Only gameplay-owned edges dispatch gameplay Event Bus events. Held/released inputs
+retain their press owner and cannot transfer into gameplay on UI close. Clear
+`focus_owner` when releasing focus; a destroyed owner also releases the route.
+[Text Input](text-input.md) owns this lifecycle while a field is edited.

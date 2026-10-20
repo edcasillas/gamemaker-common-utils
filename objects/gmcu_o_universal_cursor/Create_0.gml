@@ -2,6 +2,8 @@ if (gmcu_singleton()) {
 	return;
 }
 
+text_input_owner = noone;
+
 // Consumers may supply GUI coordinates for externally scaled browser canvases.
 if (!variable_global_exists("gmcu_gui_pointer_provider")) {
 	global.gmcu_gui_pointer_provider = undefined;
@@ -108,5 +110,5 @@ function navigate(_direction) {
 	
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR);
 function on_draw_gui() {
-	draw_sprite(sprite_index, 0, gui_x, gui_y);
+	if (sprite_exists(sprite_index)) draw_sprite(sprite_index, 0, gui_x, gui_y);
 }

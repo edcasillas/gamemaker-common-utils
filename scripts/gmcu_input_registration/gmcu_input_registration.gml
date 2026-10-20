@@ -9,10 +9,8 @@ function gmcu_input_registration_create_state() {
 		registration_count: 0,
 		is_down: false,
 		owner: GMCU_INPUT_OWNER_GAMEPLAY,
-		pressed_gameplay: false,
-		released_gameplay: false,
-		pressed_dev_menu: false,
-		released_dev_menu: false
+		pressed: false,
+		released: false
 	};
 }
 

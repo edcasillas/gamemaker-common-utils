@@ -239,3 +239,12 @@ position and interactable hit testing. Leaving the provider undefined preserves
 native input. This hook supports external canvas scaling without introducing an
 engine-adapter dependency into Common Utils. The consumer owns conversion from
 its page coordinates and viewport to GUI space.
+
+## Procedural controls and text editing
+
+Subscribers can define `hit_width` and `hit_height` for rectangles without sprites;
+other controls retain sprite-based bounds. [Text Input](text-input.md) supplies
+these dimensions to match its drawing. Its active `text_input_owner` restricts
+cursor targets and delegates D-pad navigation to the generated keyboard. Physical
+arrows edit the caret, and Enter cannot activate a hovered character. Without an
+active text owner, standard button navigation and activation remain in effect.

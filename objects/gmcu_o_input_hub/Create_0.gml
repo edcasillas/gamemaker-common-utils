@@ -1,5 +1,7 @@
 if (gmcu_singleton()) { return; }
 
+focus_owner = noone;
+focus_route = "";
 gamepads = [];
 virtual_gamepad_connected = false;
 // Prompt device stays undecided until input is used or a virtual pad is available.
@@ -14,10 +16,11 @@ gmcu_input_registration_ensure_init();
 
 /**
  * @description Returns the owner that should receive a newly pressed interaction this Step.
- * @returns {String} `dev_menu` when the Dev Menu is open, otherwise `gameplay`.
+ * @returns {String} Dev Menu, active instance focus route, or gameplay.
  */
 function current_input_owner() {
 	if (gmcu_dev_menu_is_open()) return GMCU_INPUT_OWNER_DEV_MENU;
+	if (instance_exists(focus_owner)) return focus_route;
 	return GMCU_INPUT_OWNER_GAMEPLAY;
 }
 
@@ -29,8 +32,7 @@ function current_input_owner() {
  */
 function input_state_pressed(_state, _owner) {
 	if (is_undefined(_state)) return false;
-	if (_owner == GMCU_INPUT_OWNER_DEV_MENU) return _state.pressed_dev_menu;
-	return _state.pressed_gameplay;
+	return _state.pressed && _state.owner == _owner && current_input_owner() == _owner;
 }
 
 /**
@@ -41,8 +43,7 @@ function input_state_pressed(_state, _owner) {
  */
 function input_state_released(_state, _owner) {
 	if (is_undefined(_state)) return false;
-	if (_owner == GMCU_INPUT_OWNER_DEV_MENU) return _state.released_dev_menu;
-	return _state.released_gameplay;
+	return _state.released && _state.owner == _owner && current_input_owner() == _owner;
 }
 
 /**
@@ -53,7 +54,7 @@ function input_state_released(_state, _owner) {
  */
 function input_state_down(_state, _owner) {
 	if (is_undefined(_state)) return false;
-	return _state.is_down && _state.owner == _owner;
+	return _state.is_down && _state.owner == _owner && current_input_owner() == _owner;
 }
 
 /**

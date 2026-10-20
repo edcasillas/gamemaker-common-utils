@@ -10,6 +10,9 @@
   },
   "defaultScriptType":1,
   "Folders":[
+    {"$GMFolder":"","%Name":"TextInput","folderPath":"folders/CommonUtils/Objects/UI/TextInput.yy","name":"TextInput","resourceType":"GMFolder","resourceVersion":"2.0"},
+    {"$GMFolder":"","%Name":"TextInput","folderPath":"folders/CommonUtils/Scripts/TextInput.yy","name":"TextInput","resourceType":"GMFolder","resourceVersion":"2.0"},
+
     {"$GMFolder":"","%Name":"CommonUtils","folderPath":"folders/CommonUtils.yy","name":"CommonUtils","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Core","folderPath":"folders/CommonUtils/Core.yy","name":"Core","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"DevMenu","folderPath":"folders/CommonUtils/DevMenu.yy","name":"DevMenu","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -43,6 +46,13 @@
   "MetaData":{},
   "name":"gamemaker-common-utils",
   "resources":[
+    {"id":{"name":"gmcu_text_input_events","path":"scripts/gmcu_text_input_events/gmcu_text_input_events.yy"}},
+    {"id":{"name":"gmcu_text_state","path":"scripts/gmcu_text_state/gmcu_text_state.yy"}},
+    {"id":{"name":"gmcu_o_textbox","path":"objects/gmcu_o_textbox/gmcu_o_textbox.yy"}},
+    {"id":{"name":"gmcu_o_text_keyboard","path":"objects/gmcu_o_text_keyboard/gmcu_o_text_keyboard.yy"}},
+    {"id":{"name":"gmcu_o_text_key","path":"objects/gmcu_o_text_key/gmcu_o_text_key.yy"}},
+    {"id":{"name":"gmcu_text_input_html5","path":"extensions/gmcu_text_input_html5/gmcu_text_input_html5.yy"}},
+
     {"id":{"name":"gmcu_disable_mobile","path":"extensions/gmcu_disable_mobile/gmcu_disable_mobile.yy",},},
     {"id":{"name":"gmcu_html5_helpers","path":"extensions/gmcu_html5_helpers/gmcu_html5_helpers.yy",},},
     {"id":{"name":"gmcu_o_base_button_game","path":"objects/gmcu_o_base_button_game/gmcu_o_base_button_game.yy",},},
