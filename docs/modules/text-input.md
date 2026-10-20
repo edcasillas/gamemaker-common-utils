@@ -109,3 +109,9 @@ When no key is targeted, the first D-pad direction selects the first character;
 subsequent directions navigate. Mouse hover highlights the key under the cursor.
 Accepted physical characters flash their normalized visible key for 150 ms,
 without moving pointer or navigation focus. Rejected characters produce no flash.
+
+Physical Left/Right and Delete/Backspace flash their visible action keys.
+Ctrl/Cmd+C and Ctrl/Cmd+V flash COPY/PASTE when enabled, independently of clipboard
+success. DONE/Enter/Start and CANCEL/Escape/B show a 150 ms feedback beat before
+closing; further editing input is ignored during that beat. Start uses Input Hub's
+active text-input route and is registered/unregistered with the textbox.

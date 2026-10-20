@@ -6,9 +6,9 @@ function gmcu_text_capture_begin() {
   window.addEventListener('keydown', function(e) {
     if(!s.active || e.isComposing)return;
     if(e.ctrlKey || e.metaKey) {
-      if(e.key.toLowerCase()==='c')return;
+      if(e.key.toLowerCase()==='c') {if(!e.repeat)s.queue.push({kind:'shortcut',value:'COPY'});return;}
       // Let the browser dispatch paste with its clipboardData, avoiding a read permission.
-      if(e.key.toLowerCase()==='v')return;
+      if(e.key.toLowerCase()==='v') {if(!e.repeat)s.queue.push({kind:'shortcut',value:'PASTE'});return;}
       return;
     }
     if(e.key==='Enter' || e.key==='Escape') {

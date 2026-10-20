@@ -62,9 +62,9 @@ function navigate(_direction) {
     if (instance_exists(best)) { gmcu_o_universal_cursor.gui_x=best.x; gmcu_o_universal_cursor.gui_y=best.y; }
 }
 
-/** Flash an accepted physical character without moving pointer or navigation focus.
- * @param {string} _character Normalized alphabet character. */
-function flash_character(_character) {
+/** Flash a visible character or action without moving pointer or navigation focus.
+ * @param {string} _character Normalized character or action name. */
+function flash_key(_character) {
     var key_action = _character == " " ? "SPACE" : _character;
     for (var i=0; i<array_length(keys); i++) {
         if (keys[i].action == key_action) { keys[i].flash_until=current_time+150; break; }

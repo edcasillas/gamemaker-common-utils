@@ -1,17 +1,24 @@
 if (!editing || current_time == opened_at) exit;
+if (pending_close != -1) {
+    if (current_time >= close_due) finish(pending_close == 1);
+    exit;
+}
 if (gmcu_ui_overlay_blocks_pointer_input()) exit;
 var events = json_parse(gmcu_text_capture_poll());
 for (var i = 0; i < array_length(events); i++) {
     var e = events[i];
-    if (!editing) break;
+    if (!editing || pending_close != -1) break;
     if (e.kind == "char") {
         var character = state.normalize(e.value);
         if (character != "") {
             state.type(character);
-            area.flash_character(character);
+            area.flash_key(character);
         }
     }
     else if (e.kind == "paste") { if (paste_mode != "none") state.paste(e.value, paste_mode); }
+    else if (e.kind == "shortcut") {
+        if ((e.value == "COPY" && copy_mode == "all") || (e.value == "PASTE" && paste_mode != "none")) area.flash_key(e.value);
+    }
     else if (e.kind == "feedback") feedback=e.value;
     else if (e.kind == "action") edit_action(e.value);
     else if (e.kind == "clipboard" && e.owner == string(id) && e.token == clipboard_token) {
@@ -21,13 +28,15 @@ for (var i = 0; i < array_length(events); i++) {
         else { feedback = state.paste(e.value, paste_mode) ? "Pasted" : "No permitted characters"; }
     }
 }
-if (!editing) exit;
+if (!editing || pending_close != -1) exit;
 var action = keyboard_check(vk_left) ? "LEFT" : (keyboard_check(vk_right) ? "RIGHT" : ((keyboard_check(vk_backspace) || keyboard_check(vk_delete)) ? "DEL" : ""));
 if (action == "") repeat_key = "";
 else if (action != repeat_key) { repeat_key = action; repeat_due = current_time + 400; edit_action(action); }
 else if (current_time >= repeat_due) { repeat_due = current_time + 80; edit_action(action); }
-if (!editing) exit;
-if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face2,"text_input")) finish(false);
+if (!editing || pending_close != -1) exit;
+if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face2,"text_input")) edit_action("CANCEL");
+else if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_start,"text_input")) edit_action("DONE");
+if (pending_close != -1) exit;
 // Only the actual canvas pointer can cause outside-click cancellation. HTML pad
 // touches are captured by its adapter and never reach the runner's mouse lane.
 if (editing && mouse_check_button_pressed(mb_left)) {

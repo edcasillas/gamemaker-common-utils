@@ -1,5 +1,6 @@
 state = new gmcu_TextState(alphabet, text_length, case_sensitive, wrap_caret, initial_value);
 editing = false; touched = false; hovered = false; pressed = false; feedback = "";
+pending_close = -1; close_due = 0;
 area = noone; is_interactable = true; hit_width = field_width; hit_height = field_height;
 repeat_key = 0; repeat_due = 0; opened_at = -1; clipboard_token = 0;
 if (textbox_id == "" || keyboard_area_id == "") show_error("Textbox requires textbox_id and keyboard_area_id", true);
@@ -8,6 +9,7 @@ if (keyboard_layout == "qwerty") {
     for (var i=1;i<=string_length(alphabet);i++) if (string_pos(string_char_at(alphabet,i),"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ")==0) show_error("QWERTY layout supports uppercase ASCII letters, digits and space",true);
 }
 gmcu_register_gamepad_button(gp_face2);
+gmcu_register_gamepad_button(gp_start);
 gmcu_universal_cursor_subscribe(textbox_id);
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
 /** Activate this field and its configured keyboard area. */
@@ -22,7 +24,7 @@ function activate() {
     }
     if (!instance_exists(area)) show_error("Textbox keyboard area not found: " + keyboard_area_id, true);
     editing = true; global.gmcu_active_textbox = id; opened_at = current_time;
-    feedback = ""; repeat_key = 0; keyboard_string = "";
+    pending_close = -1; feedback = ""; repeat_key = 0; keyboard_string = "";
     gmcu_text_capture_begin();
     gmcu_text_copy_snapshot(copy_mode == "all" ? copy_text() : "", copy_mode == "all");
     var cursor = gmcu_o_universal_cursor;
@@ -56,14 +58,17 @@ function copy_text() {
 }
 /** Apply one editing action or an accepted literal character. */
 function edit_action(_action) {
-    if (!editing) return;
+    if (!editing || pending_close != -1) return;
+    area.flash_key(_action);
     switch (_action) {
         case "SPACE": state.type(" "); break;
         case "LEFT": state.move(-1); break;
         case "RIGHT": state.move(1); break;
         case "DEL": if (allow_delete) state.erase(); break;
-        case "DONE": finish(true); break;
-        case "CANCEL": finish(false); break;
+        case "DONE":
+        case "CANCEL":
+            // Keep the pressed key visible for its feedback beat before closing.
+            pending_close = (_action == "DONE"); close_due = current_time + 150; break;
         case "COPY": if (copy_mode == "all") { clipboard_token++; gmcu_text_clipboard("copy", copy_text(), string(id), clipboard_token); } break;
         case "PASTE": if (paste_mode != "none") { clipboard_token++; gmcu_text_clipboard("paste", "", string(id), clipboard_token); } break;
         default: state.type(_action); break;
