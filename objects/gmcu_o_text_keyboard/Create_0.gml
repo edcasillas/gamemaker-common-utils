@@ -27,9 +27,6 @@ function open(_textbox) {
     if (target.paste_mode != "none") array_push(actions,"PASTE");
     array_push(actions,"CANCEL","DONE");
     for (var c = 0; c < array_length(actions); c++) add_key(actions[c], row_count-1, c, array_length(actions), min(100,(area_width-16)/array_length(actions)-6),key_height,row_count);
-    if (array_length(keys)>0) {
-        gmcu_o_universal_cursor.gui_x = keys[0].x; gmcu_o_universal_cursor.gui_y = keys[0].y;
-    }
 }
 /** Create one shared interactive key in a centered row. */
 function add_key(_action,_row,_column,_columns,_width,_height,_rows) {
@@ -46,7 +43,11 @@ function close() {
 /** Navigate to an adjacent key or nearest horizontal center in the next row. */
 function navigate(_direction) {
     var current = gmcu_o_universal_cursor.hovered_interactable;
-    if (!instance_exists(current) || current.object_index != gmcu_o_text_key) current = keys[0];
+    if (!instance_exists(current) || current.object_index != gmcu_o_text_key || current.keyboard_area != id) {
+        gmcu_o_universal_cursor.gui_x=keys[0].x;
+        gmcu_o_universal_cursor.gui_y=keys[0].y;
+        return;
+    }
     var best = noone; var distance = 1000000000;
     for (var i = 0; i < array_length(keys); i++) {
         var k = keys[i]; var valid = false; var dist = 0;
@@ -59,4 +60,13 @@ function navigate(_direction) {
         if (valid && dist < distance) { distance=dist; best=k; }
     }
     if (instance_exists(best)) { gmcu_o_universal_cursor.gui_x=best.x; gmcu_o_universal_cursor.gui_y=best.y; }
+}
+
+/** Flash an accepted physical character without moving pointer or navigation focus.
+ * @param {string} _character Normalized alphabet character. */
+function flash_character(_character) {
+    var key_action = _character == " " ? "SPACE" : _character;
+    for (var i=0; i<array_length(keys); i++) {
+        if (keys[i].action == key_action) { keys[i].flash_until=current_time+150; break; }
+    }
 }

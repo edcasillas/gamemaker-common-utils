@@ -4,7 +4,13 @@ var events = json_parse(gmcu_text_capture_poll());
 for (var i = 0; i < array_length(events); i++) {
     var e = events[i];
     if (!editing) break;
-    if (e.kind == "char") state.type(e.value);
+    if (e.kind == "char") {
+        var character = state.normalize(e.value);
+        if (character != "") {
+            state.type(character);
+            area.flash_character(character);
+        }
+    }
     else if (e.kind == "paste") { if (paste_mode != "none") state.paste(e.value, paste_mode); }
     else if (e.kind == "feedback") feedback=e.value;
     else if (e.kind == "action") edit_action(e.value);

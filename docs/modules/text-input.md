@@ -101,3 +101,11 @@ Responses are associated with the initiating field and operation token.
   outside this implementation. Mixed case uses an explicit alphabetic layout.
 - A successful desktop test does not establish mobile or physical controller
   compatibility. Verify the exact hosted artifact on the intended devices.
+
+### Key feedback
+
+Opening preserves the pointer position and does not select a character key.
+When no key is targeted, the first D-pad direction selects the first character;
+subsequent directions navigate. Mouse hover highlights the key under the cursor.
+Accepted physical characters flash their normalized visible key for 150 ms,
+without moving pointer or navigation focus. Rejected characters produce no flash.
