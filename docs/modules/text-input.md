@@ -15,7 +15,7 @@ coordinates; their instance `x/y` is the center of their drawn rectangle.
 
 | Object | Room Editor variables |
 | --- | --- |
-| Textbox | `textbox_id`, `label`, `initial_value`, `alphabet`, `case_sensitive`, `text_length`, `mask`, `wrap_caret`, `allow_delete`, `keyboard_area_id`, `keyboard_layout`, `copy_mode`, `paste_mode`, `field_width`, `field_height`, `font`, colors |
+| Textbox | `textbox_id`, `label`, `initial_value`, `alphabet`, `case_sensitive`, `text_length`, `mask`, `wrap_caret`, `allow_delete`, `keyboard_area_id`, `keyboard_layout`, `paste_mode`, `field_width`, `field_height`, `font`, colors |
 | Keyboard area | Unique `area_id`, `area_width`, `area_height` |
 
 `keyboard_area_id` selects the area. Layout choices are `alphabetic` (three
@@ -29,8 +29,9 @@ other characters are visual separators. An empty mask displays unseparated slots
 Case-insensitive input maps to the character as spelled in the alphabet; ambiguous
 case variants are rejected. `wrap_caret` selects wrapping versus clamped movement.
 
-`copy_mode`: `none` or `all`. `paste_mode`: `none`, `replace_all`, or `from_caret`.
-Disabled actions are absent from the keyboard and ignored by shortcuts.
+`paste_mode`: `none`, `replace_all`, or `from_caret`. Disabled paste is absent
+from the keyboard and ignored by shortcuts. Copy is a host action and does not
+appear in the text keyboard.
 
 ## Host contract
 
@@ -86,17 +87,20 @@ global.gmcu_gui_pointer_provider = function() {
 Use the host's GUI dimensions. Only primary canvas gestures update this pointer;
 external HTML controller touches do not become outside-field clicks.
 
-Ctrl/Cmd+C uses the browser copy event; Ctrl/Cmd+V uses its paste payload. Virtual
-COPY/PASTE use the asynchronous Clipboard API. The UI distinguishes denied or
-unavailable access from an empty clipboard. Browser permissions, secure context,
-iframe policy, and gesture requirements can still reject these operations.
-Responses are associated with the initiating field and operation token.
+Hosts copy any string with `gmcu_text_clipboard_copy(text)`. The function calls
+the host page's synchronous `window.gmcu_text_clipboard_write(text)` bridge; the
+host template must load this bridge before the GameMaker runner. A host can place
+a copy control beside any label or field and decide when that action is enabled.
+Virtual PASTE and Ctrl/Cmd+V use the asynchronous Clipboard API. The UI
+distinguishes denied or unavailable access from an empty clipboard. Browser
+permissions and iframe policy can still reject clipboard access. Paste responses
+are associated with the initiating field and operation token.
 
 ## Scope and limitations
 
 - The capture adapter targets HTML5; native runners require a separate adapter.
-- COPY compacts incomplete slots, preserving mask separators: positional holes do
-  not round-trip. Use complete values for portable passwords.
+- Textboxes do not own copy policy. Hosts should copy a field only when its value
+  meets the host's requirements; the copy helper writes the exact supplied text.
 - Selection copy, keyboard pages, IME composition, and emoji/grapheme editing are
   outside this implementation. Mixed case uses an explicit alphabetic layout.
 - A successful desktop test does not establish mobile or physical controller
@@ -111,7 +115,7 @@ Accepted physical characters flash their normalized visible key for 150 ms,
 without moving pointer or navigation focus. Rejected characters produce no flash.
 
 Physical Left/Right and Delete/Backspace flash their visible action keys.
-Ctrl/Cmd+C and Ctrl/Cmd+V flash COPY/PASTE when enabled, independently of clipboard
-success. DONE/Enter/Start and CANCEL/Escape/B show a 150 ms feedback beat before
+Ctrl/Cmd+V flashes PASTE when enabled, independently of clipboard success.
+DONE/Enter/Start and CANCEL/Escape/B show a 150 ms feedback beat before
 closing; further editing input is ignored during that beat. Start uses Input Hub's
 active text-input route and is registered/unregistered with the textbox.

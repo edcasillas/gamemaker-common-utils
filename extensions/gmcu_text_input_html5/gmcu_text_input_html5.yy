@@ -100,24 +100,6 @@
         },
         {
           "$GMExtensionFunction": "",
-          "%Name": "gmcu_text_copy_snapshot",
-          "argCount": 2,
-          "args": [
-            1,
-            2
-          ],
-          "documentation": "",
-          "externalName": "gmcu_text_copy_snapshot",
-          "help": "gmcu_text_copy_snapshot",
-          "hidden": false,
-          "kind": 11,
-          "name": "gmcu_text_copy_snapshot",
-          "resourceType": "GMExtensionFunction",
-          "resourceVersion": "2.0",
-          "returnType": 2
-        },
-        {
-          "$GMExtensionFunction": "",
           "%Name": "gmcu_text_pointer_gui",
           "argCount": 2,
           "args": [

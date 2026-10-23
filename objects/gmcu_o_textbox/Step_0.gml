@@ -17,7 +17,7 @@ for (var i = 0; i < array_length(events); i++) {
     }
     else if (e.kind == "paste") { if (paste_mode != "none") state.paste(e.value, paste_mode); }
     else if (e.kind == "shortcut") {
-        if ((e.value == "COPY" && copy_mode == "all") || (e.value == "PASTE" && paste_mode != "none")) area.flash_key(e.value);
+        if (e.value == "PASTE" && paste_mode != "none") area.flash_key(e.value);
     }
     else if (e.kind == "feedback") feedback=e.value;
     else if (e.kind == "action") edit_action(e.value);
@@ -49,5 +49,3 @@ if (editing && mouse_check_button_pressed(mb_left)) {
     var in_keys = point_in_rectangle(px, py, area.x-area.area_width/2, area.y-area.area_height/2, area.x+area.area_width/2, area.y+area.area_height/2);
     if (!in_field && !in_keys) finish(false, false);
 }
-
-if (editing) gmcu_text_copy_snapshot(copy_mode == "all" ? copy_text() : "", copy_mode == "all");

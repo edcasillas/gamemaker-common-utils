@@ -6,7 +6,7 @@ function gmcu_text_capture_begin() {
   window.addEventListener('keydown', function(e) {
     if(!s.active || e.isComposing)return;
     if(e.ctrlKey || e.metaKey) {
-      if(e.key.toLowerCase()==='c') {if(!e.repeat)s.queue.push({kind:'shortcut',value:'COPY'});return;}
+      if(e.key.toLowerCase()==='c') return;
       // Let the browser dispatch paste with its clipboardData, avoiding a read permission.
       if(e.key.toLowerCase()==='v') {if(!e.repeat)s.queue.push({kind:'shortcut',value:'PASTE'});return;}
       return;
@@ -16,7 +16,6 @@ function gmcu_text_capture_begin() {
     }
     if(e.key.length===1) { e.preventDefault(); if(!e.repeat)s.queue.push({kind:'char',value:e.key}); }
   },true);
-  window.addEventListener('copy',function(e){if(!s.active)return; e.preventDefault(); if(s.copyAllowed){e.clipboardData.setData('text/plain',s.copyText);s.queue.push({kind:'feedback',value:'Copied'});}},true);
   window.addEventListener('paste',function(e){if(!s.active)return; e.preventDefault();s.queue.push({kind:'paste',value:e.clipboardData.getData('text/plain')});},true);
   return 0;
 }
@@ -27,15 +26,17 @@ function gmcu_text_capture_poll(){var q=gmcuTextInput.queue;gmcuTextInput.queue=
 /** Request clipboard access; responses carry the initiating field/session token. */
 function gmcu_text_clipboard(action,value,owner,token){
   var finish=function(ok,text){gmcuTextInput.queue.push({kind:'clipboard',action:action,owner:owner,token:token,ok:ok,value:text||''});};
+  if(action==='copy') {
+    var bridge=window.gmcu_text_clipboard_write;
+    if(typeof bridge!=='function')return 0;
+    try {return bridge(value)?1:0;} catch(e) {return 0;}
+  }
   if(!navigator.clipboard){finish(false,'');return 0;}
   var request;
-  try {request=action==='copy'?navigator.clipboard.writeText(value):navigator.clipboard.readText();}
+  try {request=navigator.clipboard.readText();}
   catch(e){finish(false,'');return 0;}
   Promise.resolve(request).then(function(text){finish(true,text);},function(){finish(false,'');});return 0;
 }
-
-/** Cache the active value for synchronous browser COPY gestures. */
-function gmcu_text_copy_snapshot(text,allowed){gmcuTextInput.copyText=text;gmcuTextInput.copyAllowed=!!allowed;return 0;}
 
 /** Track canvas gestures without observing touches on surrounding HTML controls. */
 var gmcuTextPointer = null;

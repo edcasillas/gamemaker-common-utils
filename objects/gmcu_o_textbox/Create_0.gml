@@ -26,7 +26,6 @@ function activate() {
     editing = true; global.gmcu_active_textbox = id; opened_at = current_time;
     pending_close = -1; feedback = ""; repeat_key = 0; keyboard_string = "";
     gmcu_text_capture_begin();
-    gmcu_text_copy_snapshot(copy_mode == "all" ? copy_text() : "", copy_mode == "all");
     var cursor = gmcu_o_universal_cursor;
     cursor.text_input_owner = id;
     gmcu_o_input_hub.focus_owner=id; gmcu_o_input_hub.focus_route="text_input";
@@ -46,8 +45,8 @@ function finish(_submit, _restore_cursor = true) {
     global.gmcu_active_textbox = noone;
     if (_submit && state.valid()) gmcu_eventbus_dispatch(GMCU_EVENT_TEXT_SUBMITTED, { textbox_id: textbox_id, value: state.text() });
 }
-/** Return mask-formatted text for COPY, omitting empty positions and placeholders. */
-function copy_text() {
+/** Return the field's displayed formatting with empty slots omitted. */
+function formatted_value() {
     if (mask == "") return state.text();
     var result = ""; var slot = 0;
     for (var i = 1; i <= string_length(mask); i++) {
@@ -69,7 +68,6 @@ function edit_action(_action) {
         case "CANCEL":
             // Keep the pressed key visible for its feedback beat before closing.
             pending_close = (_action == "DONE"); close_due = current_time + 150; break;
-        case "COPY": if (copy_mode == "all") { clipboard_token++; gmcu_text_clipboard("copy", copy_text(), string(id), clipboard_token); } break;
         case "PASTE": if (paste_mode != "none") { clipboard_token++; gmcu_text_clipboard("paste", "", string(id), clipboard_token); } break;
         default: state.type(_action); break;
     }

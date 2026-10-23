@@ -23,7 +23,6 @@ function open(_textbox) {
     if (has_space) add_key("SPACE",array_length(rows),0,1,min(320,area_width-16),key_height,row_count);
     var actions = ["LEFT", "RIGHT"];
     if (target.allow_delete) array_push(actions,"DEL");
-    if (target.copy_mode != "none") array_push(actions,"COPY");
     if (target.paste_mode != "none") array_push(actions,"PASTE");
     array_push(actions,"CANCEL","DONE");
     for (var c = 0; c < array_length(actions); c++) add_key(actions[c], row_count-1, c, array_length(actions), min(100,(area_width-16)/array_length(actions)-6),key_height,row_count);

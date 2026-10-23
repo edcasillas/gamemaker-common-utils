@@ -42,10 +42,6 @@
         "\"alphabetic\"",
         "\"qwerty\"",
       ],"multiselect":false,"name":"keyboard_layout","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"alphabetic\"","varType":4,},
-    {"$GMObjectProperty":"v2","%Name":"copy_mode","filters":[],"listItems":[
-        "\"none\"",
-        "\"all\"",
-      ],"multiselect":false,"name":"copy_mode","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"none\"","varType":4,},
     {"$GMObjectProperty":"v2","%Name":"paste_mode","filters":[],"listItems":[
         "\"none\"",
         "\"replace_all\"",
