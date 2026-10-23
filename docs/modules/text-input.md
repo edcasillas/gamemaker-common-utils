@@ -15,14 +15,44 @@ coordinates; their instance `x/y` is the center of their drawn rectangle.
 
 | Object | Room Editor variables |
 | --- | --- |
-| Textbox | `textbox_id`, `label`, `initial_value`, `alphabet`, `case_sensitive`, `text_length`, `mask`, `wrap_caret`, `allow_delete`, `keyboard_area_id`, `keyboard_layout`, `paste_mode`, `field_width`, `field_height`, `font`, colors |
-| Keyboard area | Unique `area_id`, `area_width`, `area_height` |
+| Textbox | `textbox_id`, `label`, `initial_value`, `alphabet`, `case_sensitive`, `text_length`, `mask`, `wrap_caret`, `allow_delete`, `keyboard_area_id`, `keyboard_layout`, `paste_mode`, `skin`, `field_width`, `field_height`, `font`, colors |
+| Keyboard area | Unique `area_id`, `area_width`, `area_height`, `skin` |
 
 `keyboard_area_id` selects the area. Layout choices are `alphabetic` (three
 centered character rows) and `qwerty` (digits plus three uppercase letter rows).
 QWERTY accepts uppercase ASCII letters, digits, and optional space. Alphabetic
 layout follows the supplied alphabet. A permitted space gets a wide separate key.
 The host must allocate enough area for its alphabet and font.
+
+Textboxes and keyboard areas expose independent `skin` choices (`clean` or
+`retro`). These styles change the field and generated key presentation while
+leaving editing state, layout, hit testing, and navigation unchanged. The retro
+skin uses unboxed compact text, with distinct colors for characters and actions;
+the clean skin uses filled controls. Keyboard areas also expose an optional
+`custom_draw` method. The area owns key generation and input; key drawing owns
+presentation. A host can assign a method to one keyboard area to provide a
+custom key renderer:
+
+```gml
+keyboard_area.custom_draw = method(keyboard_area, function(_key) {
+    // Draw _key using its x/y, action, hit_width, and hit_height.
+});
+```
+
+The renderer receives the generated key instance and must draw within its hit
+rectangle. Built-in skins handle character/action captions and hover/press
+feedback. A custom renderer takes responsibility for those visual states and
+must keep each key aligned with its hit target.
+
+Textboxes expose the same `custom_draw` hook for host-specific field rendering:
+
+```gml
+textbox.custom_draw = method(textbox, function(_field) {
+    // Draw _field's label, value, caret, validation, and feedback states.
+});
+```
+
+The callback receives the textbox instance and owns its complete rendering.
 
 `text_length` is the exact number of editable slots. `mask` has one `X` per slot;
 other characters are visual separators. An empty mask displays unseparated slots.

@@ -2,6 +2,7 @@ state = new gmcu_TextState(alphabet, text_length, case_sensitive, wrap_caret, in
 editing = false; touched = false; hovered = false; pressed = false; feedback = "";
 pending_close = -1; close_due = 0;
 area = noone; is_interactable = true; hit_width = field_width; hit_height = field_height;
+custom_draw = noone;
 repeat_key = 0; repeat_due = 0; opened_at = -1; clipboard_token = 0;
 if (textbox_id == "" || keyboard_area_id == "") show_error("Textbox requires textbox_id and keyboard_area_id", true);
 if (mask != "" && string_count("X", mask) != text_length) show_error("Textbox mask must have one X per position", true);
@@ -82,11 +83,35 @@ function on_pressed() { activate(); }
 function on_released() { }
 /** Draw the field, persistent mask, editing blink, and closed-field validation. */
 function on_draw_gui() {
+    if (custom_draw != noone) { custom_draw(id); return; }
     var saved = new gmcu_DrawingParameters();
     if (font != noone && font_exists(font)) draw_set_font(font);
     draw_set_alpha(1); draw_set_halign(fa_left); draw_set_valign(fa_middle);
     var left = x - field_width / 2; var top = y - field_height / 2;
     var invalid = touched && !editing && !state.valid();
+    if (skin == "retro") {
+        draw_set_halign(fa_center);
+        draw_set_color(text_color); draw_text_transformed(x, top - 20, string_upper(label), 0.6, 0.6, 0);
+        var pattern = mask == "" ? string_repeat("X", text_length) : mask;
+        var advance = min(12, (field_width - 24) / string_length(pattern));
+        var origin = x - string_length(pattern) * advance / 2; var slot = 0;
+        var blink = (current_time div 400) mod 2 == 0;
+        for (var i = 1; i <= string_length(pattern); i++) {
+            var c = string_char_at(pattern, i); var color = make_color_rgb(28, 88, 202);
+            if (c == "X") {
+                var filled = state.slots[slot] != "";
+                c = filled ? state.slots[slot] : "X";
+                color = filled ? make_color_rgb(44, 255, 92) : make_color_rgb(28, 88, 202);
+                if (editing && slot == state.caret && blink) { c = filled ? "" : "_"; color = c_white; }
+                slot++;
+            }
+            draw_set_color(color); draw_text_transformed(origin + (i - 1) * advance, y, c, 0.6, 0.6, 0);
+        }
+        draw_set_halign(fa_left);
+        if (invalid) { draw_set_color(c_red); draw_text_transformed(x, top + field_height + 18, string_upper(string(text_length) + " characters required"), 0.6, 0.6, 0); }
+        else if (feedback != "") { draw_set_color(make_color_rgb(44,255,92)); draw_text_transformed(x, top + field_height + 18, string_upper(feedback), 0.6, 0.6, 0); }
+        saved.apply(); return;
+    }
     draw_set_color(background_color); draw_rectangle(left, top, left + field_width, top + field_height, false);
     draw_set_color(invalid ? c_red : (editing || hovered ? accent_color : c_gray));
     draw_rectangle(left, top, left + field_width, top + field_height, true);

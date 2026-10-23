@@ -47,6 +47,10 @@
         "\"replace_all\"",
         "\"from_caret\"",
       ],"multiselect":false,"name":"paste_mode","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"none\"","varType":4,},
+    {"$GMObjectProperty":"v2","%Name":"skin","filters":[],"listItems":[
+        "\"clean\"",
+        "\"retro\"",
+      ],"multiselect":false,"name":"skin","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"clean\"","varType":4,},
     {"$GMObjectProperty":"v2","%Name":"field_width","filters":[],"listItems":[],"multiselect":false,"name":"field_width","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"620","varType":0,},
     {"$GMObjectProperty":"v2","%Name":"field_height","filters":[],"listItems":[],"multiselect":false,"name":"field_height","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"54","varType":0,},
     {"$GMObjectProperty":"v2","%Name":"font","filters":[

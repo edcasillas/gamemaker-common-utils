@@ -31,6 +31,10 @@
     {"$GMObjectProperty":"v2","%Name":"area_id","filters":[],"listItems":[],"multiselect":false,"name":"area_id","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"","varType":2,},
     {"$GMObjectProperty":"v2","%Name":"area_width","filters":[],"listItems":[],"multiselect":false,"name":"area_width","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"760","varType":0,},
     {"$GMObjectProperty":"v2","%Name":"area_height","filters":[],"listItems":[],"multiselect":false,"name":"area_height","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"290","varType":0,},
+    {"$GMObjectProperty":"v2","%Name":"skin","filters":[],"listItems":[
+        "\"clean\"",
+        "\"retro\"",
+      ],"multiselect":false,"name":"skin","rangeEnabled":false,"rangeMax":1000.0,"rangeMin":0.0,"resourceType":"GMObjectProperty","resourceVersion":"2.0","value":"\"clean\"","varType":4,},
   ],
   "resourceType":"GMObject",
   "resourceVersion":"2.0",

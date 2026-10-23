@@ -1,4 +1,6 @@
 keys = []; target = noone; nav_button = -1; nav_due = 0;
+if (skin == "") skin = "clean";
+custom_draw = noone;
 /** Build visible keys for the active textbox; preserve its editing state. */
 function open(_textbox) {
     close(); target = _textbox;
