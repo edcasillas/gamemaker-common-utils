@@ -1,18 +1,36 @@
 state = new gmcu_TextState(alphabet, text_length, case_sensitive, wrap_caret, initial_value);
-editing = false; touched = false; hovered = false; pressed = false; feedback = "";
-pending_close = -1; close_due = 0;
-area = noone; is_interactable = true; hit_width = field_width; hit_height = field_height;
-custom_draw = noone;
-repeat_key = 0; repeat_due = 0; opened_at = -1; clipboard_token = 0;
+
+editing = false;			// True while this textbox owns the active editing session.
+touched = false;			// True after the field closes at least once; enables validation feedback.
+hovered = false;			// Universal Cursor hover state for the field.
+pressed = false;			// Pointer press state used by the interactable control.
+feedback = "";				// Current status or clipboard feedback shown below the field.
+pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
+close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
+area = noone;				// Keyboard area assigned while this textbox is being edited.
+is_interactable = true;		// Lets Universal Cursor target this textbox.
+hit_width = field_width;	// Universal Cursor hitbox width, matching the drawn field.
+hit_height = field_height;	// Universal Cursor hitbox height, matching the drawn field.
+custom_draw = noone;		// Optional host-provided field renderer; noone uses the built-in skin.
+repeat_key = "";			// Physical key currently repeating, or empty when released.
+repeat_due = 0;				// Next repeat time for held arrow/delete keys.
+opened_at = -1;				// Time editing opened; ignores input from the opening press.
+clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
+
 if (textbox_id == "" || keyboard_area_id == "") show_error("Textbox requires textbox_id and keyboard_area_id", true);
 if (mask != "" && string_count("X", mask) != text_length) show_error("Textbox mask must have one X per position", true);
+
 if (keyboard_layout == "qwerty") {
-    for (var i=1;i<=string_length(alphabet);i++) if (string_pos(string_char_at(alphabet,i),"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ")==0) show_error("QWERTY layout supports uppercase ASCII letters, digits and space",true);
+    for (var i=1; i<=string_length(alphabet); i++)
+		if (string_pos(string_char_at(alphabet,i),"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ")==0)
+			show_error("QWERTY layout supports uppercase ASCII letters, digits and space",true);
 }
-gmcu_register_gamepad_button(gp_face2);
-gmcu_register_gamepad_button(gp_start);
+
+gmcu_register_gamepad_button(gp_face2); // B button will cancel
+gmcu_register_gamepad_button(gp_start);	// Start button will submit
 gmcu_universal_cursor_subscribe(textbox_id);
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
+
 /** Activate this field and its configured keyboard area. */
 function activate() {
     if (editing) return;
@@ -32,6 +50,7 @@ function activate() {
     gmcu_o_input_hub.focus_owner=id; gmcu_o_input_hub.focus_route="text_input";
     area.open(id);
 }
+
 /** Close and validate; submit a complete value only when explicitly requested. */
 function finish(_submit, _restore_cursor = true) {
     if (!editing) return;
@@ -46,6 +65,7 @@ function finish(_submit, _restore_cursor = true) {
     global.gmcu_active_textbox = noone;
     if (_submit && state.valid()) gmcu_eventbus_dispatch(GMCU_EVENT_TEXT_SUBMITTED, { textbox_id: textbox_id, value: state.text() });
 }
+
 /** Return the field's displayed formatting with empty slots omitted. */
 function formatted_value() {
     if (mask == "") return state.text();
@@ -56,6 +76,7 @@ function formatted_value() {
     }
     return result;
 }
+
 /** Apply one editing action or an accepted literal character. */
 function edit_action(_action) {
     if (!editing || pending_close != -1) return;
@@ -73,17 +94,22 @@ function edit_action(_action) {
         default: state.type(_action); break;
     }
 }
+
 /** Receive pointer/controller focus. */
 function on_hover_enter() { hovered = true; }
+
 /** Release pointer/controller focus. */
 function on_hover_leave() { hovered = false; pressed = false; }
+
 /** Open editing on activation; the opening release cannot enter a character. */
 function on_pressed() { activate(); }
+
 /** Opening a field consumes its press, so release has no editing action. */
 function on_released() { }
+
 /** Draw the field, persistent mask, editing blink, and closed-field validation. */
 function on_draw_gui() {
-    if (custom_draw != noone) { custom_draw(id); return; }
+    if (custom_draw != noone) { method_call(custom_draw, [id]); return; }
     var saved = new gmcu_DrawingParameters();
     if (font != noone && font_exists(font)) draw_set_font(font);
     draw_set_alpha(1); draw_set_halign(fa_left); draw_set_valign(fa_middle);

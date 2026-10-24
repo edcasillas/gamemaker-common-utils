@@ -111,9 +111,9 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
 - Paste uses the Clipboard API and may be denied by browser permissions or
   iframe policy. `gmcu_text_clipboard_last_error()` returns the latest failure.
 
-For custom presentation, assign `custom_draw` on a textbox or keyboard area; the
-callback owns all drawing for that element. The built-in `clean` and `retro`
-skins provide shared defaults.
+For custom presentation, assign a bound method to `custom_draw` on a textbox or
+keyboard area; its argument is the field or key instance and it owns that
+element's drawing. The built-in `clean` and `retro` skins provide defaults.
 
 ## Scope
 

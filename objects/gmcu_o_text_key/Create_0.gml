@@ -16,7 +16,7 @@ function on_released() { pressed=false; }
 function on_draw_gui() {
     if (!instance_exists(keyboard_area)) return;
     if (keyboard_area.custom_draw != noone) {
-        keyboard_area.custom_draw(id);
+        method_call(keyboard_area.custom_draw, [id]);
         return;
     }
     var saved = new gmcu_DrawingParameters();
