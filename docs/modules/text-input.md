@@ -123,7 +123,14 @@ clipboard bridge, so projects do not copy a host script or add a template tag.
 A host can place a copy control beside any label or field and decide when that
 action is enabled. Canvas hosts prepare the enabled copy value and GUI bounds
 before input, then the bridge writes during the trusted canvas `pointerup` event.
-The bridge uses a temporary focused input and `execCommand` fallback.
+When the shared HTML Virtual Controller is active, the host can also permit its
+A button to copy while the copy control is under [Universal Cursor](universal-cursor.md). The bridge
+then writes during the trusted DOM `pointerup` on the controller's captured
+action region. The bridge records the virtual button at `pointerdown` and matches
+its `pointerId` at `pointerup`, because pointer capture retargets the release to
+the region. This path requires the player's touch on the virtual A button; a
+physical gamepad event has no browser pointer gesture. The bridge uses a
+temporary focused input and `execCommand` fallback.
 `gmcu_text_clipboard_last_error()` exposes the latest bridge failure. Calling a
 browser clipboard command outside the user gesture may fail.
 Virtual PASTE and Ctrl/Cmd+V use the asynchronous Clipboard API. The UI
