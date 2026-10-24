@@ -121,6 +121,11 @@ Hosts copy any string with `gmcu_text_clipboard_copy(text)`. The function calls
 the host page's synchronous `window.gmcu_text_clipboard_write(text)` bridge; the
 host template must load this bridge before the GameMaker runner. A host can place
 a copy control beside any label or field and decide when that action is enabled.
+Canvas hosts prepare the enabled copy value and GUI bounds before input, then let
+the bridge write during the trusted canvas `pointerup` event. The bridge uses a
+temporary focused input and `execCommand` fallback. `gmcu_text_clipboard_last_error()`
+exposes the latest bridge failure. Calling a browser clipboard command outside
+the user gesture may fail.
 Virtual PASTE and Ctrl/Cmd+V use the asynchronous Clipboard API. The UI
 distinguishes denied or unavailable access from an empty clipboard. Browser
 permissions and iframe policy can still reject clipboard access. Paste responses

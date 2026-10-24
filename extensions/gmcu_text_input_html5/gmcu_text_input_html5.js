@@ -26,6 +26,11 @@ function gmcu_text_capture_poll(){var q=gmcuTextInput.queue;gmcuTextInput.queue=
 /** Request clipboard access; responses carry the initiating field/session token. */
 function gmcu_text_clipboard(action,value,owner,token){
   var finish=function(ok,text){gmcuTextInput.queue.push({kind:'clipboard',action:action,owner:owner,token:token,ok:ok,value:text||''});};
+  if(action==='prepare_copy') {
+    var prepare=window.gmcu_text_clipboard_prepare;
+    if(typeof prepare!=='function')return 0;
+    try {return prepare(value,owner)?1:0;} catch(e) {return 0;}
+  }
   if(action==='copy') {
     var bridge=window.gmcu_text_clipboard_write;
     if(typeof bridge!=='function')return 0;

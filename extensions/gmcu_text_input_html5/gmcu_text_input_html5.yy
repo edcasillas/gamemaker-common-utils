@@ -115,6 +115,21 @@
           "resourceType": "GMExtensionFunction",
           "resourceVersion": "2.0",
           "returnType": 1
+        },
+        {
+          "$GMExtensionFunction": "",
+          "%Name": "gmcu_text_clipboard_last_error",
+          "argCount": 0,
+          "args": [],
+          "documentation": "Returns the latest HTML5 clipboard failure detail.",
+          "externalName": "gmcu_text_clipboard_last_error",
+          "help": "gmcu_text_clipboard_last_error",
+          "hidden": false,
+          "kind": 11,
+          "name": "gmcu_text_clipboard_last_error",
+          "resourceType": "GMExtensionFunction",
+          "resourceVersion": "2.0",
+          "returnType": 1
         }
       ],
       "init": "",
