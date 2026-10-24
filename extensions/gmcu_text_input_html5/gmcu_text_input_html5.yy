@@ -141,6 +141,24 @@
       "resourceVersion": "2.0",
       "uncompress": false,
       "usesRunnerInterface": false
+    },
+    {
+      "$GMExtensionFile": "v1",
+      "%Name": "",
+      "constants": [],
+      "copyToTargets": 32,
+      "filename": "gmcu_text_input_clipboard.js",
+      "final": "",
+      "functions": [],
+      "init": "",
+      "kind": 5,
+      "name": "",
+      "origname": "",
+      "ProxyFiles": [],
+      "resourceType": "GMExtensionFile",
+      "resourceVersion": "2.0",
+      "uncompress": false,
+      "usesRunnerInterface": false
     }
   ],
   "gradleinject": "",
