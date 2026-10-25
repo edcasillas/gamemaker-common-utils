@@ -13,7 +13,7 @@ when clipboard actions are available.
    - Extension: `gmcu_text_input_html5`.
 2. Register the module dependencies: [Input Hub](input-hub.md),
    [Universal Cursor](universal-cursor.md), [Layered GUI](layered-gui.md), and
-   [Event Bus](event-bus.md).
+   [Event Bus](event-bus.md), and [Logging](logging.md).
 3. Place the dependency managers required by those modules in the room. At
    minimum, Text Input needs `gmcu_o_input_hub`,
    `gmcu_o_universal_cursor`, and `gmcu_o_layered_gui_manager`.
@@ -26,6 +26,11 @@ when clipboard actions are available.
    editing.
 6. Add a host controller that subscribes to submitted values (example below).
    Build for HTML5 with the registered extension enabled.
+
+Invalid field configuration is logged and the field instance is removed. If its
+keyboard area is missing or duplicated when editing opens, the field logs the
+error and removes itself without taking input focus. The text state exposes `config_error` for
+hosts that construct it directly.
 
 ## Room Editor variables
 
