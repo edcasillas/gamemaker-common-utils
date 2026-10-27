@@ -17,7 +17,7 @@ repeat_key = "";			// Physical key currently repeating, or empty when released.
 repeat_due = 0;				// Next repeat time for held arrow/delete keys.
 opened_at = -1;				// Time editing opened; ignores input from the opening press.
 clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
-inputs_registered = false;	// Whether this textbox owns gamepad registrations.
+inputs_registered = false; // Set after registering B/Start; Clean Up skips unregistering them if Create exited before registration.
 diagnostic_id = "textbox_id=" + string(textbox_id) + ", instance=" + string(id); // Stable field label and runtime instance for errors.
 
 // gmcu_TextState validates the alphabet, length, and initial value in its constructor.
