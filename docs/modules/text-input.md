@@ -1,7 +1,7 @@
 # Text Input
 
 Use `gmcu_o_textbox` for editable text and `gmcu_o_text_keyboard` for its on-screen
-keyboard. The host places and labels fields, handles submitted values, and decides
+keyboard. The host places separate labels, handles submitted values, and decides
 when clipboard actions are available.
 
 ## Add it to a room
@@ -25,7 +25,10 @@ when clipboard actions are available.
    `area_id`. Place the textbox children, set a unique `textbox_id` and the
    matching `keyboard_area_id`. Do not place `gmcu_o_text_key`; the keyboard
    creates character and action keys while editing.
-6. Add a host controller that subscribes to submitted values (example below).
+6. Place field titles and status messages as separate `gmcu_o_label_gui` instances.
+   Give a status label a unique `binding_id` and set the textbox's
+   `status_label_id` to that value. Position and style each label in the Room Editor.
+7. Add a host controller that subscribes to submitted values (example below).
    Build for the intended target. HTML5 uses the registered capture extension;
    native runners use GameMaker keyboard and clipboard functions.
 
@@ -39,6 +42,8 @@ At creation, the textbox checks:
 - `textbox_id` and `keyboard_area_id`, one `X` per editable mask position, and
   `keyboard_layout` set to `alphabetic` or `qwerty`;
 - a centered sprite assigned to the concrete textbox object;
+- when `status_label_id` is set, exactly one placed `gmcu_o_label_gui` with the
+  matching `binding_id` (checked after room instances are created);
 - QWERTY characters limited to uppercase A–Z, 0–9, and space. Alphabetic keys
   are generated from the supplied alphabet, so they need no fixed character set.
 
@@ -56,11 +61,11 @@ Set these on each `gmcu_o_textbox` instance:
 | Variable | Purpose |
 | --- | --- |
 | `textbox_id` | Unique host-facing field ID; included in submit events. |
-| `label` | Label drawn above the field. |
 | `initial_value` | Starting text; omitted characters leave empty slots. |
 | `alphabet` | Accepted characters. QWERTY accepts uppercase A–Z, digits, and optional space. |
 | `text_length` | Exact number of editable positions. |
 | `keyboard_area_id` | `area_id` of the keyboard area used by this field. |
+| `status_label_id` | Optional `binding_id` of an independently placed GUI label for validation and clipboard feedback. |
 | `keyboard_layout` | `alphabetic` or `qwerty`. Alphabetic arranges the supplied alphabet in three rows. |
 
 Optional textbox variables:

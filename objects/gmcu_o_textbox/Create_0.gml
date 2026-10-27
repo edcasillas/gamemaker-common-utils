@@ -4,6 +4,8 @@ editing = false;			// True while this textbox owns the active editing session.
 touched = false;			// True after the field closes at least once; enables validation feedback.
 hovered = false;			// Universal Cursor hover state for the field.
 feedback = "";				// Current status or clipboard feedback shown below the field.
+status_label = noone; // Independent GUI label resolved by status_label_id.
+status_label_color = c_white; // Original label color restored after validation clears.
 pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
 close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
 keyboard_area = noone;		// Keyboard object that renders keys and receives editing actions.
@@ -287,18 +289,9 @@ function on_draw_gui() {
 
     draw_self();
 
-    if (retro) {
-        draw_set_halign(fa_center);
-        draw_set_color(text_color);
-        draw_text_transformed(x, top - 20, string_upper(label), 0.6, 0.6, 0);
-    } else {
-        if (invalid || editing || hovered) {
-            draw_set_color(invalid ? c_red : accent_color);
-            draw_rectangle(left, top, left + hit_width, top + hit_height, true);
-        }
-
-        draw_set_color(text_color);
-        draw_text(left, top - 19, label);
+    if (!retro && (invalid || editing || hovered)) {
+        draw_set_color(invalid ? c_red : accent_color);
+        draw_rectangle(left, top, left + hit_width, top + hit_height, true);
     }
 
     // Both skins render the same slots, separators, and caret state.
@@ -322,23 +315,6 @@ function on_draw_gui() {
             draw_text_transformed(origin + (mask_position - 1) * advance, y, character, 0.6, 0.6, 0);
         } else {
             draw_text(origin + (mask_position - 1) * advance, y, character);
-        }
-    }
-
-    draw_set_halign(fa_left);
-    if (invalid) {
-        draw_set_color(c_red);
-        if (retro) {
-            draw_text_transformed(x, top + hit_height + 18, string_upper(string(text_length) + " characters required"), 0.6, 0.6, 0);
-        } else {
-            draw_text(left, top + hit_height + 18, string(text_length) + " characters required");
-        }
-    } else if (feedback != "") {
-        draw_set_color(retro ? make_color_rgb(44, 255, 92) : text_color);
-        if (retro) {
-            draw_text_transformed(x, top + hit_height + 18, string_upper(feedback), 0.6, 0.6, 0);
-        } else {
-            draw_text(left, top + hit_height + 18, feedback);
         }
     }
 

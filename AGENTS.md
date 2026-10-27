@@ -1,5 +1,17 @@
 # Agent Rules
 
+## IDE Diagnostics
+
+- Shared GameMaker resources must have no Feather errors or warnings in a
+  consumer project before delivery. A successful CLI compile does not verify
+  Feather. Open each diagnostic at its exact object, event, and line; do not
+  infer the cause from the object name alone. Reload resources changed outside
+  the IDE and confirm the displayed counters after the fix.
+- Declare variables passed in `instance_create_*` creation structs in the
+  target object's Variable Definitions when Feather requires them. Within one
+  event, reuse an existing local instead of declaring it again inside a nested
+  block.
+
 ## Mandatory Mobile Blocking Contract
 
 - Keep the blocking implementation in an editable `.js` source file. The `.yy`

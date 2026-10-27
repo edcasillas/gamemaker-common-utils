@@ -74,7 +74,7 @@ if (mouse_active) {
 	var _list_y = _panel_y + header_height;
 	var _visible_rows = max(1, floor((_gui_h - panel_margin * 2 - header_height - 12) / row_height));
 	var _hover = floor((_mouse_y - _list_y) / row_height) + scroll_offset;
-	var _items = current_items();
+	var_items = current_items();
 	if (_mouse_x >= _panel_x && _mouse_x <= _panel_x + _panel_w
 		&& _hover >= 0 && _hover < array_length(_items)) {
 		selected_index = _hover;
