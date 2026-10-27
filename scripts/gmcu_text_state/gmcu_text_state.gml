@@ -26,29 +26,38 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
     // Initial text must be a string before character-level checks can run.
     if (!is_string(_initial)) config_error = "Invalid textbox initial value";
 
-    // Compare every alphabet character with the entries after it.
-    // First alphabet position in each comparison.
-    for (var i = 1; i <= string_length(alphabet); i++) {
-        // Character or key at the current position.
-        var c = string_char_at(alphabet, i);
-        // Second index for the alphabet comparison.
-        for (var j = i + 1; j <= string_length(alphabet); j++) {
-            // Second alphabet character in the uniqueness check.
-            var d = string_char_at(alphabet, j);
+    // Duplicate alphabet entries make keyboard normalization ambiguous.
+    for (var first_index = 1; first_index <= string_length(alphabet); first_index++) {
+        var first_character = string_char_at(alphabet, first_index); // Alphabet entry being checked.
+        for (var second_index = first_index + 1; second_index <= string_length(alphabet); second_index++) {
+            var second_character = string_char_at(alphabet, second_index); // Later alphabet entry.
             // Reject duplicate characters, including case-equivalent entries when case-insensitive.
-            if (c == d || (!case_sensitive && string_upper(c) == string_upper(d))) config_error = "Ambiguous textbox alphabet";
+            if (first_character == second_character || (!case_sensitive && string_upper(first_character) == string_upper(second_character))) {
+                config_error = "Ambiguous textbox alphabet";
+            }
         }
     }
 
-    /** Normalize one character to its alphabet representation; return empty if rejected. */
+    /** Normalize a character to its alphabet representation.
+     * @param {String} _char Character to check.
+     * @returns {String} Accepted character, or empty when rejected.
+     */
     static normalize = function(_char) {
-        if (string_length(_char) != 1) return "";
-        if (string_pos(_char, alphabet) > 0 && _char != "") return _char;
-        // Current key, slot, or character index.
-        if (!case_sensitive) for (var k = 1; k <= string_length(alphabet); k++) {
-            // Alphabet character being compared to typed input.
-            var candidate = string_char_at(alphabet, k);
-            if (string_upper(candidate) == string_upper(_char)) return candidate;
+        if (string_length(_char) != 1) {
+            return "";
+        }
+
+        if (string_pos(_char, alphabet) > 0 && _char != "") {
+            return _char;
+        }
+
+        if (!case_sensitive) {
+            for (var alphabet_index = 1; alphabet_index <= string_length(alphabet); alphabet_index++) {
+                var candidate = string_char_at(alphabet, alphabet_index); // Accepted equivalent of the typed character.
+                if (string_upper(candidate) == string_upper(_char)) {
+                    return candidate;
+                }
+            }
         }
 
         return "";
@@ -59,12 +68,16 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
         caret = wrap ? (caret + _offset + capacity) mod capacity : clamp(caret + _offset, 0, capacity - 1);
     };
 
-    /** Replace the current position with an accepted character and advance. */
+    /** Replace the current position with an accepted character and advance.
+     * @param {String} _char Character to enter.
+     */
     static type = function(_char) {
-        // Character or key at the current position.
-        var c = normalize(_char);
-        if (c == "") return;
-        slots[caret] = c;
+        var normalized_character = normalize(_char); // Accepted character, or empty when rejected.
+        if (normalized_character == "") {
+            return;
+        }
+
+        slots[caret] = normalized_character;
         move(1);
     };
 
@@ -74,48 +87,77 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
         caret = max(0, caret - 1);
     };
 
-    /** Return whether every editable position is occupied. */
+    /** Check whether every editable position is occupied.
+     * @returns {Boolean} Whether the field contains a complete value.
+     */
     static valid = function() {
-        // Current key, slot, or character index.
-        for (var k = 0; k < capacity; k++) if (slots[k] == "") return false;
+        for (var slot_index = 0; slot_index < capacity; slot_index++) {
+            if (slots[slot_index] == "") {
+                return false;
+            }
+        }
+
         return true;
     };
 
-    /** Return compact text; consumers must use slots for a lossless incomplete draft. */
+    /** Return compact text; use slots for a lossless incomplete draft.
+     * @returns {String} Occupied characters in slot order.
+     */
     static text = function() {
         var result = ""; // Occupied characters in slot order.
-        // Current key, slot, or character index.
-        for (var k = 0; k < capacity; k++) result += slots[k];
+        for (var slot_index = 0; slot_index < capacity; slot_index++) {
+            result += slots[slot_index];
+        }
+
         return result;
     };
 
-    /** Filter and paste text using replace_all or from_caret; return whether anything changed. */
+    /** Filter and paste text using replace_all or from_caret.
+     * @param {String} _text Source text.
+     * @param {String} _mode Paste placement mode.
+     * @returns {Boolean} Whether any accepted character was applied.
+     */
     static paste = function(_text, _mode) {
         // Accepted characters filtered from pasted text.
         var clean = "";
-        // Current key, slot, or character index.
-        for (var k = 1; k <= string_length(_text); k++) clean += normalize(string_char_at(_text, k));
-        if (clean == "" || _mode == "none") return false;
+        for (var text_index = 1; text_index <= string_length(_text); text_index++) {
+            clean += normalize(string_char_at(_text, text_index));
+        }
+
+        if (clean == "" || _mode == "none") {
+            return false;
+        }
+
         // First editable position affected by paste.
         var start = _mode == "replace_all" ? 0 : caret;
-        if (_mode == "replace_all") slots = array_create(capacity, "");
-        // Number of characters or positions being processed.
-        var count = min(string_length(clean), capacity - start);
-        // Current key, slot, or character index.
-        for (var k = 0; k < count; k++) slots[start + k] = string_char_at(clean, k + 1);
-        caret = min(capacity - 1, start + count);
+        if (_mode == "replace_all") {
+            slots = array_create(capacity, "");
+        }
+
+        var pasted_count = min(string_length(clean), capacity - start); // Characters that fit from the paste position.
+        for (var pasted_index = 0; pasted_index < pasted_count; pasted_index++) {
+            slots[start + pasted_index] = string_char_at(clean, pasted_index + 1);
+        }
+
+        caret = min(capacity - 1, start + pasted_count);
         return true;
     };
 
     // The initial value must fit in the available slots.
-    if (string_length(initial) > capacity) config_error = "Textbox initial value exceeds capacity";
-    // Index for this sequence.
-    for (var i = 1; i <= string_length(initial); i++) {
-        // Character or key at the current position.
-        var c = normalize(string_char_at(initial, i));
+    if (string_length(initial) > capacity) {
+        config_error = "Textbox initial value exceeds capacity";
+    }
+
+    for (var initial_index = 1; initial_index <= string_length(initial); initial_index++) {
+        var normalized_character = normalize(string_char_at(initial, initial_index)); // Accepted initial character, or empty.
         // Every initial character must normalize into the alphabet.
-        if (c == "") config_error = "Textbox initial value outside alphabet";
+        if (normalized_character == "") {
+            config_error = "Textbox initial value outside alphabet";
+        }
+
         // Skip writes beyond the safe slot array when the initial value is too long.
-        if (i <= capacity) slots[i - 1] = c;
+        if (initial_index <= capacity) {
+            slots[initial_index - 1] = normalized_character;
+        }
     }
 }

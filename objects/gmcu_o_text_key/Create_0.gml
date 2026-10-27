@@ -5,8 +5,11 @@ held_due = 0; // Time when a held action repeats.
 is_interactable = true; // Allows Universal Cursor to activate this key.
 gmcu_universal_cursor_subscribe(action);
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, action);
+
 /** Mark this key as focused. */
-function on_hover_enter() { hovered=true; }
+function on_hover_enter() {
+    hovered = true;
+}
 
 /** Stop repeating when the key loses focus. */
 function on_hover_leave() {
@@ -18,11 +21,15 @@ function on_hover_leave() {
 function on_pressed() {
     pressed = true;
     held_due = current_time + 400;
-    if (instance_exists(keyboard_area.target)) keyboard_area.target.edit_action(action);
+    if (instance_exists(keyboard_area.target)) {
+        keyboard_area.target.edit_action(action);
+    }
 }
 
 /** End the held action. */
-function on_released() { pressed=false; }
+function on_released() {
+    pressed = false;
+}
 
 /** Render the same rectangle used by Universal Cursor hit testing. */
 function on_draw_gui() {
@@ -34,8 +41,13 @@ function on_draw_gui() {
 
     // Drawing parameters restored after rendering.
     var saved = new gmcu_DrawingParameters();
-    if (font != noone && font_exists(font)) draw_set_font(font);
-    draw_set_alpha(1); draw_set_halign(fa_center); draw_set_valign(fa_middle);
+    if (font != noone && font_exists(font)) {
+        draw_set_font(font);
+    }
+
+    draw_set_alpha(1);
+    draw_set_halign(fa_center);
+    draw_set_valign(fa_middle);
     // Whether the key is hovered or flashing.
     var highlighted = hovered || current_time < flash_until;
     // Visible label for this key.

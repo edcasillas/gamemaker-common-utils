@@ -1,10 +1,19 @@
-if (!editing || current_time == opened_at) exit;
-if (pending_close != -1) {
-    if (current_time >= close_due) finish(pending_close == 1);
+if (!editing || current_time == opened_at) {
     exit;
 }
 
-if (gmcu_ui_overlay_blocks_pointer_input()) exit;
+if (pending_close != -1) {
+    if (current_time >= close_due) {
+        finish(pending_close == 1);
+    }
+
+    exit;
+}
+
+if (gmcu_ui_overlay_blocks_pointer_input()) {
+    exit;
+}
+
 // Physical keyboard and clipboard events waiting for this textbox.
 var events = [];
 if (os_browser != browser_not_a_browser) {
@@ -17,58 +26,83 @@ if (os_browser != browser_not_a_browser) {
         array_push(events, { kind: "char", value: string_char_at(typed_text, typed_index) });
     }
 
-    if (keyboard_check_pressed(vk_enter)) array_push(events, { kind: "action", value: "DONE" });
-    if (keyboard_check_pressed(vk_escape)) array_push(events, { kind: "action", value: "CANCEL" });
+    if (keyboard_check_pressed(vk_enter)) {
+        array_push(events, { kind: "action", value: "DONE" });
+    }
+
+    if (keyboard_check_pressed(vk_escape)) {
+        array_push(events, { kind: "action", value: "CANCEL" });
+    }
 }
-// Index for this sequence.
-for (var i = 0; i < array_length(events); i++) {
-    // Event being applied to the active textbox.
-    var e = events[i];
-    if (!editing || pending_close != -1) break;
-    if (e.kind == "char") {
-        // Character normalized against the active alphabet.
-        var character = state.normalize(e.value);
+
+for (var event_index = 0; event_index < array_length(events); event_index++) {
+    var input_event = events[event_index]; // Pending browser or native input for this field.
+    if (!editing || pending_close != -1) {
+        break;
+    }
+
+    if (input_event.kind == "char") {
+        var character = state.normalize(input_event.value); // Accepted alphabet character, or empty.
         if (character != "") {
             state.type(character);
             area.flash_key(character);
         }
-    }
-    else if (e.kind == "paste") {
-        if (paste_mode != "none") state.paste(e.value, paste_mode);
-    }
-    else if (e.kind == "shortcut") {
-        if (e.value == "PASTE" && paste_mode != "none") area.flash_key(e.value);
-    }
-    else if (e.kind == "feedback") feedback=e.value;
-    else if (e.kind == "action") edit_action(e.value);
-    else if (e.kind == "clipboard" && e.owner == string(id) && e.token == clipboard_token) {
-        if (!e.ok) feedback = "Clipboard unavailable";
-        else if (e.action == "copy") feedback = "Copied";
-        else if (e.value == "") feedback = "Clipboard is empty";
-        else {
-            feedback = state.paste(e.value, paste_mode) ? "Pasted" : "No permitted characters";
+    } else if (input_event.kind == "paste") {
+        if (paste_mode != "none") {
+            state.paste(input_event.value, paste_mode);
+        }
+    } else if (input_event.kind == "shortcut") {
+        if (input_event.value == "PASTE" && paste_mode != "none") {
+            area.flash_key(input_event.value);
+        }
+    } else if (input_event.kind == "feedback") {
+        feedback = input_event.value;
+    } else if (input_event.kind == "action") {
+        edit_action(input_event.value);
+    } else if (input_event.kind == "clipboard" && input_event.owner == string(id) && input_event.token == clipboard_token) {
+        if (!input_event.ok) {
+            feedback = "Clipboard unavailable";
+        } else if (input_event.action == "copy") {
+            feedback = "Copied";
+        } else if (input_event.value == "") {
+            feedback = "Clipboard is empty";
+        } else {
+            feedback = state.paste(input_event.value, paste_mode) ? "Pasted" : "No permitted characters";
         }
     }
 }
 
-if (!editing || pending_close != -1) exit;
+if (!editing || pending_close != -1) {
+    exit;
+}
+
 // Physical key action to repeat or apply.
 var action = keyboard_check(vk_left) ? "LEFT" : (keyboard_check(vk_right) ? "RIGHT" : ((keyboard_check(vk_backspace) || keyboard_check(vk_delete)) ? "DEL" : ""));
-if (action == "") repeat_key = "";
-else if (action != repeat_key) {
+if (action == "") {
+    repeat_key = "";
+} else if (action != repeat_key) {
     repeat_key = action;
     repeat_due = current_time + 400;
     edit_action(action);
-}
-else if (current_time >= repeat_due) {
+} else if (current_time >= repeat_due) {
     repeat_due = current_time + 80;
     edit_action(action);
 }
 
-if (!editing || pending_close != -1) exit;
-if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face2,"text_input")) edit_action("CANCEL");
-else if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_start,"text_input")) edit_action("DONE");
-if (pending_close != -1) exit;
+if (!editing || pending_close != -1) {
+    exit;
+}
+
+if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_face2, "text_input")) {
+    edit_action("CANCEL");
+} else if (gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_start, "text_input")) {
+    edit_action("DONE");
+}
+
+if (pending_close != -1) {
+    exit;
+}
+
 // Only the actual canvas pointer can cause outside-click cancellation. HTML pad
 // touches are captured by its adapter and never reach the runner's mouse lane.
 if (editing && mouse_check_button_pressed(mb_left)) {
@@ -83,9 +117,9 @@ if (editing && mouse_check_button_pressed(mb_left)) {
         }
     }
 
-    // Whether the pointer is inside the textbox.
-    var in_field = point_in_rectangle(px, py, x-field_width/2, y-field_height/2, x+field_width/2, y+field_height/2);
-    // Whether the pointer is inside the keyboard area.
-    var in_keys = point_in_rectangle(px, py, area.x-area.area_width/2, area.y-area.area_height/2, area.x+area.area_width/2, area.y+area.area_height/2);
-    if (!in_field && !in_keys) finish(false, false);
+    var in_field = point_in_rectangle(px, py, x - field_width / 2, y - field_height / 2, x + field_width / 2, y + field_height / 2); // Pointer hits this field.
+    var in_keys = point_in_rectangle(px, py, area.x - area.area_width / 2, area.y - area.area_height / 2, area.x + area.area_width / 2, area.y + area.area_height / 2); // Pointer hits its keyboard.
+    if (!in_field && !in_keys) {
+        finish(false, false);
+    }
 }
