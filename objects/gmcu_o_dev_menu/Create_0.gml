@@ -64,7 +64,7 @@ function on_draw_gui() {
 	var _panel_w = _gui_w - panel_margin * 2;
 	var _panel_h = _gui_h - panel_margin * 2;
 	var _page = current_page();
-	var _items = current_items();
+	var _visible_items = current_items();
 
 	draw_set_alpha(_theme.overlay_alpha);
 	draw_set_color(_theme.overlay_color);
@@ -85,12 +85,12 @@ function on_draw_gui() {
 	if (selected_index >= scroll_offset + _visible_rows) {
 		scroll_offset = selected_index - _visible_rows + 1;
 	}
-	scroll_offset = clamp(scroll_offset, 0, max(0, array_length(_items) - _visible_rows));
+	scroll_offset = clamp(scroll_offset, 0, max(0, array_length(_visible_items) - _visible_rows));
 
 	for (var _row = 0; _row < _visible_rows; _row++) {
 		var _index = scroll_offset + _row;
-		if (_index >= array_length(_items)) break;
-		var _item = _items[_index];
+		if (_index >= array_length(_visible_items)) break;
+		var _item = _visible_items[_index];
 		var _y1 = _panel_y + header_height + _row * row_height;
 		var _y2 = _y1 + row_height - 2;
 		var _enabled = item_enabled(_item);
@@ -175,10 +175,10 @@ function on_draw_gui() {
 	draw_set_color(_theme.muted_color);
 	draw_set_halign(fa_right);
 	var _help = "Esc/B: Back | F1/Start: Close";
-	if (array_length(_items) > 0
+	if (array_length(_visible_items) > 0
 		&& selected_index >= 0
-		&& selected_index < array_length(_items)
-		&& _items[selected_index].type == "copy_text") {
+		&& selected_index < array_length(_visible_items)
+		&& _visible_items[selected_index].type == "copy_text") {
 		_help = "Enter/A/Click: Copy | " + _help;
 	}
 	draw_text(_panel_x + _panel_w - 18, _panel_y + header_height * 0.5, _help);
