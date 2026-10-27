@@ -6,7 +6,7 @@ hovered = false;			// Universal Cursor hover state for the field.
 feedback = "";				// Current status or clipboard feedback shown below the field.
 pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
 close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
-area = noone;				// Keyboard area assigned while this textbox is being edited.
+keyboard_area = noone;		// Keyboard object that renders keys and receives editing actions.
 is_interactable = true;		// Lets Universal Cursor target this textbox.
 hit_width = field_width;	// Universal Cursor hitbox width, matching the drawn field.
 hit_height = field_height;	// Universal Cursor hitbox height, matching the drawn field.
@@ -77,13 +77,13 @@ function activate() {
     }
 
     // An absent or duplicated keyboard area cannot receive this field's editing actions.
-    var resolved_area = gmcu_text_resolve_keyboard_area(keyboard_area_id); // Unique area, or noone on configuration error.
-    if (resolved_area == noone) {
+    var resolved_keyboard = gmcu_text_resolve_keyboard_area(keyboard_area_id); // Unique keyboard object, or noone on configuration error.
+    if (resolved_keyboard == noone) {
         instance_destroy();
         return;
     }
 
-    area = resolved_area;
+    keyboard_area = resolved_keyboard;
 
     if (instance_exists(global.gmcu_active_textbox)) {
         global.gmcu_active_textbox.finish(false, false);
@@ -95,16 +95,23 @@ function activate() {
     pending_close = -1;
     feedback = "";
     repeat_key = "";
-    keyboard_string = "";
+    
+    keyboard_string = "";	// Native GameMaker input uses keyboard_string; clear text typed before this field took focus.
+
+    // HTML5 captures DOM key/paste events without focusing an input or opening the mobile OS keyboard.
     if (os_browser != browser_not_a_browser) {
         gmcu_text_capture_begin();
     }
 
-    var cursor = gmcu_o_universal_cursor; // Shared cursor receiving keyboard focus.
-    cursor.text_input_owner = id;
+    // Universal Cursor limits selectable controls to this textbox and its keys while editing.
+    gmcu_o_universal_cursor.text_input_owner = id;
+
+    // Input Hub routes gamepad presses to the text-input owner instead of gameplay.
     gmcu_o_input_hub.focus_owner = id;
     gmcu_o_input_hub.focus_route = "text_input";
-    area.open(id);
+
+    // Generate visible keys for this textbox's alphabet and layout.
+    keyboard_area.open(id);
 }
 
 /** Close editing and dispatch a complete value only when requested.
@@ -120,14 +127,15 @@ function finish(_submit, _restore_cursor = true) {
     touched = true;
     repeat_key = "";
     clipboard_token++;
+	
     if (os_browser != browser_not_a_browser) {
         gmcu_text_capture_end();
     } else {
         keyboard_string = "";
     }
 
-    if (instance_exists(area)) {
-        area.close();
+    if (instance_exists(keyboard_area)) {
+        keyboard_area.close();
     }
 
     if (instance_exists(gmcu_o_universal_cursor)) {
@@ -177,7 +185,7 @@ function edit_action(_action) {
         return;
     }
 
-    area.flash_key(_action);
+    keyboard_area.flash_key(_action);
     switch (_action) {
         case "SPACE":
             state.type(" ");
@@ -223,23 +231,16 @@ function edit_action(_action) {
 }
 
 /** Receive pointer/controller focus. */
-function on_hover_enter() {
-    hovered = true;
-}
+function on_hover_enter() { hovered = true; }
 
 /** Release pointer/controller focus. */
-function on_hover_leave() {
-    hovered = false;
-}
+function on_hover_leave() { hovered = false; }
 
 /** Open editing on activation; the opening release cannot enter a character. */
-function on_pressed() {
-    activate();
-}
+function on_pressed() { activate();}
 
 /** Opening a field consumes its press, so release has no editing action. */
-function on_released() {
-}
+function on_released() { }
 
 /** Draw the field, persistent mask, editing blink, and closed-field validation. */
 function on_draw_gui() {

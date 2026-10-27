@@ -45,7 +45,7 @@ for (var event_index = 0; event_index < array_length(events); event_index++) {
         var character = state.normalize(input_event.value); // Accepted alphabet character, or empty.
         if (character != "") {
             state.type(character);
-            area.flash_key(character);
+            keyboard_area.flash_key(character);
         }
     } else if (input_event.kind == "paste") {
         if (paste_mode != "none") {
@@ -53,7 +53,7 @@ for (var event_index = 0; event_index < array_length(events); event_index++) {
         }
     } else if (input_event.kind == "shortcut") {
         if (input_event.value == "PASTE" && paste_mode != "none") {
-            area.flash_key(input_event.value);
+            keyboard_area.flash_key(input_event.value);
         }
     } else if (input_event.kind == "feedback") {
         feedback = input_event.value;
@@ -118,7 +118,7 @@ if (editing && mouse_check_button_pressed(mb_left)) {
     }
 
     var in_field = point_in_rectangle(px, py, x - field_width / 2, y - field_height / 2, x + field_width / 2, y + field_height / 2); // Pointer hits this field.
-    var in_keys = point_in_rectangle(px, py, area.x - area.area_width / 2, area.y - area.area_height / 2, area.x + area.area_width / 2, area.y + area.area_height / 2); // Pointer hits its keyboard.
+    var in_keys = point_in_rectangle(px, py, keyboard_area.x - keyboard_area.area_width / 2, keyboard_area.y - keyboard_area.area_height / 2, keyboard_area.x + keyboard_area.area_width / 2, keyboard_area.y + keyboard_area.area_height / 2); // Pointer hits this field's keyboard.
     if (!in_field && !in_keys) {
         finish(false, false);
     }
