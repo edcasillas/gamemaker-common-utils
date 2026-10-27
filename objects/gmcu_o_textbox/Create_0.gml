@@ -8,7 +8,6 @@ feedback = "";				// Current status or clipboard feedback shown below the field.
 pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
 close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
 area = noone;				// Keyboard area assigned while this textbox is being edited.
-area_count = 0;				// Number of keyboard areas matching this textbox during activation.
 is_interactable = true;		// Lets Universal Cursor target this textbox.
 hit_width = field_width;	// Universal Cursor hitbox width, matching the drawn field.
 hit_height = field_height;	// Universal Cursor hitbox height, matching the drawn field.
@@ -76,26 +75,14 @@ gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
 function activate() {
     if (editing) return;
 
-    // Clear the previous keyboard reference so this activation resolves the area by its configured ID.
-    area = noone;
-    // Count matching areas because opening an arbitrary one would hide duplicate Room Editor IDs.
-    area_count = 0;
-
-    // Find keyboard areas whose Room Editor area_id matches this field's keyboard_area_id.
-    with (gmcu_o_text_keyboard) {
-        if (area_id == other.keyboard_area_id) {
-            other.area_count++;
-            other.area = id;
-        }
-    }
-
-    // The textbox sends actions to area.open() after taking focus. Zero matches
-    // leaves no receiver; multiple matches make the chosen receiver ambiguous.
-    if (area_count != 1) {
-        gmcu_log_error(diagnostic_id + ": expected exactly one keyboard area with area_id=" + string(keyboard_area_id) + "; found " + string(area_count));
+    // An absent or duplicated keyboard area cannot receive this field's editing actions.
+    var resolved_area = gmcu_text_resolve_keyboard_area(keyboard_area_id); // Unique area, or noone on configuration error.
+    if (resolved_area == noone) {
         instance_destroy();
         return;
     }
+
+    area = resolved_area;
 
     if (instance_exists(global.gmcu_active_textbox)) global.gmcu_active_textbox.finish(false, false);
     editing = true;

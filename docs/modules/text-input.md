@@ -8,7 +8,7 @@ when clipboard actions are available.
 
 1. Register the Text Input resources in the consumer `.yyp`:
    - Objects: `gmcu_o_textbox`, `gmcu_o_text_keyboard`, `gmcu_o_text_key`.
-   - Scripts: `gmcu_text_state`, `gmcu_text_input_events`,
+   - Scripts: `gmcu_text_state`, `gmcu_text_resolve_keyboard_area`, `gmcu_text_input_events`,
      `gmcu_text_clipboard_copy`.
    - For HTML5, extension: `gmcu_text_input_html5`.
 2. Register the module dependencies: [Input Hub](input-hub.md),
