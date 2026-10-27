@@ -76,12 +76,17 @@ gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
 function activate() {
     if (editing) return;
 
-    // Match the Room Editor's keyboard_area_id against the placed keyboard areas.
+    // Clear the previous keyboard reference so this activation resolves the area by its configured ID.
     area = noone;
+    // Count matching areas because opening an arbitrary one would hide duplicate Room Editor IDs.
     area_count = 0;
-    with (gmcu_o_text_keyboard) if (area_id == other.keyboard_area_id) {
-        other.area_count++;
-        other.area = id;
+
+    // Find keyboard areas whose Room Editor area_id matches this field's keyboard_area_id.
+    with (gmcu_o_text_keyboard) {
+        if (area_id == other.keyboard_area_id) {
+            other.area_count++;
+            other.area = id;
+        }
     }
 
     // The textbox sends actions to area.open() after taking focus. Zero matches
