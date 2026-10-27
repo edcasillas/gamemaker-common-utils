@@ -117,7 +117,7 @@ if (editing && mouse_check_button_pressed(mb_left)) {
         }
     }
 
-    var in_field = point_in_rectangle(px, py, x - field_width / 2, y - field_height / 2, x + field_width / 2, y + field_height / 2); // Pointer hits this field.
+    var in_field = point_in_rectangle(px, py, x - hit_width / 2, y - hit_height / 2, x + hit_width / 2, y + hit_height / 2); // Pointer hits this field's sprite.
     var in_keys = point_in_rectangle(px, py, keyboard_area.x - keyboard_area.area_width / 2, keyboard_area.y - keyboard_area.area_height / 2, keyboard_area.x + keyboard_area.area_width / 2, keyboard_area.y + keyboard_area.area_height / 2); // Pointer hits this field's keyboard.
     if (!in_field && !in_keys) {
         finish(false, false);

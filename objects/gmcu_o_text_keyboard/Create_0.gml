@@ -3,9 +3,35 @@ target = noone; // Textbox receiving key actions while open.
 nav_button = -1; // D-pad direction held for navigation repeat.
 nav_due = 0; // Time when held navigation repeats.
 custom_draw = noone; // Optional host renderer for generated keys.
+area_width = 0; // Keyboard panel width derived from its sprite and Room Editor scale.
+area_height = 0; // Keyboard panel height derived from its sprite and Room Editor scale.
+
+if (sprite_index == noone) {
+    gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": assign a sprite to the keyboard object");
+    instance_destroy();
+    return;
+}
+
+if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2) || sprite_get_yoffset(sprite_index) != floor(sprite_get_height(sprite_index) / 2)) {
+    gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": keyboard sprite origin must be centered");
+    instance_destroy();
+    return;
+}
+
+image_speed = 0;
+area_width = sprite_get_width(sprite_index) * abs(image_xscale);
+area_height = sprite_get_height(sprite_index) * abs(image_yscale);
+gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT + 1, area_id);
 
 if (skin == "") {
     skin = "clean";
+}
+
+/** Draw the host sprite behind active keys in GUI coordinates. */
+function on_draw_gui() {
+    if (instance_exists(target)) {
+        draw_self();
+    }
 }
 
 /** Build keys from the active textbox's alphabet and layout.

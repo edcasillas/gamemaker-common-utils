@@ -17,13 +17,14 @@ when clipboard actions are available.
 3. Place the dependency managers required by those modules in the room. At
    minimum, Text Input needs `gmcu_o_input_hub`,
    `gmcu_o_universal_cursor`, and `gmcu_o_layered_gui_manager`.
-4. Place one `gmcu_o_text_keyboard` for each keyboard location. Give each a
-   unique `area_id`, set its size, and position it in GUI coordinates. Its `x/y`
-   is the center of the key area.
-5. Place each `gmcu_o_textbox`. Set a unique `textbox_id`, its keyboard's
-   `keyboard_area_id`, and the field options below. Its `x/y` is the center of
-   the field. Do not place `gmcu_o_text_key`; the keyboard creates keys while
-   editing.
+4. Create concrete child objects of `gmcu_o_textbox` and `gmcu_o_text_keyboard`.
+   Assign each child a centered sprite that shows its field or keyboard panel
+   in the Room Editor. The sprite dimensions and instance scale determine the
+   rendered bounds and hit target.
+5. Place the keyboard children in GUI coordinates and give each a unique
+   `area_id`. Place the textbox children, set a unique `textbox_id` and the
+   matching `keyboard_area_id`. Do not place `gmcu_o_text_key`; the keyboard
+   creates character and action keys while editing.
 6. Add a host controller that subscribes to submitted values (example below).
    Build for the intended target. HTML5 uses the registered capture extension;
    native runners use GameMaker keyboard and clipboard functions.
@@ -37,6 +38,7 @@ At creation, the textbox checks:
   string that fits and uses only allowed characters;
 - `textbox_id` and `keyboard_area_id`, one `X` per editable mask position, and
   `keyboard_layout` set to `alphabetic` or `qwerty`;
+- a centered sprite assigned to the concrete textbox object;
 - QWERTY characters limited to uppercase A–Z, 0–9, and space. Alphabetic keys
   are generated from the supplied alphabet, so they need no fixed character set.
 
@@ -71,19 +73,20 @@ Optional textbox variables:
 | `allow_delete` | `true` | Show and enable `DEL`. Deletion leaves an empty slot. |
 | `paste_mode` | `none` | `none`, `replace_all`, or `from_caret`. |
 | `skin` | `clean` | `clean` or `retro`; independent of keyboard skin. |
-| `field_width`, `field_height` | `620`, `54` | Draw and hit-target size in GUI pixels. |
 | `font` | empty | Font asset used by the field and its generated keys. |
-| `text_color`, `placeholder_color`, `background_color`, `accent_color` | built-in colors | Clean-skin colors. |
+| `text_color`, `placeholder_color`, `accent_color` | built-in colors | Text and interaction colors over the host sprite. |
 
 Set these on each `gmcu_o_text_keyboard` instance:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `area_id` | empty | Unique ID referenced by textbox instances. |
-| `area_width`, `area_height` | `760`, `290` | Keyboard layout bounds in GUI pixels. |
 | `skin` | `clean` | `clean` or `retro`. |
 
-Set textbox and keyboard positions/sizes for the room's GUI dimensions. A space
+The keyboard area requires a centered sprite and draws it behind its generated
+keys only while editing. The host can change the sprite and skin together; keep
+replacement sprites at the same dimensions so their hit targets stay aligned.
+Set instance positions and scales for the room's GUI dimensions. A space
 in `alphabet` creates a wide `SPACE` key. The action row contains `LEFT`,
 `RIGHT`, optional `DEL` and `PASTE`, then `CANCEL` and `DONE`.
 

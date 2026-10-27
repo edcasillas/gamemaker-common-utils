@@ -8,8 +8,8 @@ pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
 close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
 keyboard_area = noone;		// Keyboard object that renders keys and receives editing actions.
 is_interactable = true;		// Lets Universal Cursor target this textbox.
-hit_width = field_width;	// Universal Cursor hitbox width, matching the drawn field.
-hit_height = field_height;	// Universal Cursor hitbox height, matching the drawn field.
+hit_width = 0;				// Updated from the assigned sprite width and Room Editor scale.
+hit_height = 0;			// Updated from the assigned sprite height and Room Editor scale.
 custom_draw = noone;		// Optional host-provided field renderer; noone uses the built-in skin.
 repeat_key = "";			// Physical key currently repeating, or empty when released.
 repeat_due = 0;				// Next repeat time for held arrow/delete keys.
@@ -17,6 +17,24 @@ opened_at = -1;				// Time editing opened; ignores input from the opening press.
 clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
 inputs_registered = false;	// Set after registering B/Start; Clean Up skips unregistering them if Create exited before registration.
 diagnostic_id = "textbox_id=" + string(textbox_id) + ", instance=" + string(id); // Stable field label and runtime instance for errors.
+
+// A concrete child object supplies the visible frame and its Room Editor bounds.
+if (sprite_index == noone) {
+    gmcu_log_error(diagnostic_id + ": assign a sprite to the textbox object");
+    instance_destroy();
+    return;
+}
+
+// The field's x/y and cursor hit target both use the sprite center.
+if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2) || sprite_get_yoffset(sprite_index) != floor(sprite_get_height(sprite_index) / 2)) {
+    gmcu_log_error(diagnostic_id + ": textbox sprite origin must be centered");
+    instance_destroy();
+    return;
+}
+
+image_speed = 0;
+hit_width = sprite_get_width(sprite_index) * abs(image_xscale);
+hit_height = sprite_get_height(sprite_index) * abs(image_yscale);
 
 // gmcu_TextState validates the alphabet, length, and initial value in its constructor.
 // An error means its slots do not represent the requested field, so do not register input or draw it.
@@ -257,25 +275,28 @@ function on_draw_gui() {
     draw_set_alpha(1);
     draw_set_halign(fa_left);
     draw_set_valign(fa_middle);
-    var left = x - field_width / 2; // Left edge of the drawn field.
-    var top = y - field_height / 2; // Top edge of the drawn field.
+    var left = x - hit_width / 2; // Left edge of the assigned sprite.
+    var top = y - hit_height / 2; // Top edge of the assigned sprite.
     var invalid = touched && !editing && !state.valid(); // Closed field missing required characters.
     var retro = skin == "retro"; // Whether to draw the unframed pixel-style field.
     var pattern = mask == "" ? string_repeat("X", text_length) : mask; // Editable slots and visible separators.
-    var advance = min(retro ? 12 : 25, (field_width - 24) / string_length(pattern)); // Distance between glyphs.
+    var advance = min(retro ? 12 : 25, (hit_width - 24) / string_length(pattern)); // Distance between glyphs.
     var origin = x - string_length(pattern) * advance / 2; // Center of the first glyph.
     var slot = 0; // Editable slot represented by the next X in the mask.
     var blink = (current_time div 400) mod 2 == 0; // Caret's visible phase.
+
+    draw_self();
 
     if (retro) {
         draw_set_halign(fa_center);
         draw_set_color(text_color);
         draw_text_transformed(x, top - 20, string_upper(label), 0.6, 0.6, 0);
     } else {
-        draw_set_color(background_color);
-        draw_rectangle(left, top, left + field_width, top + field_height, false);
-        draw_set_color(invalid ? c_red : (editing || hovered ? accent_color : c_gray));
-        draw_rectangle(left, top, left + field_width, top + field_height, true);
+        if (invalid || editing || hovered) {
+            draw_set_color(invalid ? c_red : accent_color);
+            draw_rectangle(left, top, left + hit_width, top + hit_height, true);
+        }
+
         draw_set_color(text_color);
         draw_text(left, top - 19, label);
     }
@@ -308,16 +329,16 @@ function on_draw_gui() {
     if (invalid) {
         draw_set_color(c_red);
         if (retro) {
-            draw_text_transformed(x, top + field_height + 18, string_upper(string(text_length) + " characters required"), 0.6, 0.6, 0);
+            draw_text_transformed(x, top + hit_height + 18, string_upper(string(text_length) + " characters required"), 0.6, 0.6, 0);
         } else {
-            draw_text(left, top + field_height + 18, string(text_length) + " characters required");
+            draw_text(left, top + hit_height + 18, string(text_length) + " characters required");
         }
     } else if (feedback != "") {
         draw_set_color(retro ? make_color_rgb(44, 255, 92) : text_color);
         if (retro) {
-            draw_text_transformed(x, top + field_height + 18, string_upper(feedback), 0.6, 0.6, 0);
+            draw_text_transformed(x, top + hit_height + 18, string_upper(feedback), 0.6, 0.6, 0);
         } else {
-            draw_text(left, top + field_height + 18, feedback);
+            draw_text(left, top + hit_height + 18, feedback);
         }
     }
 
