@@ -17,7 +17,7 @@ repeat_key = "";			// Physical key currently repeating, or empty when released.
 repeat_due = 0;				// Next repeat time for held arrow/delete keys.
 opened_at = -1;				// Time editing opened; ignores input from the opening press.
 clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
-inputs_registered = false; // Set after registering B/Start; Clean Up skips unregistering them if Create exited before registration.
+inputs_registered = false;	// Set after registering B/Start; Clean Up skips unregistering them if Create exited before registration.
 diagnostic_id = "textbox_id=" + string(textbox_id) + ", instance=" + string(id); // Stable field label and runtime instance for errors.
 
 // gmcu_TextState validates the alphabet, length, and initial value in its constructor.
@@ -68,20 +68,13 @@ if (keyboard_layout == "qwerty") {
 gmcu_register_gamepad_button(gp_face2); // B button will cancel
 gmcu_register_gamepad_button(gp_start);	// Start button will submit
 inputs_registered = true;
+
 gmcu_universal_cursor_subscribe(textbox_id);
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
 
 /** Activate this field and its configured keyboard area. */
 function activate() {
     if (editing) return;
-
-    // Physical typing is captured by the HTML5 extension. A native runner cannot
-    // start that capture, so this field must not take focus there.
-    if (os_browser == browser_not_a_browser) {
-        gmcu_log_error(diagnostic_id + ": HTML5 browser runtime is required");
-        instance_destroy();
-        return;
-    }
 
     // Match the Room Editor's keyboard_area_id against the placed keyboard areas.
     area = noone;
@@ -107,7 +100,7 @@ function activate() {
     feedback = "";
     repeat_key = 0;
     keyboard_string = "";
-    gmcu_text_capture_begin();
+    if (os_browser != browser_not_a_browser) gmcu_text_capture_begin();
     // Shared Universal Cursor instance.
     var cursor = gmcu_o_universal_cursor;
     cursor.text_input_owner = id;
@@ -126,7 +119,8 @@ function finish(_submit, _restore_cursor = true) {
     touched = true;
     repeat_key = 0;
     clipboard_token++;
-    gmcu_text_capture_end();
+    if (os_browser != browser_not_a_browser) gmcu_text_capture_end();
+    else keyboard_string = "";
     if (instance_exists(area)) area.close();
     if (instance_exists(gmcu_o_universal_cursor)) {
         gmcu_o_universal_cursor.text_input_owner = noone;
@@ -178,8 +172,17 @@ function edit_action(_action) {
             break;
         case "PASTE":
             if (paste_mode != "none") {
-                clipboard_token++;
-                gmcu_text_clipboard("paste", "", string(id), clipboard_token);
+                if (os_browser != browser_not_a_browser) {
+                    clipboard_token++;
+                    gmcu_text_clipboard("paste", "", string(id), clipboard_token);
+                } else {
+                    try {
+                        feedback = state.paste(clipboard_get_text(), paste_mode) ? "Pasted" : "Clipboard is empty or has no permitted characters";
+                    } catch (_clipboard_error) {
+                        gmcu_log_error(diagnostic_id + ": native clipboard read failed: " + string(_clipboard_error));
+                        feedback = "Clipboard unavailable";
+                    }
+                }
             }
 
             break;

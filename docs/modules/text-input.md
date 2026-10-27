@@ -10,7 +10,7 @@ when clipboard actions are available.
    - Objects: `gmcu_o_textbox`, `gmcu_o_text_keyboard`, `gmcu_o_text_key`.
    - Scripts: `gmcu_text_state`, `gmcu_text_input_events`,
      `gmcu_text_clipboard_copy`.
-   - Extension: `gmcu_text_input_html5`.
+   - For HTML5, extension: `gmcu_text_input_html5`.
 2. Register the module dependencies: [Input Hub](input-hub.md),
    [Universal Cursor](universal-cursor.md), [Layered GUI](layered-gui.md),
    [Event Bus](event-bus.md), and [Logging](logging.md).
@@ -25,7 +25,8 @@ when clipboard actions are available.
    the field. Do not place `gmcu_o_text_key`; the keyboard creates keys while
    editing.
 6. Add a host controller that subscribes to submitted values (example below).
-   Build for HTML5 with the registered extension enabled.
+   Build for the intended target. HTML5 uses the registered capture extension;
+   native runners use GameMaker keyboard and clipboard functions.
 
 ## Configuration checks
 
@@ -39,8 +40,8 @@ At creation, the textbox checks:
 - QWERTY characters limited to uppercase A–Z, 0–9, and space. Alphabetic keys
   are generated from the supplied alphabet, so they need no fixed character set.
 
-When editing opens, it checks for an HTML5 browser runtime and exactly one
-keyboard area with the requested `area_id`. A failed check logs the room, object,
+When editing opens, it checks for exactly one keyboard area with the requested
+`area_id`. A failed check logs the room, object,
 `textbox_id`, runtime instance ID, and reason, then removes the textbox before
 it takes input focus. `gmcu_log_error()` requests a visual notification in
 DevBuild when the host has registered a notification handler. Direct callers of
@@ -117,8 +118,8 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
   the caret. Enter/START submit; Escape/B cancel. Virtual directions navigate
   keys, A activates, and the stick moves Universal Cursor.
 - Clicking or tapping a field opens its keyboard. Tapping outside closes it and
-  keeps the draft. The module captures browser keyboard input without opening
-  the mobile OS keyboard.
+  keeps the draft. HTML5 captures browser keyboard input without opening the
+  mobile OS keyboard. Native runners use `keyboard_string` for typed characters.
 - `gmcu_text_clipboard_copy(text)` copies host-provided text. Keep the host's
   copy button separate from the keyboard and enable it only when the host's
   validation passes.
@@ -127,8 +128,9 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
   matches the pressed button's `pointerId` across pointer capture and copies
   synchronously on that trusted release. Gamepad polling cannot substitute for
   a browser pointer gesture.
-- Paste uses the Clipboard API and may be denied by browser permissions or
-  iframe policy. `gmcu_text_clipboard_last_error()` returns the latest failure.
+- HTML5 paste uses the Clipboard API and may be denied by browser permissions
+  or iframe policy. `gmcu_text_clipboard_last_error()` returns that failure.
+  Native runners use GameMaker's clipboard functions.
 
 For custom presentation, assign a bound method to `custom_draw` on a textbox or
 keyboard area; its argument is the field or key instance and it owns that
@@ -136,7 +138,7 @@ element's drawing. The built-in `clean` and `retro` skins provide defaults.
 
 ## Scope
 
-The capture adapter targets HTML5. Selection copy, IME composition, keyboard
+The browser capture adapter targets HTML5. Selection copy, IME composition, keyboard
 pages, and emoji/grapheme editing are not supported. Test the exported artifact
 on intended browsers and devices; desktop or mocked tests do not establish
 mobile clipboard support.

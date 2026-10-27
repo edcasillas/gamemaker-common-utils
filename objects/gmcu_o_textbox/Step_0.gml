@@ -6,7 +6,20 @@ if (pending_close != -1) {
 
 if (gmcu_ui_overlay_blocks_pointer_input()) exit;
 // Physical keyboard and clipboard events waiting for this textbox.
-var events = json_parse(gmcu_text_capture_poll());
+var events = [];
+if (os_browser != browser_not_a_browser) {
+    events = json_parse(gmcu_text_capture_poll());
+} else {
+    // GameMaker collects printable native keyboard input between Step events.
+    var typed_text = keyboard_string;
+    keyboard_string = "";
+    for (var typed_index = 1; typed_index <= string_length(typed_text); typed_index++) {
+        array_push(events, { kind: "char", value: string_char_at(typed_text, typed_index) });
+    }
+
+    if (keyboard_check_pressed(vk_enter)) array_push(events, { kind: "action", value: "DONE" });
+    if (keyboard_check_pressed(vk_escape)) array_push(events, { kind: "action", value: "CANCEL" });
+}
 // Index for this sequence.
 for (var i = 0; i < array_length(events); i++) {
     // Event being applied to the active textbox.
