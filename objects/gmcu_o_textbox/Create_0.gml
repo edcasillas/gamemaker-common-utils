@@ -8,7 +8,7 @@ feedback = "";				// Current status or clipboard feedback shown below the field.
 pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
 close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
 area = noone;				// Keyboard area assigned while this textbox is being edited.
-area_count = 0; // Number of keyboard areas matching this textbox during activation.
+area_count = 0;				// Number of keyboard areas matching this textbox during activation.
 is_interactable = true;		// Lets Universal Cursor target this textbox.
 hit_width = field_width;	// Universal Cursor hitbox width, matching the drawn field.
 hit_height = field_height;	// Universal Cursor hitbox height, matching the drawn field.
@@ -17,28 +17,48 @@ repeat_key = "";			// Physical key currently repeating, or empty when released.
 repeat_due = 0;				// Next repeat time for held arrow/delete keys.
 opened_at = -1;				// Time editing opened; ignores input from the opening press.
 clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
-inputs_registered = false; // Whether this textbox owns gamepad registrations.
+inputs_registered = false;	// Whether this textbox owns gamepad registrations.
+diagnostic_id = "textbox_id=" + string(textbox_id) + ", instance=" + string(id); // Stable field label and runtime instance for errors.
 
+// gmcu_TextState validates the alphabet, length, and initial value in its constructor.
+// An error means its slots do not represent the requested field, so do not register input or draw it.
 if (state.config_error != "") {
-    instance_destroy();
-    return;
-}
-if (textbox_id == "" || keyboard_area_id == "") {
-    gmcu_log_error("Textbox requires textbox_id and keyboard_area_id");
-    instance_destroy();
-    return;
-}
-if (mask != "" && string_count("X", mask) != text_length) {
-    gmcu_log_error("Textbox mask must have one X per position: " + textbox_id);
+    gmcu_log_error(diagnostic_id + ": " + state.config_error);
     instance_destroy();
     return;
 }
 
+// textbox_id identifies submit events; keyboard_area_id identifies the area that renders keys.
+// Without either ID, this instance cannot connect those interactions to the right host or keyboard.
+if (textbox_id == "" || keyboard_area_id == "") {
+    gmcu_log_error(diagnostic_id + ": textbox_id and keyboard_area_id are required");
+    instance_destroy();
+    return;
+}
+
+// Each X in the mask reads one state slot while drawing. A different count would
+// skip saved characters or read beyond the slot array.
+if (mask != "" && string_count("X", mask) != text_length) {
+    gmcu_log_error(diagnostic_id + ": mask must have one X per position");
+    instance_destroy();
+    return;
+}
+
+// The keyboard builder implements only these two layouts. An unknown value would
+// silently enter its alphabetic branch, hiding a Room Editor configuration error.
+if (keyboard_layout != "alphabetic" && keyboard_layout != "qwerty") {
+    gmcu_log_error(diagnostic_id + ": unsupported keyboard_layout=" + string(keyboard_layout));
+    instance_destroy();
+    return;
+}
+
+// The QWERTY keyboard has fixed key rows. Check the supplied alphabet so every
+// accepted character also has a key the player can select.
 if (keyboard_layout == "qwerty") {
-    // Index for this sequence.
+    // Position of the alphabet character being checked.
     for (var i=1; i<=string_length(alphabet); i++) {
         if (string_pos(string_char_at(alphabet, i), "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ") == 0) {
-            gmcu_log_error("QWERTY layout supports uppercase ASCII letters, digits and space: " + textbox_id);
+            gmcu_log_error(diagnostic_id + ": QWERTY layout supports uppercase ASCII letters, digits and space");
             instance_destroy();
             return;
         }
@@ -54,22 +74,31 @@ gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
 /** Activate this field and its configured keyboard area. */
 function activate() {
     if (editing) return;
+
+    // Physical typing is captured by the HTML5 extension. A native runner cannot
+    // start that capture, so this field must not take focus there.
     if (os_browser == browser_not_a_browser) {
-        gmcu_log_error("Text Input requires the HTML5 capture adapter: " + textbox_id);
+        gmcu_log_error(diagnostic_id + ": HTML5 browser runtime is required");
         instance_destroy();
         return;
     }
+
+    // Match the Room Editor's keyboard_area_id against the placed keyboard areas.
     area = noone;
     area_count = 0;
     with (gmcu_o_text_keyboard) if (area_id == other.keyboard_area_id) {
         other.area_count++;
         other.area = id;
     }
+
+    // The textbox sends actions to area.open() after taking focus. Zero matches
+    // leaves no receiver; multiple matches make the chosen receiver ambiguous.
     if (area_count != 1) {
-        gmcu_log_error("Textbox requires exactly one keyboard area: " + keyboard_area_id);
+        gmcu_log_error(diagnostic_id + ": expected exactly one keyboard area with area_id=" + string(keyboard_area_id) + "; found " + string(area_count));
         instance_destroy();
         return;
     }
+
     if (instance_exists(global.gmcu_active_textbox)) global.gmcu_active_textbox.finish(false, false);
     editing = true;
     global.gmcu_active_textbox = id;
@@ -106,6 +135,7 @@ function finish(_submit, _restore_cursor = true) {
             gmcu_o_universal_cursor.gui_y = y;
         }
     }
+
     if (instance_exists(gmcu_o_input_hub) && gmcu_o_input_hub.focus_owner == id) gmcu_o_input_hub.focus_owner=noone;
     global.gmcu_active_textbox = noone;
     if (_submit && state.valid()) gmcu_eventbus_dispatch(GMCU_EVENT_TEXT_SUBMITTED, { textbox_id: textbox_id, value: state.text() });
@@ -127,6 +157,7 @@ function formatted_value() {
             result += c;
         }
     }
+
     return result;
 }
 
@@ -150,6 +181,7 @@ function edit_action(_action) {
                 clipboard_token++;
                 gmcu_text_clipboard("paste", "", string(id), clipboard_token);
             }
+
             break;
         default: state.type(_action); break;
     }
@@ -172,7 +204,11 @@ function on_released() { }
 
 /** Draw the field, persistent mask, editing blink, and closed-field validation. */
 function on_draw_gui() {
-    if (custom_draw != noone) { method_call(custom_draw, [id]); return; }
+    if (custom_draw != noone) {
+        method_call(custom_draw, [id]);
+        return;
+    }
+
     // Drawing parameters restored after rendering.
     var saved = new gmcu_DrawingParameters();
     if (font != noone && font_exists(font)) draw_set_font(font);
@@ -205,15 +241,25 @@ function on_draw_gui() {
                     c = filled ? "" : "_";
                     color = c_white;
                 }
+
                 slot++;
             }
+
             draw_set_color(color); draw_text_transformed(origin + (i - 1) * advance, y, c, 0.6, 0.6, 0);
         }
+
         draw_set_halign(fa_left);
-        if (invalid) { draw_set_color(c_red); draw_text_transformed(x, top + field_height + 18, string_upper(string(text_length) + " characters required"), 0.6, 0.6, 0); }
-        else if (feedback != "") { draw_set_color(make_color_rgb(44,255,92)); draw_text_transformed(x, top + field_height + 18, string_upper(feedback), 0.6, 0.6, 0); }
+        if (invalid) {
+            draw_set_color(c_red);
+            draw_text_transformed(x, top + field_height + 18, string_upper(string(text_length) + " characters required"), 0.6, 0.6, 0);
+        } else if (feedback != "") {
+            draw_set_color(make_color_rgb(44,255,92));
+            draw_text_transformed(x, top + field_height + 18, string_upper(feedback), 0.6, 0.6, 0);
+        }
+
         saved.apply(); return;
     }
+
     draw_set_color(background_color); draw_rectangle(left, top, left + field_width, top + field_height, false);
     draw_set_color(invalid ? c_red : (editing || hovered ? accent_color : c_gray));
     draw_rectangle(left, top, left + field_width, top + field_height, true);
@@ -239,12 +285,21 @@ function on_draw_gui() {
                 c = filled ? "" : "_";
                 color = text_color;
             }
+
             slot++;
         }
+
         draw_set_color(color); draw_text(origin + (i - 1) * advance, y, c);
     }
-    if (invalid) { draw_set_color(c_red); draw_text(left, top + field_height + 18, string(text_length) + " characters required"); }
-    else if (feedback != "") { draw_set_color(text_color); draw_text(left, top + field_height + 18, feedback); }
+
+    if (invalid) {
+        draw_set_color(c_red);
+        draw_text(left, top + field_height + 18, string(text_length) + " characters required");
+    } else if (feedback != "") {
+        draw_set_color(text_color);
+        draw_text(left, top + field_height + 18, feedback);
+    }
+
     saved.apply();
 }
 

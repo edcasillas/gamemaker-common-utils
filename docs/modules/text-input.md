@@ -12,7 +12,7 @@ when clipboard actions are available.
      `gmcu_text_clipboard_copy`.
    - Extension: `gmcu_text_input_html5`.
 2. Register the module dependencies: [Input Hub](input-hub.md),
-   [Universal Cursor](universal-cursor.md), [Layered GUI](layered-gui.md), and
+   [Universal Cursor](universal-cursor.md), [Layered GUI](layered-gui.md),
    [Event Bus](event-bus.md), and [Logging](logging.md).
 3. Place the dependency managers required by those modules in the room. At
    minimum, Text Input needs `gmcu_o_input_hub`,
@@ -27,10 +27,24 @@ when clipboard actions are available.
 6. Add a host controller that subscribes to submitted values (example below).
    Build for HTML5 with the registered extension enabled.
 
-Invalid field configuration is logged and the field instance is removed. If its
-keyboard area is missing or duplicated when editing opens, the field logs the
-error and removes itself without taking input focus. The text state exposes `config_error` for
-hosts that construct it directly.
+## Configuration checks
+
+At creation, the textbox checks:
+
+- a nonempty alphabet without duplicate characters (including case-equivalent
+  characters when case-insensitive), a positive integer length, and an initial
+  string that fits and uses only allowed characters;
+- `textbox_id` and `keyboard_area_id`, one `X` per editable mask position, and
+  `keyboard_layout` set to `alphabetic` or `qwerty`;
+- QWERTY characters limited to uppercase A–Z, 0–9, and space. Alphabetic keys
+  are generated from the supplied alphabet, so they need no fixed character set.
+
+When editing opens, it checks for an HTML5 browser runtime and exactly one
+keyboard area with the requested `area_id`. A failed check logs the room, object,
+`textbox_id`, runtime instance ID, and reason, then removes the textbox before
+it takes input focus. `gmcu_log_error()` requests a visual notification in
+DevBuild when the host has registered a notification handler. Direct callers of
+`gmcu_TextState` inspect its `config_error` field.
 
 ## Room Editor variables
 

@@ -7,19 +7,23 @@ gmcu_universal_cursor_subscribe(action);
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, action);
 /** Mark this key as focused. */
 function on_hover_enter() { hovered=true; }
+
 /** Stop repeating when the key loses focus. */
 function on_hover_leave() {
     hovered = false;
     pressed = false;
 }
+
 /** Activate on press; only movement and deletion may repeat. */
 function on_pressed() {
     pressed = true;
     held_due = current_time + 400;
     if (instance_exists(keyboard_area.target)) keyboard_area.target.edit_action(action);
 }
+
 /** End the held action. */
 function on_released() { pressed=false; }
+
 /** Render the same rectangle used by Universal Cursor hit testing. */
 function on_draw_gui() {
     if (!instance_exists(keyboard_area)) return;
@@ -27,6 +31,7 @@ function on_draw_gui() {
         method_call(keyboard_area.custom_draw, [id]);
         return;
     }
+
     // Drawing parameters restored after rendering.
     var saved = new gmcu_DrawingParameters();
     if (font != noone && font_exists(font)) draw_set_font(font);
@@ -45,5 +50,6 @@ function on_draw_gui() {
         draw_set_color(highlighted ? make_color_rgb(15,32,25) : c_white);
         draw_text(x,y,caption);
     }
+
     saved.apply();
 }

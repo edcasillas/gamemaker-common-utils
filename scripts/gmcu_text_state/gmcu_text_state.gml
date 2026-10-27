@@ -11,6 +11,7 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
     if (is_real(_length)) {
         if (_length >= 1 && _length == floor(_length)) capacity = _length;
     }
+
     case_sensitive = _case_sensitive; // Whether letter case must match the alphabet.
     wrap = _wrap; // Whether caret movement wraps around field boundaries.
     caret = 0; // Active editable position.
@@ -18,9 +19,15 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
     config_error = ""; // Invalid configuration reason; empty when usable.
     // Initial text normalized into the fixed slots.
     var initial = is_string(_initial) ? _initial : "";
+
+    // Require a nonempty alphabet and a positive whole-number slot count.
     if (alphabet == "" || !is_real(_length) || _length != capacity) config_error = "Invalid textbox alphabet/length";
+
+    // Initial text must be a string before character-level checks can run.
     if (!is_string(_initial)) config_error = "Invalid textbox initial value";
-    // Index for this sequence.
+
+    // Compare every alphabet character with the entries after it.
+    // First alphabet position in each comparison.
     for (var i = 1; i <= string_length(alphabet); i++) {
         // Character or key at the current position.
         var c = string_char_at(alphabet, i);
@@ -28,9 +35,11 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
         for (var j = i + 1; j <= string_length(alphabet); j++) {
             // Second alphabet character in the uniqueness check.
             var d = string_char_at(alphabet, j);
+            // Reject duplicate characters, including case-equivalent entries when case-insensitive.
             if (c == d || (!case_sensitive && string_upper(c) == string_upper(d))) config_error = "Ambiguous textbox alphabet";
         }
     }
+
     /** Normalize one character to its alphabet representation; return empty if rejected. */
     static normalize = function(_char) {
         if (string_length(_char) != 1) return "";
@@ -41,12 +50,15 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
             var candidate = string_char_at(alphabet, k);
             if (string_upper(candidate) == string_upper(_char)) return candidate;
         }
+
         return "";
     };
+
     /** Move the caret by the signed offset, wrapping or clamping to field boundaries. */
     static move = function(_offset) {
         caret = wrap ? (caret + _offset + capacity) mod capacity : clamp(caret + _offset, 0, capacity - 1);
     };
+
     /** Replace the current position with an accepted character and advance. */
     static type = function(_char) {
         // Character or key at the current position.
@@ -55,17 +67,20 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
         slots[caret] = c;
         move(1);
     };
+
     /** Clear the current position without shifting its suffix, then move backward. */
     static erase = function() {
         slots[caret] = "";
         caret = max(0, caret - 1);
     };
+
     /** Return whether every editable position is occupied. */
     static valid = function() {
         // Current key, slot, or character index.
         for (var k = 0; k < capacity; k++) if (slots[k] == "") return false;
         return true;
     };
+
     /** Return compact text; consumers must use slots for a lossless incomplete draft. */
     static text = function() {
         var result = ""; // Occupied characters in slot order.
@@ -73,6 +88,7 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
         for (var k = 0; k < capacity; k++) result += slots[k];
         return result;
     };
+
     /** Filter and paste text using replace_all or from_caret; return whether anything changed. */
     static paste = function(_text, _mode) {
         // Accepted characters filtered from pasted text.
@@ -90,13 +106,16 @@ function gmcu_TextState(_alphabet, _length, _case_sensitive, _wrap, _initial) co
         caret = min(capacity - 1, start + count);
         return true;
     };
+
+    // The initial value must fit in the available slots.
     if (string_length(initial) > capacity) config_error = "Textbox initial value exceeds capacity";
     // Index for this sequence.
     for (var i = 1; i <= string_length(initial); i++) {
         // Character or key at the current position.
         var c = normalize(string_char_at(initial, i));
+        // Every initial character must normalize into the alphabet.
         if (c == "") config_error = "Textbox initial value outside alphabet";
+        // Skip writes beyond the safe slot array when the initial value is too long.
         if (i <= capacity) slots[i - 1] = c;
     }
-    if (config_error != "") gmcu_log_error(config_error);
 }

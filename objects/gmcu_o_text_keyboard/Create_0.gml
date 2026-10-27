@@ -20,6 +20,7 @@ function open(_textbox) {
         // Index for this sequence.
         for (var i = 1; i <= count; i += columns) array_push(rows, string_copy(characters, i, columns));
     }
+
     // Whether the textbox permits a space character.
     var has_space=string_pos(" ",target.alphabet)>0;
     // Number of keyboard rows including action rows.
@@ -39,6 +40,7 @@ function open(_textbox) {
         // Character or key at the current position.
         for (var c = 0; c < columns; c++) add_key(string_char_at(filtered,c+1), r, c, columns, key_width, key_height, row_count);
     }
+
     if (has_space) add_key("SPACE",array_length(rows),0,1,min(320,area_width-16),key_height,row_count);
     // Editing actions placed in the bottom row.
     var actions = ["LEFT", "RIGHT"];
@@ -48,6 +50,7 @@ function open(_textbox) {
     // Character or key at the current position.
     for (var c = 0; c < array_length(actions); c++) add_key(actions[c], row_count-1, c, array_length(actions), min(100,(area_width-16)/array_length(actions)-6),key_height,row_count);
 }
+
 /** Create one shared interactive key in a centered row. */
 function add_key(_action,_row,_column,_columns,_width,_height,_rows) {
     // Horizontal center of a generated key.
@@ -58,6 +61,7 @@ function add_key(_action,_row,_column,_columns,_width,_height,_rows) {
     var key = instance_create_depth(px,py,depth,gmcu_o_text_key, {keyboard_area:id, action:_action, hit_width:_width, hit_height:_height, row_index:_row, font:target.font});
     array_push(keys,key);
 }
+
 /** Destroy generated keys and release the editing target. */
 function close() {
     // Index for this sequence.
@@ -66,6 +70,7 @@ function close() {
     target = noone;
     nav_button = -1;
 }
+
 /** Navigate to an adjacent key or nearest horizontal center in the next row. */
 function navigate(_direction) {
     // Key selected by Universal Cursor.
@@ -75,6 +80,7 @@ function navigate(_direction) {
         gmcu_o_universal_cursor.gui_y=keys[0].y;
         return;
     }
+
     var best = noone; // Nearest navigable key in the requested direction.
     var distance = 1000000000; // Distance from the current key to best.
     // Index for this sequence.
@@ -100,11 +106,13 @@ function navigate(_direction) {
                 dist = abs(k.x-current.x);
                 break;
         }
+
         if (valid && dist < distance) {
             distance = dist;
             best = k;
         }
     }
+
     if (instance_exists(best)) {
         gmcu_o_universal_cursor.gui_x = best.x;
         gmcu_o_universal_cursor.gui_y = best.y;
@@ -118,6 +126,9 @@ function flash_key(_character) {
     var key_action = _character == " " ? "SPACE" : _character;
     // Index for this sequence.
     for (var i=0; i<array_length(keys); i++) {
-        if (keys[i].action == key_action) { keys[i].flash_until=current_time+150; break; }
+        if (keys[i].action == key_action) {
+            keys[i].flash_until = current_time + 150;
+            break;
+        }
     }
 }
