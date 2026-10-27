@@ -21,7 +21,7 @@ if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2
 image_speed = 0;
 area_width = sprite_get_width(sprite_index) * abs(image_xscale);
 area_height = sprite_get_height(sprite_index) * abs(image_yscale);
-gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT + 1, area_id);
+gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_TEXT_KEYBOARD, area_id);
 
 if (skin == "") {
     skin = "clean";

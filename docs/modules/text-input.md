@@ -25,9 +25,9 @@ when clipboard actions are available.
    `area_id`. Place the textbox children, set a unique `textbox_id` and the
    matching `keyboard_area_id`. Do not place `gmcu_o_text_key`; the keyboard
    creates character and action keys while editing.
-6. Place field titles and status messages as separate `gmcu_o_label_gui` instances.
-   Give a status label a unique `binding_id` and set the textbox's
-   `status_label_id` to that value. Position and style each label in the Room Editor.
+6. Place field titles and optional status messages as separate labels. The host
+   may subscribe to `GMCU_EVENT_TEXT_STATUS_CHANGED` and route its message to
+   any presentation component, including a `gmcu_o_label_gui` in the Room Editor.
 7. Add a host controller that subscribes to submitted values (example below).
    Build for the intended target. HTML5 uses the registered capture extension;
    native runners use GameMaker keyboard and clipboard functions.
@@ -42,8 +42,6 @@ At creation, the textbox checks:
 - `textbox_id` and `keyboard_area_id`, one `X` per editable mask position, and
   `keyboard_layout` set to `alphabetic` or `qwerty`;
 - a centered sprite assigned to the concrete textbox object;
-- when `status_label_id` is set, exactly one placed `gmcu_o_label_gui` with the
-  matching `binding_id` (checked after room instances are created);
 - QWERTY characters limited to uppercase A–Z, 0–9, and space. Alphabetic keys
   are generated from the supplied alphabet, so they need no fixed character set.
 
@@ -65,7 +63,6 @@ Set these on each `gmcu_o_textbox` instance:
 | `alphabet` | Accepted characters. QWERTY accepts uppercase A–Z, digits, and optional space. |
 | `text_length` | Exact number of editable positions. |
 | `keyboard_area_id` | `area_id` of the keyboard area used by this field. |
-| `status_label_id` | Optional `binding_id` of an independently placed GUI label for validation and clipboard feedback. |
 | `keyboard_layout` | `alphabetic` or `qwerty`. Alphabetic arranges the supplied alphabet in three rows. |
 
 Optional textbox variables:
@@ -101,8 +98,12 @@ Subscribe before assigning the host's `on_event` handler:
 
 ```gml
 gmcu_eventbus_subscribe(GMCU_EVENT_TEXT_SUBMITTED);
+gmcu_eventbus_subscribe(GMCU_EVENT_TEXT_STATUS_CHANGED);
 on_event = function(_event_name, _event_args) {
     switch (_event_name) {
+        case GMCU_EVENT_TEXT_STATUS_CHANGED:
+            // Route _event_args.message and severity to the host's UI.
+            break;
         case GMCU_EVENT_TEXT_SUBMITTED:
             switch (_event_args.textbox_id) {
                 case "password":
@@ -116,7 +117,10 @@ on_event = function(_event_name, _event_args) {
 
 Unsubscribe when the host is destroyed. Textboxes also expose `activate()` and
 `finish(_submit)`. `finish(false)` cancels and keeps the draft; `finish(true)`
-submits only when every slot is valid. Closed incomplete fields show validation.
+submits only when every slot is valid. `GMCU_EVENT_TEXT_STATUS_CHANGED` emits
+`textbox_id`, `valid`, `invalid`, `editing`, `message`, and `severity` whenever
+field status changes. The host decides how to show validation and clipboard
+feedback; no label is required for editing or submitting.
 The submit event is the host's committed-value boundary. `state.slots` preserves
 empty positions; `state.text()` omits them and is not a lossless draft format.
 

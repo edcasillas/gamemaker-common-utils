@@ -4,7 +4,7 @@ pressed = false; // Whether an activation press is held.
 held_due = 0; // Time when a held action repeats.
 is_interactable = true; // Allows Universal Cursor to activate this key.
 gmcu_universal_cursor_subscribe(action);
-gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, action);
+gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_TEXT_KEY, action);
 
 /** Mark this key as focused. */
 function on_hover_enter() {

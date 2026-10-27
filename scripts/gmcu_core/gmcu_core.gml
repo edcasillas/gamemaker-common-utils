@@ -15,6 +15,8 @@
 // Common GUI draw priorities for LayeredGUI.
 // Larger values draw earlier; lower values draw later and appear on top.
 #macro GMCU_GUI_PRIORITY_DEFAULT 0
+#macro GMCU_GUI_PRIORITY_TEXT_KEYBOARD -100
+#macro GMCU_GUI_PRIORITY_TEXT_KEY -101
 #macro GMCU_GUI_PRIORITY_LEADERBOARD_OVERLAY -900
 #macro GMCU_GUI_PRIORITY_UNIVERSAL_CURSOR -1000
 #macro GMCU_GUI_PRIORITY_TRANSITION_OVERLAY -1500
