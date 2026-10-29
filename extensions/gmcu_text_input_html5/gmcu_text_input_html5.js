@@ -1,5 +1,46 @@
 /** Capture browser text without focusing an editable element on mobile. */
-var gmcuTextInput = { active: false, queue: [], installed: false };
+var gmcuTextInput = { active: false, queue: [], installed: false, pasteOverlay: null };
+
+/** Remove the browser paste target after paste, cancellation, or field close. */
+function gmcu_text_paste_close() {
+  if (gmcuTextInput.pasteOverlay) {
+    gmcuTextInput.pasteOverlay.remove();
+    gmcuTextInput.pasteOverlay = null;
+  }
+}
+
+/** Offer the browser's native Paste action when clipboard reads are unavailable. */
+function gmcu_text_paste_open() {
+  gmcu_text_paste_close();
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#000c;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
+
+  var panel = document.createElement('div');
+  panel.style.cssText = 'width:min(100%,420px);padding:20px;background:#17263a;color:white;font:18px sans-serif;border-radius:8px;box-sizing:border-box';
+
+  var instructions = document.createElement('p');
+  instructions.textContent = 'Hold the field below, then choose Paste.';
+
+  var target = document.createElement('input');
+  target.type = 'text';
+  target.inputMode = 'none';
+  target.placeholder = 'Hold here to Paste';
+  target.setAttribute('aria-label', 'Paste text here');
+  target.style.cssText = 'width:100%;font:18px sans-serif;padding:12px;box-sizing:border-box';
+
+  var cancel = document.createElement('button');
+  cancel.type = 'button';
+  cancel.textContent = 'Cancel';
+  cancel.style.cssText = 'margin-top:14px;padding:10px 18px;font:18px sans-serif';
+  cancel.addEventListener('click', gmcu_text_paste_close);
+
+  panel.append(instructions, target, cancel);
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+  gmcuTextInput.pasteOverlay = overlay;
+  target.focus();
+}
 
 /** Start capturing keyboard and paste events for the active textbox.
  * @returns {number} GameMaker extension success sentinel.
@@ -56,6 +97,7 @@ function gmcu_text_capture_begin() {
 
     event.preventDefault();
     capture.queue.push({ kind: 'paste', value: event.clipboardData.getData('text/plain') });
+    gmcu_text_paste_close();
   }, true);
 
   return 0;
@@ -67,6 +109,7 @@ function gmcu_text_capture_begin() {
 function gmcu_text_capture_end() {
   gmcuTextInput.active = false;
   gmcuTextInput.queue = [];
+  gmcu_text_paste_close();
   return 0;
 }
 
@@ -87,14 +130,15 @@ function gmcu_text_capture_poll() {
  * @returns {number} Immediate bridge result; asynchronous reads enqueue a response.
  */
 function gmcu_text_clipboard(action, value, owner, token) {
-  function finish(ok, text) {
+  function finish(ok, text, error) {
     gmcuTextInput.queue.push({
       kind: 'clipboard',
       action: action,
       owner: owner,
       token: token,
       ok: ok,
-      value: text || ''
+      value: text || '',
+      error: error || ''
     });
   }
 
@@ -124,8 +168,14 @@ function gmcu_text_clipboard(action, value, owner, token) {
     }
   }
 
+  if (action === 'paste' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '')) {
+    gmcu_text_paste_open();
+    gmcuTextInput.queue.push({ kind: 'feedback', value: 'Use the browser Paste action' });
+    return 0;
+  }
+
   if (!navigator.clipboard) {
-    finish(false, '');
+    finish(false, '', 'Clipboard API unavailable (secureContext=' + Boolean(window.isSecureContext) + ')');
     return 0;
   }
 
@@ -133,13 +183,15 @@ function gmcu_text_clipboard(action, value, owner, token) {
   try {
     request = navigator.clipboard.readText();
   } catch (error) {
-    finish(false, '');
+    finish(false, '', (error && error.name ? error.name + ': ' : '') + String(error && error.message || error));
     return 0;
   }
 
   Promise.resolve(request).then(
     function (text) { finish(true, text); },
-    function () { finish(false, ''); }
+    function (error) {
+      finish(false, '', (error && error.name ? error.name + ': ' : '') + String(error && error.message || error));
+    }
   );
   return 0;
 }

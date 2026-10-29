@@ -49,7 +49,7 @@ for (var event_index = 0; event_index < array_length(events); event_index++) {
         }
     } else if (input_event.kind == "paste") {
         if (paste_mode != "none") {
-            state.paste(input_event.value, paste_mode);
+            feedback = state.paste(input_event.value, paste_mode) ? "Pasted" : "Clipboard is empty or has no permitted characters";
         }
     } else if (input_event.kind == "shortcut") {
         if (input_event.value == "PASTE" && paste_mode != "none") {
@@ -61,7 +61,7 @@ for (var event_index = 0; event_index < array_length(events); event_index++) {
         edit_action(input_event.value);
     } else if (input_event.kind == "clipboard" && input_event.owner == string(id) && input_event.token == clipboard_token) {
         if (!input_event.ok) {
-            feedback = "Clipboard unavailable";
+            feedback = "Paste failed: " + input_event.error;
         } else if (input_event.action == "copy") {
             feedback = "Copied";
         } else if (input_event.value == "") {
