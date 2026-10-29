@@ -140,12 +140,15 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
   matches the pressed button's `pointerId` across pointer capture and copies
   synchronously on that trusted release. Gamepad polling cannot substitute for
   a browser pointer gesture.
-- On mobile HTML5, PASTE opens a browser field for the system Paste action;
-  `inputmode=none` requests that the OS keyboard stay hidden. The browser's
-  paste event supplies the text to the active textbox, including on HTTP LAN
-  origins where the Clipboard API is unavailable. On desktop HTML5, PASTE
-  reads through the Clipboard API; rejection details appear in field status.
-  Native runners use GameMaker's clipboard functions.
+- HTML5 PASTE prepares the visible key bounds before interaction. A trusted
+  canvas tap, or virtual-controller A press while PASTE is selected, starts
+  `navigator.clipboard.readText()` inside the browser pointer event; GameMaker's
+  later key callback consumes that request instead of starting another read.
+  The browser either returns the text or presents its native consent UI.
+  Canceling consent ends the request without opening another surface. Physical
+  gamepads do not create a trusted browser event. Origins without the Clipboard
+  API report it as unavailable. Native runners use GameMaker's clipboard
+  functions.
 
 For custom presentation, assign a bound method to `custom_draw` on a textbox or
 keyboard area; its argument is the field or key instance and it owns that

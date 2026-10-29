@@ -5,7 +5,7 @@
 #macro GMCU_UNKNOWN_ROOM "<unknown_room>"
 #macro GMCU_DELTA_TIME_SECONDS delta_time * 0.000001
 
-#macro GMCU_IS_DEV_BUILD false
+#macro Default:GMCU_IS_DEV_BUILD false
 #macro DevBuild:GMCU_IS_DEV_BUILD true
 
 // GameMaker draws instances only inside this depth range.

@@ -31,6 +31,21 @@ if (skin == "") {
 function on_draw_gui() {
     if (instance_exists(target)) {
         draw_self();
+
+        if (os_browser != browser_not_a_browser && target.paste_mode != "none") {
+            for (var paste_key_index = 0; paste_key_index < array_length(keys); paste_key_index++) {
+                var paste_key = keys[paste_key_index]; // Generated PASTE key prepared for a trusted browser gesture.
+                if (paste_key.action == "PASTE") {
+                    var paste_options = {
+                        bounds: [paste_key.x, paste_key.y, paste_key.hit_width, paste_key.hit_height, display_get_gui_width(), display_get_gui_height()],
+                        allowVirtualControllerA: paste_key.hovered
+                    };
+
+                    gmcu_text_clipboard("prepare_paste", string(target.id), json_stringify(paste_options), target.clipboard_token + 1);
+                    break;
+                }
+            }
+        }
     }
 }
 

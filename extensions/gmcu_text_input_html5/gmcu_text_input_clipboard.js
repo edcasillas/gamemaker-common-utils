@@ -10,6 +10,8 @@
 
   var pendingCopy = null; // Text and GUI bounds prepared by the host's draw event.
   var recentCopy = null; // Trusted gesture result consumed by GameMaker's later release callback.
+  var pendingPaste = null; // Textbox identity and PASTE key bounds prepared by the keyboard draw event.
+  var recentPaste = null; // Trusted paste request consumed by GameMaker's later key callback.
   var virtualPointerKeys = new Map(); // Original virtual button by pointer ID across pointer capture.
   var lastError = 'No copy attempt yet'; // Browser diagnostic shown when a copy fails.
   /** Copy text synchronously through the DOM fallback during a trusted browser event.
@@ -50,6 +52,69 @@
     var result = write(text);
     recentCopy = { text: text, ok: result.ok, error: result.error, time: Date.now() };
   }
+  /** Return whether a trusted canvas pointer is inside prepared GUI bounds.
+   * @param {PointerEvent} event Browser pointer event.
+   * @param {object} prepared GUI bounds and dimensions.
+   * @returns {boolean} Whether the pointer targets the prepared control.
+   */
+  function hitsCanvasBounds(event, prepared) {
+    if (!canvas || (event.target !== canvas && !canvas.contains(event.target))) {
+      return false;
+    }
+
+    var rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) {
+      return false;
+    }
+
+    var guiX = (event.clientX - rect.left) * prepared.guiWidth / rect.width;
+    var guiY = (event.clientY - rect.top) * prepared.guiHeight / rect.height;
+    return guiX >= prepared.x - prepared.width / 2 && guiX <= prepared.x + prepared.width / 2
+      && guiY >= prepared.y - prepared.height / 2 && guiY <= prepared.y + prepared.height / 2;
+  }
+  /** Read the clipboard during the trusted event and queue the asynchronous result.
+   * @param {object} prepared Textbox owner, token, and target bounds.
+   */
+  function readPaste(prepared) {
+    var generation = gmcuTextInput.generation;
+    recentPaste = { owner: prepared.owner, token: prepared.token, time: Date.now() };
+
+    function finish(ok, text, error) {
+      if (!gmcuTextInput.active || generation !== gmcuTextInput.generation) {
+        return;
+      }
+
+      gmcuTextInput.queue.push({
+        kind: 'clipboard',
+        action: 'paste',
+        owner: prepared.owner,
+        token: prepared.token,
+        ok: ok,
+        value: text || '',
+        error: error || ''
+      });
+    }
+
+    if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
+      finish(false, '', 'Clipboard API unavailable (secureContext=' + Boolean(window.isSecureContext) + ')');
+      return;
+    }
+
+    var request;
+    try {
+      request = navigator.clipboard.readText();
+    } catch (error) {
+      finish(false, '', (error && error.name ? error.name + ': ' : '') + String(error && error.message || error));
+      return;
+    }
+
+    Promise.resolve(request).then(
+      function (text) { finish(true, text, ''); },
+      function (error) {
+        finish(false, '', (error && error.name ? error.name + ': ' : '') + String(error && error.message || error));
+      }
+    );
+  }
   /** Record which virtual-control button starts a trusted pointer gesture.
    * @param {PointerEvent} event Browser pointer press before pointer capture.
    */
@@ -61,6 +126,19 @@
     var button = event.target && event.target.closest && event.target.closest('#hvc-controls [data-key]');
     if (button) {
       virtualPointerKeys.set(event.pointerId, button.dataset.key);
+    }
+
+    if (!pendingPaste) {
+      return;
+    }
+
+    if (button && button.dataset.key === '0' && pendingPaste.allowVirtualControllerA) {
+      readPaste(pendingPaste);
+      return;
+    }
+
+    if (hitsCanvasBounds(event, pendingPaste)) {
+      readPaste(pendingPaste);
     }
   }
   /** Forget virtual-control gestures that are canceled before release.
@@ -89,19 +167,7 @@
       return;
     }
 
-    if (!canvas || (event.target !== canvas && !canvas.contains(event.target))) {
-      return;
-    }
-
-    var rect = canvas.getBoundingClientRect();
-    if (!rect.width || !rect.height) {
-      return;
-    }
-
-    var guiX = (event.clientX - rect.left) * pendingCopy.guiWidth / rect.width;
-    var guiY = (event.clientY - rect.top) * pendingCopy.guiHeight / rect.height;
-    if (guiX < pendingCopy.x - pendingCopy.width / 2 || guiX > pendingCopy.x + pendingCopy.width / 2 ||
-        guiY < pendingCopy.y - pendingCopy.height / 2 || guiY > pendingCopy.y + pendingCopy.height / 2) {
+    if (!hitsCanvasBounds(event, pendingCopy)) {
       return;
     }
 
@@ -140,6 +206,56 @@
       pendingCopy = null;
       return false;
     }
+  };
+  /** Prepare the active PASTE key for a trusted browser gesture.
+   * @param {string} owner Active textbox instance ID.
+   * @param {string} optionsJson JSON bounds and virtual-controller eligibility.
+   * @param {number} token Clipboard request token expected by the textbox.
+   * @returns {boolean} Whether the prepared data is valid.
+   */
+  window.gmcu_text_clipboard_prepare_paste = function (owner, optionsJson, token) {
+    try {
+      var options = JSON.parse(optionsJson);
+      var bounds = options.bounds;
+      if (!Array.isArray(bounds) || bounds.length !== 6 || !bounds.every(Number.isFinite) ||
+          typeof options.allowVirtualControllerA !== 'boolean') {
+        return false;
+      }
+
+      pendingPaste = {
+        owner: String(owner),
+        token: token,
+        x: bounds[0],
+        y: bounds[1],
+        width: bounds[2],
+        height: bounds[3],
+        guiWidth: bounds[4],
+        guiHeight: bounds[5],
+        allowVirtualControllerA: options.allowVirtualControllerA
+      };
+      return true;
+    } catch (error) {
+      pendingPaste = null;
+      return false;
+    }
+  };
+  /** Consume a trusted paste request before GameMaker starts a duplicate read.
+   * @param {string} owner Active textbox instance ID.
+   * @param {number} token Clipboard request token.
+   * @returns {boolean} Whether the trusted request is already running.
+   */
+  window.gmcu_text_clipboard_consume_paste = function (owner, token) {
+    if (recentPaste && recentPaste.owner === String(owner) && recentPaste.token === token && Date.now() - recentPaste.time < 1200) {
+      recentPaste = null;
+      return true;
+    }
+
+    return false;
+  };
+  /** Discard prepared paste state when text editing ends. */
+  window.gmcu_text_clipboard_clear_paste = function () {
+    pendingPaste = null;
+    recentPaste = null;
   };
   document.addEventListener('pointerdown', pointerDown, true);
   document.addEventListener('pointerup', pointerUp, true);

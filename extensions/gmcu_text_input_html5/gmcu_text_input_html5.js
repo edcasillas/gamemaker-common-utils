@@ -1,46 +1,5 @@
 /** Capture browser text without focusing an editable element on mobile. */
-var gmcuTextInput = { active: false, queue: [], installed: false, pasteOverlay: null };
-
-/** Remove the browser paste target after paste, cancellation, or field close. */
-function gmcu_text_paste_close() {
-  if (gmcuTextInput.pasteOverlay) {
-    gmcuTextInput.pasteOverlay.remove();
-    gmcuTextInput.pasteOverlay = null;
-  }
-}
-
-/** Offer the browser's native Paste action when clipboard reads are unavailable. */
-function gmcu_text_paste_open() {
-  gmcu_text_paste_close();
-
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#000c;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box';
-
-  var panel = document.createElement('div');
-  panel.style.cssText = 'width:min(100%,420px);padding:20px;background:#17263a;color:white;font:18px sans-serif;border-radius:8px;box-sizing:border-box';
-
-  var instructions = document.createElement('p');
-  instructions.textContent = 'Hold the field below, then choose Paste.';
-
-  var target = document.createElement('input');
-  target.type = 'text';
-  target.inputMode = 'none';
-  target.placeholder = 'Hold here to Paste';
-  target.setAttribute('aria-label', 'Paste text here');
-  target.style.cssText = 'width:100%;font:18px sans-serif;padding:12px;box-sizing:border-box';
-
-  var cancel = document.createElement('button');
-  cancel.type = 'button';
-  cancel.textContent = 'Cancel';
-  cancel.style.cssText = 'margin-top:14px;padding:10px 18px;font:18px sans-serif';
-  cancel.addEventListener('click', gmcu_text_paste_close);
-
-  panel.append(instructions, target, cancel);
-  overlay.appendChild(panel);
-  document.body.appendChild(overlay);
-  gmcuTextInput.pasteOverlay = overlay;
-  target.focus();
-}
+var gmcuTextInput = { active: false, queue: [], installed: false, generation: 0 };
 
 /** Start capturing keyboard and paste events for the active textbox.
  * @returns {number} GameMaker extension success sentinel.
@@ -49,6 +8,7 @@ function gmcu_text_capture_begin() {
   var capture = gmcuTextInput;
   capture.active = true;
   capture.queue = [];
+  capture.generation++;
 
   if (capture.installed) {
     return 0;
@@ -95,9 +55,12 @@ function gmcu_text_capture_begin() {
       return;
     }
 
+    if (!event.clipboardData) {
+      return;
+    }
+
     event.preventDefault();
     capture.queue.push({ kind: 'paste', value: event.clipboardData.getData('text/plain') });
-    gmcu_text_paste_close();
   }, true);
 
   return 0;
@@ -109,7 +72,11 @@ function gmcu_text_capture_begin() {
 function gmcu_text_capture_end() {
   gmcuTextInput.active = false;
   gmcuTextInput.queue = [];
-  gmcu_text_paste_close();
+  gmcuTextInput.generation++;
+  if (typeof window.gmcu_text_clipboard_clear_paste === 'function') {
+    window.gmcu_text_clipboard_clear_paste();
+  }
+
   return 0;
 }
 
@@ -130,7 +97,13 @@ function gmcu_text_capture_poll() {
  * @returns {number} Immediate bridge result; asynchronous reads enqueue a response.
  */
 function gmcu_text_clipboard(action, value, owner, token) {
+  var generation = gmcuTextInput.generation;
+
   function finish(ok, text, error) {
+    if (action === 'paste' && (!gmcuTextInput.active || generation !== gmcuTextInput.generation)) {
+      return;
+    }
+
     gmcuTextInput.queue.push({
       kind: 'clipboard',
       action: action,
@@ -155,6 +128,19 @@ function gmcu_text_clipboard(action, value, owner, token) {
     }
   }
 
+  if (action === 'prepare_paste') {
+    var preparePaste = window.gmcu_text_clipboard_prepare_paste;
+    if (typeof preparePaste !== 'function') {
+      return 0;
+    }
+
+    try {
+      return preparePaste(value, owner, token) ? 1 : 0;
+    } catch (error) {
+      return 0;
+    }
+  }
+
   if (action === 'copy') {
     var bridge = window.gmcu_text_clipboard_write;
     if (typeof bridge !== 'function') {
@@ -168,13 +154,12 @@ function gmcu_text_clipboard(action, value, owner, token) {
     }
   }
 
-  if (action === 'paste' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '')) {
-    gmcu_text_paste_open();
-    gmcuTextInput.queue.push({ kind: 'feedback', value: 'Use the browser Paste action' });
+  var consumePaste = window.gmcu_text_clipboard_consume_paste;
+  if (action === 'paste' && typeof consumePaste === 'function' && consumePaste(owner, token)) {
     return 0;
   }
 
-  if (!navigator.clipboard) {
+  if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
     finish(false, '', 'Clipboard API unavailable (secureContext=' + Boolean(window.isSecureContext) + ')');
     return 0;
   }

@@ -1,4 +1,4 @@
-#macro GMCU_ENABLE_DEBUG_LOG false
+#macro Default:sGMCU_ENABLE_DEBUG_LOG false
 #macro DevBuild:GMCU_ENABLE_DEBUG_LOG true
 
 #macro GMCU_ENABLE_INFO_LOG true
