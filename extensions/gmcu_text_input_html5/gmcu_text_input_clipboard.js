@@ -14,6 +14,57 @@
   var recentPaste = null; // Trusted paste request consumed by GameMaker's later key callback.
   var virtualPointerKeys = new Map(); // Original virtual button by pointer ID across pointer capture.
   var lastError = 'No copy attempt yet'; // Browser diagnostic shown when a copy fails.
+
+  /** Return the current Permissions Policy decision for clipboard reads.
+   * @returns {boolean|null} True, false, or null when the browser cannot report it.
+   */
+  function clipboardReadPolicy() {
+    var policy = document.permissionsPolicy || document.featurePolicy;
+    if (!policy || typeof policy.allowsFeature !== 'function') {
+      return null;
+    }
+
+    try {
+      return policy.allowsFeature('clipboard-read');
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /** Describe the browser context relevant to clipboard-read failures.
+   * @returns {string} Diagnostic key/value list.
+   */
+  function clipboardReadContext() {
+    return 'secureContext=' + Boolean(window.isSecureContext) +
+      ', navigatorClipboard=' + Boolean(navigator.clipboard) +
+      ', readText=' + Boolean(navigator.clipboard && typeof navigator.clipboard.readText === 'function') +
+      ', permissionsPolicy=' + String(clipboardReadPolicy()) +
+      ', topLevel=' + Boolean(window.top === window) +
+      ', origin=' + String(window.location && window.location.origin || '') +
+      ', userAgent=' + String(navigator.userAgent || '');
+  }
+
+  /** Describe why programmatic clipboard reads are unavailable.
+   * @returns {string} Empty when readText can be attempted, otherwise a diagnostic.
+   */
+  function pasteReadDiagnostic() {
+    var policyAllowsRead = clipboardReadPolicy();
+    var context = clipboardReadContext();
+
+    if (!window.isSecureContext) {
+      return 'Clipboard read requires a secure context (' + context + ')';
+    }
+
+    if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
+      return 'Clipboard readText API unavailable (' + context + ')';
+    }
+
+    if (policyAllowsRead === false) {
+      return 'Permissions Policy blocks clipboard-read (' + context + ')';
+    }
+
+    return '';
+  }
   /** Copy text synchronously through the DOM fallback during a trusted browser event.
    * @param {string} text Text supplied by the host.
    * @returns {{ok: boolean, error: string}} Browser result and diagnostic.
@@ -95,8 +146,9 @@
       });
     }
 
-    if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
-      finish(false, '', 'Clipboard API unavailable (secureContext=' + Boolean(window.isSecureContext) + ')');
+    var unavailableReason = pasteReadDiagnostic();
+    if (unavailableReason) {
+      finish(false, '', unavailableReason);
       return;
     }
 
@@ -111,7 +163,8 @@
     Promise.resolve(request).then(
       function (text) { finish(true, text, ''); },
       function (error) {
-        finish(false, '', (error && error.name ? error.name + ': ' : '') + String(error && error.message || error));
+        var failure = (error && error.name ? error.name + ': ' : '') + String(error && error.message || error);
+        finish(false, '', failure + ' (' + clipboardReadContext() + ')');
       }
     );
   }
@@ -291,5 +344,13 @@
   };
   window.gmcu_text_clipboard_last_error = function () {
     return lastError;
+  };
+  /** Return whether the page can attempt a programmatic clipboard read. */
+  window.gmcu_text_clipboard_can_read = function () {
+    return pasteReadDiagnostic() === '';
+  };
+  /** Return the current clipboard-read capability diagnostic. */
+  window.gmcu_text_clipboard_read_diagnostic = function () {
+    return pasteReadDiagnostic();
   };
 })();

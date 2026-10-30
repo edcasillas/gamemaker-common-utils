@@ -5,6 +5,7 @@ nav_due = 0; // Time when held navigation repeats.
 custom_draw = noone; // Optional host renderer for generated keys.
 area_width = 0; // Keyboard panel width derived from its sprite and Room Editor scale.
 area_height = 0; // Keyboard panel height derived from its sprite and Room Editor scale.
+paste_available = false; // Whether this keyboard execution exposes a usable PASTE key.
 
 if (sprite_index == noone) {
     gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": assign a sprite to the keyboard object");
@@ -32,7 +33,7 @@ function on_draw_gui() {
     if (instance_exists(target)) {
         draw_self();
 
-        if (os_browser != browser_not_a_browser && target.paste_mode != "none") {
+        if (os_browser != browser_not_a_browser && paste_available) {
             for (var paste_key_index = 0; paste_key_index < array_length(keys); paste_key_index++) {
                 var paste_key = keys[paste_key_index]; // Generated PASTE key prepared for a trusted browser gesture.
                 if (paste_key.action == "PASTE") {
@@ -55,6 +56,12 @@ function on_draw_gui() {
 function open(_textbox) {
     close();
     target = _textbox;
+    paste_available = target.paste_mode != "none";
+    if (paste_available && os_browser != browser_not_a_browser && gmcu_text_clipboard_can_read() != 1) {
+        paste_available = false;
+        gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": PASTE hidden: " + gmcu_text_clipboard_read_diagnostic());
+    }
+
     var rows = []; // Character rows for the active textbox.
     if (target.keyboard_layout == "qwerty") {
         rows = ["0123456789", "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
@@ -100,7 +107,7 @@ function open(_textbox) {
         array_push(actions, "DEL");
     }
 
-    if (target.paste_mode != "none") {
+    if (paste_available) {
         array_push(actions, "PASTE");
     }
 
@@ -146,6 +153,7 @@ function close() {
     keys = [];
     target = noone;
     nav_button = -1;
+    paste_available = false;
 }
 
 /** Move selection to the adjacent key in the requested direction.

@@ -150,9 +150,12 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
   later key callback consumes that request instead of starting another read.
   The browser either returns the text or presents its native consent UI.
   Canceling consent ends the request without opening another surface. Physical
-  gamepads do not create a trusted browser event. Origins without the Clipboard
-  API report it as unavailable. Native runners use GameMaker's clipboard
-  functions.
+  gamepads do not create a trusted browser event. The keyboard omits PASTE at
+  construction when the page lacks a secure context, `readText()`, or iframe
+  permission. It logs the capability details instead of presenting a broken
+  control. A later permission rejection preserves the existing keyboard layout,
+  leaves PASTE available for retry, and writes the full browser diagnostic only
+  to the logger. Native runners use GameMaker's clipboard functions.
 
 For custom presentation, assign a bound method to `custom_draw` on a textbox or
 keyboard area; its argument is the field or key instance and it owns that

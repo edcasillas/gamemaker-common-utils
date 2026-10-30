@@ -130,6 +130,36 @@
           "resourceType": "GMExtensionFunction",
           "resourceVersion": "2.0",
           "returnType": 1
+        },
+        {
+          "$GMExtensionFunction": "",
+          "%Name": "gmcu_text_clipboard_can_read",
+          "argCount": 0,
+          "args": [],
+          "documentation": "Returns whether programmatic clipboard reads can be attempted.",
+          "externalName": "gmcu_text_clipboard_can_read",
+          "help": "gmcu_text_clipboard_can_read",
+          "hidden": false,
+          "kind": 11,
+          "name": "gmcu_text_clipboard_can_read",
+          "resourceType": "GMExtensionFunction",
+          "resourceVersion": "2.0",
+          "returnType": 2
+        },
+        {
+          "$GMExtensionFunction": "",
+          "%Name": "gmcu_text_clipboard_read_diagnostic",
+          "argCount": 0,
+          "args": [],
+          "documentation": "Returns the current clipboard-read capability diagnostic.",
+          "externalName": "gmcu_text_clipboard_read_diagnostic",
+          "help": "gmcu_text_clipboard_read_diagnostic",
+          "hidden": false,
+          "kind": 11,
+          "name": "gmcu_text_clipboard_read_diagnostic",
+          "resourceType": "GMExtensionFunction",
+          "resourceVersion": "2.0",
+          "returnType": 1
         }
       ],
       "init": "",

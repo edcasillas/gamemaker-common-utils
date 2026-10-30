@@ -62,7 +62,6 @@ for (var event_index = 0; event_index < array_length(events); event_index++) {
     } else if (input_event.kind == "clipboard" && input_event.owner == string(id) && input_event.token == clipboard_token) {
         if (!input_event.ok) {
             gmcu_log_error(diagnostic_id + ": HTML5 paste failed: " + input_event.error);
-            feedback = string_pos("Clipboard API unavailable", input_event.error) > 0 ? "Clipboard unavailable" : "Paste unavailable";
         } else if (input_event.action == "copy") {
             feedback = "Copied";
         } else if (input_event.value == "") {
