@@ -161,6 +161,13 @@ def require_clean_main(base: Path) -> None:
         raise ReleaseError("Release requires a clean Git working tree")
 
 
+def require_clean_worktree(base: Path) -> None:
+    """Require tracked and untracked consumer files to be committed."""
+    status = git_run(base, ["status", "--short"], capture=True).stdout.strip()
+    if status:
+        raise ReleaseError("Deployment requires a clean Git working tree")
+
+
 def butler_status(config: dict) -> str:
     itch = config["itch"]
     butler = find_butler(config)
@@ -510,6 +517,39 @@ def confirm_release() -> bool:
     return input("Publish this tested build to itch.io? [y/N]: ").strip().lower() == "y"
 
 
+def confirm_prototype_config(platform: dict) -> None:
+    """Require an interactive confirmation of the expected GameMaker config."""
+    expected = platform.get("gm_config", "Default")
+    answer = input(
+        f"Confirm this exact artifact was exported with {expected}. Type '{expected}': "
+    )
+    if answer.strip() != expected:
+        raise ReleaseError(f"Deployment requires a tested {expected} export")
+
+
+def deploy_prototype(config: dict, base: Path, platform_name: str, yes_tested: bool) -> None:
+    """Publish a versioned prototype without game-release commits or tags."""
+    deployment = config.get("deployment", {})
+    platform = platform_config(config, platform_name)
+    build_path = resolve(base, platform["build_path"])
+    version = str(deployment.get("version", "")).strip()
+
+    require_clean_worktree(base)
+    if not build_path.exists():
+        raise ReleaseError(f"Export not found: {build_path}")
+    if not version:
+        raise ReleaseError("Prototype deployment requires deployment.version")
+
+    confirm_tested(yes_tested)
+    confirm_prototype_config(platform)
+
+    itch = config["itch"]
+    target = f"{itch['username']}/{itch['project']}:{platform['channel']}"
+    butler = find_butler(config)
+    run([butler, "push", str(build_path), target, "--userversion", version])
+    print(f"Prototype deployment successful: {target} {version}")
+
+
 def recovery_commands(version: str, state_path: Path, source_options: Path) -> str:
     """Build the Git commands needed to complete release bookkeeping."""
     tag = f"releases/v{version}"
@@ -553,6 +593,10 @@ def deploy(
     push_prompt: bool = True,
 ) -> None:
     """Publish a tested build, then commit and tag its release metadata."""
+    if config.get("deployment", {}).get("mode") == "prototype":
+        deploy_prototype(config, base, platform_name, yes_tested)
+        return
+
     require_clean_main(base)
     platform = platform_config(config, platform_name)
     build_path = resolve(base, platform["build_path"])

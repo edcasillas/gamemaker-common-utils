@@ -306,6 +306,49 @@ class ReleaseTests(unittest.TestCase):
             self.assertEqual("original", path.read_text(encoding="utf-8"))
         self.assertFalse(number.exists())
 
+    @mock.patch.object(gmcu_release, "find_butler", return_value="/usr/bin/butler")
+    @mock.patch.object(gmcu_release, "confirm_prototype_config")
+    @mock.patch.object(gmcu_release, "confirm_tested")
+    @mock.patch.object(gmcu_release, "require_clean_worktree")
+    @mock.patch.object(gmcu_release, "run")
+    def test_prototype_deploy_uses_explicit_version_without_release_bookkeeping(
+        self,
+        run_command,
+        require_clean,
+        confirm_tested,
+        confirm_config,
+        _butler,
+    ):
+        build = self.base / "Builds/html"
+        build.mkdir(parents=True)
+        self.config["deployment"] = {
+            "mode": "prototype",
+            "version": "text-input-0.2.5",
+        }
+        self.config["platforms"]["html"]["gm_config"] = "DevBuild"
+
+        gmcu_release.deploy(
+            self.config,
+            self.base,
+            "html",
+            True,
+            push_prompt=False,
+        )
+
+        require_clean.assert_called_once_with(self.base)
+        confirm_tested.assert_called_once_with(True)
+        confirm_config.assert_called_once_with(self.config["platforms"]["html"])
+        run_command.assert_called_once_with(
+            [
+                "/usr/bin/butler",
+                "push",
+                str(build.resolve()),
+                "edu/fantasma:html",
+                "--userversion",
+                "text-input-0.2.5",
+            ]
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

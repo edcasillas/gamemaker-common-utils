@@ -57,12 +57,17 @@ before registering the server. An explicit `--port` remains strict and fails
 when occupied. State and logs go under the consumer-defined `server_state`
 path; commit neither file.
 
-`deploy` requires a clean `main` and confirmation that the exact export was tested.
-Automation passes `--yes-tested`. It reads the latest channel version from Butler,
-falls back to the versioned counter, and updates generated version files plus the
-selected GameMaker target's source version. A successful upload is followed by a
-commit of only the counter and selected target options, a `releases/v<version>`
-tag, and a separate prompt to push the commit/tag.
+Game releases require a clean `main` and confirmation that the exact export was
+tested. Automation passes `--yes-tested`. The CLI reads the latest channel version
+from Butler, falls back to the versioned counter, and updates generated version
+files plus the selected GameMaker target's source version. A successful upload is
+followed by a commit of only the counter and selected target options, a
+`releases/v<version>` tag, and a separate prompt to push the commit/tag.
+
+Prototype deployments use the same CLI with `deployment.mode` set to
+`prototype`. They require a clean working tree, an explicit user version, and
+interactive confirmation of the configured GameMaker build configuration. They
+do not update game release metadata or create commits and tags.
 
 A failed upload restores the version files. If Git bookkeeping fails after upload,
 the tool prints recovery commands; it does not undo the itch.io release.
@@ -118,6 +123,38 @@ consumer `.yyp`, `Builds/<platform>`, matching itch channel names,
 `options.ini`, `buildnumber.txt`, `itch-deploy/config.jsonc`, and the HTML server defaults.
 Advanced projects may override those fields, but ordinary consumers should not
 repeat conventions.
+
+A reusable Prototype Lab configuration keeps diagnostic builds separate from
+game releases:
+
+```json
+{
+  "project": "prototype.yyp",
+  "itch": { "username": "studio", "project": "prototype-lab" },
+  "deployment": {
+    "mode": "prototype",
+    "version": "text-input-0.2.5"
+  },
+  "platforms": {
+    "html": {
+      "id": 1,
+      "channel": "html5",
+      "build_path": "build",
+      "options_ini": "build/options.ini",
+      "buildnumber_file": "build/html5game/buildnumber.txt",
+      "gm_target": "html5",
+      "gm_runtime": "vm",
+      "gm_config": "DevBuild"
+    }
+  },
+  "html": {
+    "platform": "html",
+    "directory": "build",
+    "entrypoint": "index.html",
+    "port": 8790
+  }
+}
+```
 
 ## API
 
