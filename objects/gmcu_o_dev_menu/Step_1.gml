@@ -18,12 +18,20 @@ if (check_input_pressed(vk_escape, gp_face2)) {
 	go_back();
 	return;
 }
-if (check_input_pressed(vk_up, gp_padu)) {
-	move_selection(-1);
+var _vertical_direction = check_input_down(vk_up, gp_padu)
+	? -1
+	: (check_input_down(vk_down, gp_padd) ? 1 : 0);
+
+if (_vertical_direction == 0) {
+	vertical_repeat_direction = 0;
+} else if (_vertical_direction != vertical_repeat_direction) {
+	move_selection(_vertical_direction);
+	vertical_repeat_direction = _vertical_direction;
+	vertical_repeat_at = current_time + 400;
 	mouse_active = false;
-}
-if (check_input_pressed(vk_down, gp_padd)) {
-	move_selection(1);
+} else if (current_time >= vertical_repeat_at) {
+	move_selection(_vertical_direction);
+	vertical_repeat_at = current_time + 80;
 	mouse_active = false;
 }
 
@@ -32,7 +40,23 @@ var _selected_item = selected_index >= 0 && selected_index < array_length(_items
 	? _items[selected_index]
 	: undefined;
 	
-if (check_input_pressed(vk_left, gp_padl)) {
+var _horizontal_direction = check_input_down(vk_left, gp_padl)
+	? -1
+	: (check_input_down(vk_right, gp_padr) ? 1 : 0);
+var _horizontal_repeated = false;
+
+if (_horizontal_direction == 0) {
+	horizontal_repeat_direction = 0;
+} else if (_horizontal_direction != horizontal_repeat_direction) {
+	horizontal_repeat_direction = _horizontal_direction;
+	horizontal_repeat_at = current_time + 400;
+	_horizontal_repeated = true;
+} else if (current_time >= horizontal_repeat_at) {
+	horizontal_repeat_at = current_time + 80;
+	_horizontal_repeated = true;
+}
+
+if (_horizontal_repeated && _horizontal_direction < 0) {
 	if (!is_undefined(_selected_item) && _selected_item.type == "log_filters") {
 		log_filter_chip_index = (log_filter_chip_index - 1 + array_length(log_filter_levels)) mod array_length(log_filter_levels);
 	} else {
@@ -40,7 +64,7 @@ if (check_input_pressed(vk_left, gp_padl)) {
 	}
 	mouse_active = false;
 }
-if (check_input_pressed(vk_right, gp_padr)) {
+if (_horizontal_repeated && _horizontal_direction > 0) {
 	if (!is_undefined(_selected_item) && _selected_item.type == "log_filters") {
 		log_filter_chip_index = (log_filter_chip_index + 1) mod array_length(log_filter_levels);
 	} else {
@@ -57,8 +81,9 @@ if (check_input_released(vk_enter, gp_face1)) {
 
 #region Mouse
 
-var _mouse_x = device_mouse_x_to_gui(0);
-var _mouse_y = device_mouse_y_to_gui(0);
+var _pointer = current_gui_pointer();
+var _mouse_x = _pointer[0];
+var _mouse_y = _pointer[1];
 if (_mouse_x != last_mouse_x || _mouse_y != last_mouse_y) {
 	last_mouse_x = _mouse_x;
 	last_mouse_y = _mouse_y;

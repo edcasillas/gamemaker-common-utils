@@ -14,6 +14,10 @@ panel_margin = 24;
 last_mouse_x = -1;
 last_mouse_y = -1;
 mouse_active = false; // True after the mouse moves; false after d-pad/keyboard navigation.
+vertical_repeat_direction = 0; // Held vertical direction currently driving menu repetition.
+vertical_repeat_at = 0; // Millisecond timestamp for the next repeated vertical move.
+horizontal_repeat_direction = 0; // Held horizontal direction currently driving menu repetition.
+horizontal_repeat_at = 0; // Millisecond timestamp for the next repeated horizontal action.
 layered_gui_available = false;
 layered_gui_items = [];
 universal_cursor_available = false; // True when the consumer uses the Universal Cursor module.
@@ -680,6 +684,44 @@ function check_input_pressed(_key, _button) {
 	if (!instance_exists(gmcu_o_input_hub)) return false;
 	return gmcu_o_input_hub.gmcu_keyboard_key_pressed(_key, GMCU_INPUT_OWNER_DEV_MENU)
 		|| gmcu_o_input_hub.gmcu_gamepad_button_pressed(_button, GMCU_INPUT_OWNER_DEV_MENU);
+}
+
+/**
+ * @description Returns whether a routed keyboard key or gamepad button remains held by the Dev Menu.
+ * @param {Real} _key Keyboard key.
+ * @param {Real} _button Gamepad button.
+ * @returns {Bool} True while either routed input remains held.
+ */
+function check_input_down(_key, _button) {
+	if (!instance_exists(gmcu_o_input_hub)) return false;
+	return gmcu_o_input_hub.gmcu_keyboard_key_down(_key, GMCU_INPUT_OWNER_DEV_MENU)
+		|| gmcu_o_input_hub.gmcu_gamepad_button_down(_button, GMCU_INPUT_OWNER_DEV_MENU);
+}
+
+/**
+ * @description Resolves the active GUI pointer from the mobile provider, Universal Cursor, or GameMaker mouse.
+ * @returns {Array<Real>} GUI-space [x, y].
+ */
+function current_gui_pointer() {
+	var _direct_pointer_active = mouse_check_button(mb_left)
+		|| mouse_check_button_pressed(mb_left)
+		|| mouse_check_button_released(mb_left);
+
+	if (!_direct_pointer_active
+		&& instance_exists(gmcu_o_input_hub)
+		&& gmcu_o_input_hub.last_input_device == "gamepad"
+		&& instance_exists(gmcu_o_universal_cursor)) {
+		return [gmcu_o_universal_cursor.gui_x, gmcu_o_universal_cursor.gui_y];
+	}
+
+	if (!is_undefined(global.gmcu_gui_pointer_provider)) {
+		var _provided_pointer = global.gmcu_gui_pointer_provider();
+		if (is_array(_provided_pointer) && array_length(_provided_pointer) == 2) {
+			return _provided_pointer;
+		}
+	}
+
+	return [device_mouse_x_to_gui(0), device_mouse_y_to_gui(0)];
 }
 
 /**

@@ -98,6 +98,16 @@ function gmcu_keyboard_key_pressed(_key, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
 }
 
 /**
+ * @description Checks whether a registered keyboard key remains held for the requested owner.
+ * @param {Real} _key GameMaker vk_* key constant.
+ * @param {String} _owner Optional owner name. Defaults to gameplay.
+ * @returns {Bool} True while the owner holds the key.
+ */
+function gmcu_keyboard_key_down(_key, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	return input_state_down(gmcu_keyboard_input_state(_key), _owner);
+}
+
+/**
  * @description Reduces the current input direction to one of four cardinal angles.
  * @returns {Real|Undefined} A cardinal GMCU_DIRECTION_ANGLE value, or undefined when idle.
  */
@@ -143,6 +153,16 @@ function gmcu_gamepad_button_released(_button, _owner = GMCU_INPUT_OWNER_GAMEPLA
  */
 function gmcu_gamepad_button_pressed(_button, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
 	return input_state_pressed(gmcu_gamepad_input_state(_button), _owner);
+}
+
+/**
+ * @description Checks whether a registered gamepad button remains held for the requested owner.
+ * @param {Real} _button GameMaker gp_* button constant.
+ * @param {String} _owner Optional owner name. Defaults to gameplay.
+ * @returns {Bool} True while the owner holds the button.
+ */
+function gmcu_gamepad_button_down(_button, _owner = GMCU_INPUT_OWNER_GAMEPLAY) {
+	return input_state_down(gmcu_gamepad_input_state(_button), _owner);
 }
 
 /**

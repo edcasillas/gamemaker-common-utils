@@ -1,13 +1,5 @@
 if(!visible) return; // Skip processing inputs if cursor is not visible.
 
-if(gmcu_ui_overlay_blocks_pointer_input()) {
-	if(instance_exists(hovered_interactable)) {
-		hovered_interactable.on_hover_leave();
-	}
-	hovered_interactable = noone;
-	return;
-}
-
 // Get the current mouse position in GUI space
 var _current_mouse_x = device_mouse_x_to_gui(0);
 var _current_mouse_y = device_mouse_y_to_gui(0);
@@ -28,20 +20,23 @@ if(_current_mouse_x != last_mouse_x || _current_mouse_y != last_mouse_y) {
 }
 
 var _text_editing = instance_exists(text_input_owner);
-var _input_route = _text_editing ? "text_input" : GMCU_INPUT_OWNER_GAMEPLAY;
+var _overlay_open = gmcu_ui_overlay_blocks_pointer_input();
+var _input_route = _overlay_open
+	? GMCU_INPUT_OWNER_DEV_MENU
+	: (_text_editing ? "text_input" : GMCU_INPUT_OWNER_GAMEPLAY);
 
 // Handle directional navigation (arrow keys or D-Pad)
 var _has_input_hub = instance_exists(gmcu_o_input_hub);
-if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up))
+if (!_overlay_open && !_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_up))
 	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padu)))) {
     navigate(GMCU_DIRECTION_ANGLE.UP);
-} else if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_down))
+} else if (!_overlay_open && !_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_down))
 	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padd)))) {
     navigate(GMCU_DIRECTION_ANGLE.DOWN);
-} else if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left))
+} else if (!_overlay_open && !_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_left))
 	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padl)))) {
     navigate(GMCU_DIRECTION_ANGLE.LEFT);
-} else if (!_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right))
+} else if (!_overlay_open && !_text_editing && ((_has_input_hub && gmcu_o_input_hub.gmcu_keyboard_key_pressed(vk_right))
 	|| (_has_input_hub && gmcu_o_input_hub.gmcu_gamepad_button_pressed(gp_padr)))) {
     navigate(GMCU_DIRECTION_ANGLE.RIGHT);
 }
@@ -58,6 +53,15 @@ if (_has_input_hub) {
 	    gui_y += _axis_y * analog_speed;
 		gui_y = clamp(gui_y, 0, display_get_gui_height() - sprite_height);
 	}
+}
+
+if (_overlay_open) {
+	if (instance_exists(hovered_interactable)) {
+		hovered_interactable.on_hover_leave();
+	}
+
+	hovered_interactable = noone;
+	return;
 }
 
 

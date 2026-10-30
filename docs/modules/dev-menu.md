@@ -217,6 +217,17 @@ When [`LayeredGUI`](layered-gui.md) is available, the Dev Menu subscribes at
 layers defined in [`Core`](core.md). If LayeredGUI is not present, the menu
 falls back to its own `Draw GUI` event.
 
+### Pointer and Navigation
+
+The menu reads GUI coordinates from `global.gmcu_gui_pointer_provider` when a
+host supplies one, so scaled canvases and mobile touch map to the same rows as
+desktop pointer input. Universal Cursor remains movable while the menu owns the
+overlay; its hover callbacks stay blocked from gameplay controls underneath.
+
+Keyboard arrows and physical or virtual D-pad directions move once immediately,
+repeat after 400 ms, and continue every 80 ms while held. The left stick moves
+Universal Cursor and the face button activates the row under it.
+
 ### Lifecycle Events
 
 - `GMCU_EVENT_DEV_MENU_OPENED`
