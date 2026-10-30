@@ -98,6 +98,18 @@ function on_draw_gui() {
 		if (_index == selected_index) {
 			draw_set_color(_theme.selected_color);
 			draw_rectangle(_panel_x + 8, _y1, _panel_x + _panel_w - 8, _y2, false);
+
+			if (_item.type == "copy_text" && _enabled) {
+				gmcu_text_clipboard_prepare_copy(
+					_item.copy_text,
+					_panel_x + _panel_w * 0.5,
+					(_y1 + _y2) * 0.5,
+					_panel_w - 16,
+					_y2 - _y1,
+					true,
+					true
+				);
+			}
 		}
 
 		var _text_color = _theme.text_color;
@@ -537,6 +549,7 @@ function open_menu() {
  */
 function close_menu(_notify = true, _flush_deferred = true) {
 	if (!is_open) return;
+	gmcu_text_clipboard_prepare_copy("", 0, 0, 0, 0, false, false);
 	remember_current_page();
 	is_open = false;
 	page_stack = [];
@@ -762,7 +775,7 @@ function activate_item(_direction = 1) {
 			}
 			break;
 		case "copy_text":
-			clipboard_set_text(_item.copy_text);
+			gmcu_text_clipboard_copy(_item.copy_text);
 			break;
 	}
 }

@@ -43,6 +43,7 @@ default trigger still checks `F1`.
 | [`EventBus`](event-bus.md) | Used to dispatch events on menu opened / closed. |
 | [`LayeredGUI`](layered-gui.md) | Owns final overlay draw order when present, so the Dev Menu renders above gameplay GUI. Supplies subscriber diagnostics when its manager exists in the current room.|
 | [`UniversalCursor`](universal-cursor.md) (optional) | Supplies interactable and hover diagnostics while its singleton exists. |
+| [`Text Input`](text-input.md) clipboard bridge | Copies log and diagnostic rows through the same trusted browser-gesture path used by other copy controls. |
 
 ## Dependency Diagram
 
@@ -261,7 +262,8 @@ row, use left/right to move between chips, and press Enter / confirm to toggle
 the focused chip. Mouse clicks toggle chips directly.
 
 Log rows are copyable. Select one and press Enter, the gamepad confirmation
-button, or click it to copy the complete message to the clipboard.
+button, or click it to copy the complete message through the shared clipboard
+bridge.
 
 When [`LayeredGUI`](layered-gui.md) is also imported, the root page
 automatically includes `Layered GUI` while its manager exists in the current

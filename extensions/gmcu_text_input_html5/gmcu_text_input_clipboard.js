@@ -147,6 +147,17 @@
   function forgetVirtualPointer(event) {
     virtualPointerKeys.delete(event.pointerId);
   }
+  /** Copy during the trusted physical Enter key event for an armed control.
+   * @param {KeyboardEvent} event Browser keyboard event.
+   */
+  function keyDown(event) {
+    if (!event.isTrusted || event.repeat || event.key !== 'Enter' || !pendingCopy ||
+        !pendingCopy.text || !pendingCopy.allowKeyboardEnter) {
+      return;
+    }
+
+    rememberCopy(pendingCopy.text);
+  }
   /** Copy on a trusted canvas target or an armed virtual-controller A release.
    * @param {PointerEvent} event Browser pointer release.
    */
@@ -199,7 +210,8 @@
         height: bounds[3],
         guiWidth: bounds[4],
         guiHeight: bounds[5],
-        allowVirtualControllerA: options.allowVirtualControllerA
+        allowVirtualControllerA: options.allowVirtualControllerA,
+        allowKeyboardEnter: options.allowKeyboardEnter === true
       };
       return true;
     } catch (error) {
@@ -259,6 +271,7 @@
   };
   document.addEventListener('pointerdown', pointerDown, true);
   document.addEventListener('pointerup', pointerUp, true);
+  document.addEventListener('keydown', keyDown, true);
   document.addEventListener('pointercancel', forgetVirtualPointer, true);
   document.addEventListener('lostpointercapture', forgetVirtualPointer, true);
   window.gmcu_text_clipboard_write = function (text) {

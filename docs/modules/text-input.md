@@ -9,7 +9,7 @@ when clipboard actions are available.
 1. Register the Text Input resources in the consumer `.yyp`:
    - Objects: `gmcu_o_textbox`, `gmcu_o_text_keyboard`, `gmcu_o_text_key`.
    - Scripts: `gmcu_text_state`, `gmcu_text_resolve_keyboard_area`, `gmcu_text_input_events`,
-     `gmcu_text_clipboard_copy`.
+     `gmcu_text_clipboard_copy`, `gmcu_text_clipboard_prepare_copy`.
    - For HTML5, extension: `gmcu_text_input_html5`.
 2. Register the module dependencies: [Input Hub](input-hub.md),
    [Universal Cursor](universal-cursor.md), [Layered GUI](layered-gui.md),
@@ -135,6 +135,10 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
 - `gmcu_text_clipboard_copy(text)` copies host-provided text. Keep the host's
   copy button separate from the keyboard and enable it only when the host's
   validation passes.
+- `gmcu_text_clipboard_prepare_copy(text, x, y, width, height, allow_virtual_controller_a, allow_keyboard_enter)`
+  identifies the GUI control that may copy during the browser's trusted pointer
+  gesture. Call it while drawing the active copy control, then call
+  `gmcu_text_clipboard_copy(text)` from that control's release action.
 - HTML5 clipboard writes require a trusted browser gesture. Canvas taps copy
   synchronously on pointer release. For virtual-controller A, the extension
   matches the pressed button's `pointerId` across pointer capture and copies

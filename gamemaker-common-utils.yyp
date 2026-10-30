@@ -47,6 +47,8 @@
   "name":"gamemaker-common-utils",
   "resources":[
     {"id":{"name":"gmcu_text_input_events","path":"scripts/gmcu_text_input_events/gmcu_text_input_events.yy"}},
+    {"id":{"name":"gmcu_text_clipboard_copy","path":"scripts/gmcu_text_clipboard_copy/gmcu_text_clipboard_copy.yy"}},
+    {"id":{"name":"gmcu_text_clipboard_prepare_copy","path":"scripts/gmcu_text_clipboard_prepare_copy/gmcu_text_clipboard_prepare_copy.yy"}},
     {"id":{"name":"gmcu_text_state","path":"scripts/gmcu_text_state/gmcu_text_state.yy"}},
     {"id":{"name":"gmcu_text_resolve_keyboard_area","path":"scripts/gmcu_text_resolve_keyboard_area/gmcu_text_resolve_keyboard_area.yy"}},
     {"id":{"name":"gmcu_o_textbox","path":"objects/gmcu_o_textbox/gmcu_o_textbox.yy"}},
