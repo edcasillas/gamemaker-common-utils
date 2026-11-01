@@ -1,91 +1,37 @@
 # Release and Build Info
 
-This module separates export, testing, versioning, and publication by design.
-An export is never published automatically: test the exact artifact first,
-then invoke `deploy` explicitly.
+The release script publishes an existing GameMaker export to itch.io. Export
+and test the artifact before running it.
 
 ## Quickstart
 
-Copy `tools/release/Release.command` into the consumer repository root, make it
-executable, and provide root `itch-config.json`. Double-click the launcher for
-`Serve HTML build`, `Stop HTML server`, and `Publish to itch.io`.
-
-Run the shared tool from the consumer repository:
+Copy `tools/release/Release.command` beside the consumer `.yyp` and
+`itch-config.json`, then make it executable. Double-click it to serve the HTML
+export or publish a tested build. Serving runs `python3 -m http.server` directly.
 
 ```sh
-# Open the same interactive menu as the launcher.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py menu
-
-# Export and immediately serve the configured HTML platform.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  export --platform html --serve
-
-# Serve an existing HTML export without rebuilding it.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  serve-html --open
-
-# Stop the background HTML server.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  stop-html
-
-# Inspect resolved paths, versions, and server status.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  status
-
-# Bump the tracked platform version without deploying.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  version --platform html
-
-# Deploy an already tested export.
-python3 vendor/gamemaker-common-utils/tools/release/gmcu_release.py \
-  deploy --platform html
+./Release.command
 ```
 
-Commands default to root `itch-config.json`; `--config` supports explicit paths.
+The release script selects a configured platform, reads its export from
+`Builds/<platform>`, asks for confirmation, and runs `butler push`. Game releases
+require a clean `main`, update the generated and source versions, advance the
+counter, commit that metadata, and create `releases/v<version>`. Pushing the
+commit and tag is a separate confirmation. Prototypes use a timestamped upload
+version without Git bookkeeping.
 
-`export` uses `gm-cli package` by default. As of gm-cli 2.1.0, the official CLI
-reports that HTML5 target support is still coming soon. Consumers may provide a
-platform-specific `export_command` array using `{project}`, `{output}`,
-`{platform}`, `{target}`, `{runtime}`, `{config}`, and `{toolchain}`
-placeholders. Otherwise, export HTML from GameMaker and use `serve-html`.
-
-`--serve` is valid only for the configured HTML platform and starts the same
-background server as `serve-html`. The server listens on all interfaces and
-prints localhost and LAN URLs. If the preferred port is occupied, it selects
-the next available port automatically and verifies that `index.html` responds
-before registering the server. An explicit `--port` remains strict and fails
-when occupied. State and logs go under the consumer-defined `server_state`
-path; commit neither file.
-
-Game releases require a clean `main` and confirmation that the exact export was
-tested. Automation passes `--yes-tested`. The CLI reads the latest channel version
-from Butler, falls back to the versioned counter, and updates generated version
-files plus the selected GameMaker target's source version. A successful upload is
-followed by a commit of only the counter and selected target options, a
-`releases/v<version>` tag, and a separate prompt to push the commit/tag.
-
-Prototype deployments use the same CLI with `deployment.mode` set to
-`prototype`. They require a clean working tree, an explicit user version, and
-interactive confirmation of the configured GameMaker build configuration. They
-do not update game release metadata or create commits and tags.
-
-A failed upload restores the version files. If Git bookkeeping fails after upload,
-the tool prints recovery commands; it does not undo the itch.io release.
-
-Install and authenticate Butler before using `status` or `deploy`:
+Install and authenticate Butler before publishing:
 
 ```sh
 butler login
 butler status username/project
 ```
 
-The CLI searches `PATH`, `~/bin/butler`, and the macOS itch app's managed
-Butler installation. A consumer may override this with `tools.butler`.
+The script searches `PATH` and `~/bin/butler`.
 
 ## Resources
 
-- `tools/release/gmcu_release.py`: Export, serve, version, status, and deploy
-  CLI.
+- `tools/release/gmcu_release.sh`: Versions and publishes an existing export.
 - `scripts/gmcu_build_info`: Runtime build metadata API.
 - `objects/gmcu_o_build_info_label`: Optional bottom-right build label.
 
@@ -94,16 +40,16 @@ Butler installation. A consumer may override this with `tools.butler`.
 | Dependency | Responsibility |
 | --- | --- |
 | [`Core`](core.md) | Supplies build configuration policy to runtime resources. |
-| `gm-cli` | Used by the export workflow when the chosen platform supports it. |
-| `butler` | Used by `status` and `deploy`. |
+| `jq` | Updates the release counter file. |
+| `butler` | Publishes the selected export to itch.io. |
 
 ## Dependency Diagram
 
 ```mermaid
 flowchart LR
     Core[Core] --> ReleaseBuild[Release and Build Info]
-    GmCli[gm-cli] -. CLI only .-> ReleaseBuild
-    Butler[butler] -. CLI only .-> ReleaseBuild
+    Jq[jq] -. release script .-> ReleaseBuild
+    Butler[butler] -. release script .-> ReleaseBuild
 ```
 
 ## Consumer Configuration
@@ -118,43 +64,23 @@ The normal consumer file is intentionally small:
 }
 ```
 
-Platform order supplies stable IDs starting at `1`. Common Utils infers the
-consumer `.yyp`, `Builds/<platform>`, matching itch channel names,
-`options.ini`, `buildnumber.txt`, `itch-deploy/config.jsonc`, and the HTML server defaults.
-Advanced projects may override those fields, but ordinary consumers should not
-repeat conventions.
+Platform order supplies stable IDs starting at `1`. The script uses
+`Builds/<platform>` and the platform name as the itch.io channel.
 
 A reusable Prototype Lab configuration keeps diagnostic builds separate from
 game releases:
 
 ```json
 {
-  "project": "prototype.yyp",
-  "itch": { "username": "studio", "project": "prototype-lab" },
-  "deployment": {
-    "mode": "prototype",
-    "version": "text-input-0.2.5"
-  },
-  "platforms": {
-    "html": {
-      "id": 1,
-      "channel": "html5",
-      "build_path": "build",
-      "options_ini": "build/options.ini",
-      "buildnumber_file": "build/html5game/buildnumber.txt",
-      "gm_target": "html5",
-      "gm_runtime": "vm",
-      "gm_config": "DevBuild"
-    }
-  },
-  "html": {
-    "platform": "html",
-    "directory": "build",
-    "entrypoint": "index.html",
-    "port": 8790
-  }
+  "username": "studio",
+  "project_name": "prototype-lab",
+  "platforms": ["html"],
+  "prototype": true
 }
 ```
+
+Prototype mode reads exports from `Builds/<platform>` and generates a
+timestamped Butler version.
 
 ## API
 
@@ -181,7 +107,7 @@ text. Consumer-specific author and date values are supplied at initialization.
 
 | Item | Kind | Description |
 | --- | --- | --- |
-| `tools/release/gmcu_release.py` | CLI | Export, serve, inspect, version, and deploy builds. |
+| `tools/release/gmcu_release.sh` | Shell script | Versions and publishes an existing export. |
 | `gmcu_build_info_init(_options)` | Function | Initializes runtime build metadata. |
 | `gmcu_build_info_get_version()` | Function | Returns the current build version string. |
 | `gmcu_o_build_info_label` | Object | Optional bottom-right build label. |
