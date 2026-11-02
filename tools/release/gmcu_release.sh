@@ -8,7 +8,7 @@ set -u                                  # Stop if the script reads an undefined 
 ROOT="${1:-$(pwd)}"                     # Use the first argument as the project root, or the current directory when omitted.
 
 CONFIG="$ROOT/itch-config.json"         # Consumer-owned itch.io destination and platform list.
-STATE="$ROOT/itch-deploy/config.jsonc"  # Consumer-owned release counter source of truth.
+STATE="$ROOT/build_version.json"        # Consumer-owned release counter source of truth.
 
 # Show an error message and stop the script with an error.
 fail() {
