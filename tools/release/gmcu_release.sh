@@ -16,40 +16,43 @@ fail() {
     exit 1                                # Stop the script with a failure status.
 }
 
-read_config() {
-    /usr/bin/plutil -extract "$1" raw "$CONFIG" # Print the requested config value without JSON formatting.
-}
+[ -f "$CONFIG" ] || fail "Configuration not found: $CONFIG"                         # Require the consumer configuration file.
+command -v jq >/dev/null || fail "jq not found. Install it with: brew install jq"   # Require jq to read and update JSON files.
 
-[ -f "$CONFIG" ] || fail "Configuration not found: $CONFIG" # Require the consumer configuration file.
-command -v jq >/dev/null || fail "jq is required"             # Require jq to update the release counter JSON.
+BUTLER="$(command -v butler || true)"           # Prefer a Butler executable available in PATH.
+[ -n "$BUTLER" ] || BUTLER="$HOME/bin/butler"   # Otherwise use the standard local installation.
+[ -x "$BUTLER" ] || fail "Butler not found. Install it in PATH or at $HOME/bin/butler: https://itch.io/docs/butler/installing.html"
 
-USERNAME="$(read_config username)" || fail "Missing username"                  # itch.io account name.
-PROJECT="$(read_config project_name)" || fail "Missing project_name"           # itch.io project slug.
-PLATFORM_COUNT="$(read_config platforms)" || fail "Missing platforms"          # Number of configured export platforms.
-[ "$PLATFORM_COUNT" -gt 0 ] || fail "At least one platform is required"       # Reject an empty platform list.
+# Extract config values and validate them before continuing.
+USERNAME="$(jq -er '.username' "$CONFIG")" || fail "Missing username"                   # itch.io account name.
+PROJECT="$(jq -er '.project_name' "$CONFIG")" || fail "Missing project_name"            # itch.io project slug.
+PLATFORM_COUNT="$(jq -er '.platforms | length' "$CONFIG")" || fail "Missing platforms"  # Number of configured export platforms.
+[ "$PLATFORM_COUNT" -gt 0 ] || fail "At least one platform is required"                 # Reject an empty platform list.
 
-PLATFORM_INDEX=0                        # The only platform is selected automatically.
+# Prompt for the platform to publish when several are configured, otherwise use the only one.
+PLATFORM_INDEX=0
 if [ "$PLATFORM_COUNT" -gt 1 ]; then   # Ask which export to publish when several are configured.
-    for ((index = 0; index < PLATFORM_COUNT; index++)); do # Visit each configured platform.
-        echo "  $((index + 1)). $(read_config "platforms.$index")" # Print its numbered menu entry.
+
+    # Print a numbered menu of the configured platforms and read the selection.
+    for ((index = 0; index < PLATFORM_COUNT; index++)); do
+        echo "  $((index + 1)). $(jq -er ".platforms[$index]" "$CONFIG")"
     done
+
     read -r -p "Platform number: " choice # Read the selected one-based menu number.
-    [[ "$choice" =~ ^[0-9]+$ ]] || fail "Invalid platform" # Require an integer.
-    [ "$choice" -ge 1 ] && [ "$choice" -le "$PLATFORM_COUNT" ] || fail "Invalid platform" # Require an existing entry.
+
+    [[ "$choice" =~ ^[0-9]+$ ]] || fail "Invalid platform"                                  # Require an integer.
+    [ "$choice" -ge 1 ] && [ "$choice" -le "$PLATFORM_COUNT" ] || fail "Invalid platform"   # Require an existing entry.
+
     PLATFORM_INDEX=$((choice - 1))       # Convert the selection to a zero-based config index.
 fi
 
-PLATFORM="$(read_config "platforms.$PLATFORM_INDEX")" # Selected platform and itch.io channel name.
-PROTOTYPE="$(read_config prototype 2>/dev/null || echo false)" # Use prototype behavior only when explicitly enabled.
-BUILD="$ROOT/Builds/$PLATFORM"            # Existing GameMaker export to publish.
-[ -e "$BUILD" ] || fail "Export not found: $BUILD" # Stop before release work when the export is missing.
-
-BUTLER="$(command -v butler || true)"      # Prefer a Butler executable available in PATH.
-[ -n "$BUTLER" ] || BUTLER="$HOME/bin/butler" # Otherwise use the standard local installation.
-[ -x "$BUTLER" ] || fail "Butler not found" # Require an executable Butler before continuing.
+PLATFORM="$(jq -er ".platforms[$PLATFORM_INDEX]" "$CONFIG")"    # Selected platform and itch.io channel name.
+IS_PROTOTYPE="$(jq -r '.prototype // false' "$CONFIG")"         # Use prototype behavior only when explicitly enabled.
+BUILD="$ROOT/Builds/$PLATFORM"                                  # Existing GameMaker export to publish.
+[ -e "$BUILD" ] || fail "Export not found: $BUILD"              # Stop before release work when the export is missing.
 
 # Prototype versions are disposable; game versions advance the stored counter.
-if [ "$PROTOTYPE" = true ]; then
+if [ "$IS_PROTOTYPE" = true ]; then
     VERSION="$(basename "$ROOT")-$(date -u +%Y%m%d-%H%M%S)" # Give disposable builds a unique UTC timestamp.
 else
     [ "$(git -C "$ROOT" branch --show-current)" = main ] || fail "Release requires main" # Release only from main.
@@ -78,7 +81,7 @@ read -r -p "Continue? [y/N]: " answer    # Require explicit confirmation.
 [ "$answer" = y ] || [ "$answer" = Y ] || exit 0 # Cancel without changing anything unless confirmed.
 
 # Stamp a game export with the version that itch.io will receive.
-if [ "$PROTOTYPE" != true ]; then
+if [ "$IS_PROTOTYPE" != true ]; then
     sed -e "s/^MajorVersion=.*/MajorVersion=$YEAR/" \
         -e "s/^MinorVersion=.*/MinorVersion=$((10#$MONTH))/" \
         -e "s/^BuildVersion=.*/BuildVersion=$PLATFORM_NUMBER/" \
@@ -91,7 +94,7 @@ if [ "$PROTOTYPE" != true ]; then
 fi
 
 "$BUTLER" push "$BUILD" "$USERNAME/$PROJECT:$PLATFORM" --userversion "$VERSION" || exit 1 # Upload the export.
-[ "$PROTOTYPE" = true ] && echo "Published $VERSION" && exit 0 # Prototypes need no release bookkeeping.
+[ "$IS_PROTOTYPE" = true ] && echo "Published $VERSION" && exit 0 # Prototypes need no release bookkeeping.
 
 mkdir -p "$(dirname "$STATE")"           # Ensure the consumer state directory exists.
 [ -f "$STATE" ] || echo '{"build_counts":{}}' > "$STATE" # Initialize missing counter state.
