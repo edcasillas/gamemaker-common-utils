@@ -1,17 +1,11 @@
 /** Capture browser text without focusing an editable element on mobile. */
 var gmcuTextInput = { active: false, queue: [], installed: false, generation: 0 };
 
-/** Start capturing keyboard and paste events for the active textbox.
- * @returns {number} GameMaker extension success sentinel.
- */
-function gmcu_text_capture_begin() {
+/** Install browser input listeners before GameMaker can cancel text shortcuts. */
+function gmcu_text_capture_install() {
   var capture = gmcuTextInput;
-  capture.active = true;
-  capture.queue = [];
-  capture.generation++;
-
   if (capture.installed) {
-    return 0;
+    return;
   }
 
   capture.installed = true;
@@ -27,6 +21,8 @@ function gmcu_text_capture_begin() {
 
       // Paste data arrives through the browser's paste event, without read permission.
       if (event.key.toLowerCase() === 'v' && !event.repeat) {
+        // Keep GameMaker from canceling the browser shortcut before it emits paste.
+        event.stopImmediatePropagation();
         capture.queue.push({ kind: 'shortcut', value: 'PASTE' });
       }
 
@@ -63,6 +59,18 @@ function gmcu_text_capture_begin() {
     capture.queue.push({ kind: 'paste', value: event.clipboardData.getData('text/plain') });
   }, true);
 
+}
+
+gmcu_text_capture_install();
+
+/** Start capturing keyboard and paste events for the active textbox.
+ * @returns {number} GameMaker extension success sentinel.
+ */
+function gmcu_text_capture_begin() {
+  gmcu_text_capture_install();
+  gmcuTextInput.active = true;
+  gmcuTextInput.queue = [];
+  gmcuTextInput.generation++;
   return 0;
 }
 
