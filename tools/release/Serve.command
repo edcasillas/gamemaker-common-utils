@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Serves the exported HTML build for browser and LAN device testing.
-# Double-click this file, then open one of the URLs printed below.
+# Double-click this file; the LAN URL opens when the server is ready.
 
 clear
 
@@ -15,10 +15,9 @@ PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"   # Project folder containing this
 BUILD="$PROJECT_ROOT/Builds/html"               # Existing HTML export to serve.
 PORT=8000                                       # Local TCP port used by the test server.
 
-# Show an actionable error and keep the Terminal window open.
+# Show an actionable error and stop the launcher.
 fail() {
     printf '%b\n' "${RED}Error: $1${RESET}" >&2
-    read -r -p "Press Enter to close..."
     exit 1
 }
 
@@ -36,17 +35,34 @@ INTERFACE="$(route -n get default 2>/dev/null | awk '/interface:/{print $2; exit
 LAN_IP=""
 [ -n "$INTERFACE" ] && LAN_IP="$(ipconfig getifaddr "$INTERFACE" 2>/dev/null || true)"
 
-echo "Local: http://localhost:$PORT/"
+LOCAL_URL="http://localhost:$PORT/"
+OPEN_URL="$LOCAL_URL"
+
+echo "Local: $LOCAL_URL"
 if [ -n "$LAN_IP" ]; then
-    echo "LAN:   http://$LAN_IP:$PORT/"
+    LAN_URL="http://$LAN_IP:$PORT/"
+    OPEN_URL="$LAN_URL"
+    echo "LAN:   $LAN_URL"
 else
     echo "LAN:   unavailable; connect this computer to a network and try again."
 fi
+
 printf '%b\n' "${GREEN}Checks passed. Starting server...${RESET}"
 echo "Press Control-C to stop the server."
 
 # Listen on every network interface so both URLs can reach the same server.
-python3 -m http.server "$PORT" --bind 0.0.0.0 --directory "$BUILD"
+python3 -m http.server "$PORT" --bind 0.0.0.0 --directory "$BUILD" &
+SERVER_PID=$!
+trap 'kill "$SERVER_PID" 2>/dev/null || true' INT TERM EXIT
 
-echo
-read -r -p "Press Enter to close..."
+# Wait until the server accepts connections before opening the browser.
+while ! lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null; do
+    kill -0 "$SERVER_PID" 2>/dev/null || fail "The HTML server stopped before opening port $PORT."
+    sleep 0.1
+done
+
+open "$OPEN_URL" || printf '%b\n' "${RED}Error: Could not open $OPEN_URL automatically.${RESET}" >&2
+wait "$SERVER_PID"
+SERVER_STATUS=$?
+trap - INT TERM EXIT
+exit "$SERVER_STATUS"

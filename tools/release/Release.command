@@ -16,6 +16,3 @@ if [ ! -x "$RELEASE" ]; then
 else
     "$RELEASE" "$PROJECT_ROOT"
 fi
-
-echo
-read -r -p "Press Enter to close..."
