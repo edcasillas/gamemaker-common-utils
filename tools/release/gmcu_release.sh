@@ -107,11 +107,13 @@ sed -E "s/(\"option_${TARGET}_version\"[[:space:]]*:[[:space:]]*\")[^\"]*/\1$VER
     "$SOURCE_OPTIONS" > "$SOURCE_OPTIONS.tmp" && mv "$SOURCE_OPTIONS.tmp" "$SOURCE_OPTIONS"
 
 # Record the successful release locally; pushing remains explicit.
-git -C "$ROOT" add "$STATE" "$SOURCE_OPTIONS" || exit 1 # Stage only release-owned source files.
-git -C "$ROOT" commit -m "Release v$VERSION" || exit 1 # Create the local release commit.
-git -C "$ROOT" tag "releases/v$VERSION" || exit 1 # Mark the exact released commit.
-echo "Published and tagged v$VERSION"      # Report completed local bookkeeping.
-read -r -p "Push commit and tag? [y/N]: " answer # Keep remote Git mutation optional.
+git -C "$ROOT" add "$STATE" "$SOURCE_OPTIONS" || exit 1     # Stage only release-owned source files.
+git -C "$ROOT" commit -m "Release v$VERSION" || exit 1      # Create the local release commit.
+git -C "$ROOT" tag "releases/v$VERSION" || exit 1           # Mark the exact released commit.
+
+echo "Published and tagged v$VERSION"                       # Report completed local bookkeeping.
+
+read -r -p "Push commit and tag? [y/N]: " answer            # Keep remote Git mutation optional.
 if [ "$answer" = y ] || [ "$answer" = Y ]; then # Push only after explicit confirmation.
     git -C "$ROOT" push origin main && git -C "$ROOT" push origin "releases/v$VERSION" # Publish commit and tag together.
 fi
