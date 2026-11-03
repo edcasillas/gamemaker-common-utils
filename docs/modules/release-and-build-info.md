@@ -5,12 +5,14 @@ and test the artifact before running it.
 
 ## Quickstart
 
-Copy `tools/release/Release.command` beside the consumer `.yyp` and
-`itch-config.json`, then make it executable. Double-click it to serve the HTML
-export or publish a tested build. Serving runs `python3 -m http.server` directly.
+Copy `tools/release/Release.command`, `tools/release/Serve.command`, and
+`itch-config.json` beside the consumer `.yyp`, then make the launchers executable.
+`Release.command` publishes a tested build. `Serve.command` serves `Builds/html`
+for local and LAN testing.
 
 ```sh
 ./Release.command
+./Serve.command
 ```
 
 The release script selects a configured platform, reads its export from
@@ -33,6 +35,7 @@ The script searches `PATH` and `~/bin/butler`.
 ## Resources
 
 - `tools/release/gmcu_release.sh`: Versions and publishes an existing export.
+- `tools/release/Serve.command`: Serves an HTML export for local and LAN testing.
 - `scripts/gmcu_build_info`: Runtime build metadata API.
 - `objects/gmcu_o_build_info_label`: Optional bottom-right build label.
 

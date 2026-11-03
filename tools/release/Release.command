@@ -10,14 +10,7 @@ if [ ! -x "$RELEASE" ]; then
     echo "Common Utils release script not found:"
     echo "  $RELEASE"
 else
-    echo "1. Serve HTML build"
-    echo "2. Publish to itch.io"
-    read -r -p "Choose an option: " choice
-    if [ "$choice" = 1 ]; then
-        python3 -m http.server 8000 --bind 0.0.0.0 --directory "$PROJECT_ROOT/Builds/html"
-    elif [ "$choice" = 2 ]; then
-        "$RELEASE" "$PROJECT_ROOT"
-    fi
+    "$RELEASE" "$PROJECT_ROOT"
 fi
 
 echo
