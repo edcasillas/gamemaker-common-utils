@@ -6,13 +6,16 @@
 
 set -u                                  # Stop if the script reads an undefined variable.
 ROOT="${1:-$(pwd)}"                     # Use the first argument as the project root, or the current directory when omitted.
+RED=$'\033[31m'                          # Error text color.
+GREEN=$'\033[32m'                        # Success text color.
+RESET=$'\033[0m'                         # Restore the terminal's default color.
 
 CONFIG="$ROOT/itch-config.json"         # Consumer-owned itch.io destination and platform list.
 STATE="$ROOT/build_version.json"        # Consumer-owned release counter source of truth.
 
 # Show an error message and stop the script with an error.
 fail() {
-    echo "Error: $1" >&2                  # Write the message to stderr.
+    printf '%b\n' "${RED}Error: $1${RESET}" >&2 # Write the red message to stderr.
     exit 1                                # Stop the script with a failure status.
 }
 
@@ -49,7 +52,6 @@ if [ "$PLATFORM_COUNT" -gt 1 ]; then   # Ask which export to publish when severa
 
     [[ "$choice" =~ ^[0-9]+$ ]] || fail "Invalid platform"                                  # Require an integer.
     [ "$choice" -ge 1 ] && [ "$choice" -le "$PLATFORM_COUNT" ] || fail "Invalid platform"   # Require an existing entry.
-
     PLATFORM_INDEX=$((choice - 1))       # Convert the selection to a zero-based config index.
 fi
 
@@ -57,10 +59,9 @@ PLATFORM="$(jq -er ".platforms[$PLATFORM_INDEX]" "$CONFIG")"    # Selected platf
 BUILD="$ROOT/Builds/$PLATFORM"                                  # Existing GameMaker export to publish.
 [ -e "$BUILD" ] || fail "Export not found: $BUILD"              # Stop before release work when the export is missing.
 
-# Generate version string
+# Generate the release or prototype version string.
 if [ "$IS_PROTOTYPE" = true ]; then
-    # For prototype versions, use a unique timestamp. eg. "mygame-20240606-123456".
-    VERSION="$(basename "$ROOT")-$(date -u +%Y%m%d-%H%M%S)"
+    VERSION="$(basename "$ROOT")-$(date -u +%Y%m%d-%H%M%S)" # Example: mygame-20240606-123456.
 else
     YEAR="$(date +%Y)"                      # Version major component.
     MONTH="$(date +%m)"                     # Version minor component.
@@ -74,8 +75,8 @@ else
         COUNT="$(jq -r --arg p "$PLATFORM" --arg m "$MONTH_KEY" \
             '(.build_counts[$p][$m] // 0) + 1' "$STATE")"
     fi
-    VERSION="$YEAR.$MONTH.$PLATFORM_NUMBER.$COUNT" # Complete release version.
 
+    VERSION="$YEAR.$MONTH.$PLATFORM_NUMBER.$COUNT" # Complete release version.
     TARGET="$PLATFORM"                      # GameMaker target folder usually matches the release platform.
     [ "$PLATFORM" = html ] && TARGET=html5 # GameMaker names the HTML target html5.
     SOURCE_OPTIONS="$ROOT/options/$TARGET/options_$TARGET.yy" # Source metadata committed after release.
@@ -95,7 +96,7 @@ if [ "$IS_PROTOTYPE" != true ]; then
 fi
 
 "$BUTLER" push "$BUILD" "$USERNAME/$PROJECT:$PLATFORM" --userversion "$VERSION" || exit 1 # Upload the export.
-[ "$IS_PROTOTYPE" = true ] && echo "Published $VERSION" && exit 0 # Prototypes need no release bookkeeping.
+[ "$IS_PROTOTYPE" = true ] && printf '%b\n' "${GREEN}Published $VERSION${RESET}" && exit 0 # Prototypes need no release bookkeeping.
 
 mkdir -p "$(dirname "$STATE")"           # Ensure the consumer state directory exists.
 [ -f "$STATE" ] || echo '{"build_counts":{}}' > "$STATE" # Initialize missing counter state.
@@ -111,9 +112,9 @@ git -C "$ROOT" add "$STATE" "$SOURCE_OPTIONS" || exit 1     # Stage only release
 git -C "$ROOT" commit -m "Release v$VERSION" || exit 1      # Create the local release commit.
 git -C "$ROOT" tag "releases/v$VERSION" || exit 1           # Mark the exact released commit.
 
-echo "Published and tagged v$VERSION"                       # Report completed local bookkeeping.
-
+printf '%b\n' "${GREEN}Published and tagged v$VERSION${RESET}" # Report completed local bookkeeping.
 read -r -p "Push commit and tag? [y/N]: " answer            # Keep remote Git mutation optional.
+
 if [ "$answer" = y ] || [ "$answer" = Y ]; then # Push only after explicit confirmation.
     git -C "$ROOT" push origin main && git -C "$ROOT" push origin "releases/v$VERSION" # Publish commit and tag together.
 fi
