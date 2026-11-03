@@ -8,6 +8,7 @@ set -u                                  # Stop if the script reads an undefined 
 ROOT="${1:-$(pwd)}"                     # Use the first argument as the project root, or the current directory when omitted.
 RED=$'\033[31m'                          # Error text color.
 GREEN=$'\033[32m'                        # Success text color.
+CYAN=$'\033[36m'                         # Section heading color.
 RESET=$'\033[0m'                         # Restore the terminal's default color.
 
 CONFIG="$ROOT/itch-config.json"         # Consumer-owned itch.io destination and platform list.
@@ -83,9 +84,15 @@ else
     [ -f "$SOURCE_OPTIONS" ] || fail "Source options not found: $SOURCE_OPTIONS" # Prevent a release that cannot be recorded.
 fi
 
-echo "Publish $BUILD to $USERNAME/$PROJECT:$PLATFORM as $VERSION"   # Show the exact pending upload.
-read -r -p "Continue? [y/N]: " answer                               # Require explicit confirmation.
-[ "$answer" = y ] || [ "$answer" = Y ] || exit 0                    # Cancel without changing anything unless confirmed.
+BUILD_DISPLAY="${BUILD#"$ROOT"/}" # Show the export path relative to the project root.
+
+printf '%b\n\n' "${CYAN}Publish to itch.io${RESET}"
+printf '  %-9s%s\n' "Build:" "$BUILD_DISPLAY"
+printf '  %-9s%s\n' "Target:" "$USERNAME/$PROJECT:$PLATFORM"
+printf '  %-9s%s\n\n' "Version:" "$VERSION"
+
+read -r -p "Continue? [y/N]: " answer            # Require explicit confirmation.
+[ "$answer" = y ] || [ "$answer" = Y ] || exit 0 # Cancel without changing anything unless confirmed.
 
 # Add the runtime-readable version to a game export.
 if [ "$IS_PROTOTYPE" != true ]; then
