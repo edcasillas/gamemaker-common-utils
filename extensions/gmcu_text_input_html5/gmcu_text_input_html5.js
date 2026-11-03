@@ -185,7 +185,7 @@ function gmcu_text_clipboard(action, value, owner, token) {
  * @returns {number} One when PASTE may be offered, otherwise zero.
  */
 function gmcu_text_clipboard_can_read() {
-  var canRead = window.gmcu_text_clipboard_can_read;
+  var canRead = window.gmcu_text_clipboard_host_can_read;
   if (typeof canRead === 'function') {
     return canRead() ? 1 : 0;
   }
@@ -198,7 +198,7 @@ function gmcu_text_clipboard_can_read() {
  * @returns {string} Empty when reads can be attempted, otherwise details.
  */
 function gmcu_text_clipboard_read_diagnostic() {
-  var diagnostic = window.gmcu_text_clipboard_read_diagnostic;
+  var diagnostic = window.gmcu_text_clipboard_host_read_diagnostic;
   if (typeof diagnostic === 'function') {
     return diagnostic();
   }

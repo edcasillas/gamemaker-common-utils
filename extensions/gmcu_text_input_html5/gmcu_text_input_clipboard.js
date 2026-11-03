@@ -346,11 +346,11 @@
     return lastError;
   };
   /** Return whether the page can attempt a programmatic clipboard read. */
-  window.gmcu_text_clipboard_can_read = function () {
+  window.gmcu_text_clipboard_host_can_read = function () {
     return pasteReadDiagnostic() === '';
   };
   /** Return the current clipboard-read capability diagnostic. */
-  window.gmcu_text_clipboard_read_diagnostic = function () {
+  window.gmcu_text_clipboard_host_read_diagnostic = function () {
     return pasteReadDiagnostic();
   };
 })();
