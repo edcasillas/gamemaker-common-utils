@@ -15,8 +15,9 @@ export or publish a tested build. Serving runs `python3 -m http.server` directly
 
 The release script selects a configured platform, reads its export from
 `Builds/<platform>`, asks for confirmation, and runs `butler push`. Game releases
-require a clean `main`, update the generated and source versions, advance the
-counter, commit that metadata, and create `releases/v<version>`. Pushing the
+require a clean `main`, write the runtime build number, update the source
+version, advance the counter, commit that metadata, and create
+`releases/v<version>`. Pushing the
 commit and tag is a separate confirmation. Prototypes use a timestamped upload
 version without Git bookkeeping.
 

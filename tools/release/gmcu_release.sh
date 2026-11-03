@@ -27,7 +27,14 @@ BUTLER="$(command -v butler || true)"           # Prefer a Butler executable ava
 USERNAME="$(jq -er '.username' "$CONFIG")" || fail "Missing username"                   # itch.io account name.
 PROJECT="$(jq -er '.project_name' "$CONFIG")" || fail "Missing project_name"            # itch.io project slug.
 PLATFORM_COUNT="$(jq -er '.platforms | length' "$CONFIG")" || fail "Missing platforms"  # Number of configured export platforms.
+IS_PROTOTYPE="$(jq -r '.prototype // false' "$CONFIG")"                                 # Whether Git release bookkeeping is disabled.
 [ "$PLATFORM_COUNT" -gt 0 ] || fail "At least one platform is required"                 # Reject an empty platform list.
+
+# Validate Git before asking for input when this is a versioned game release.
+if [ "$IS_PROTOTYPE" != true ]; then
+    [ "$(git -C "$ROOT" branch --show-current)" = main ] || fail "Release requires main"  # Release only from main.
+    [ -z "$(git -C "$ROOT" status --short)" ] || fail "Release requires a clean worktree" # Keep release commits isolated.
+fi
 
 # Prompt for the platform to publish when several are configured, otherwise use the only one.
 PLATFORM_INDEX=0
@@ -47,24 +54,23 @@ if [ "$PLATFORM_COUNT" -gt 1 ]; then   # Ask which export to publish when severa
 fi
 
 PLATFORM="$(jq -er ".platforms[$PLATFORM_INDEX]" "$CONFIG")"    # Selected platform and itch.io channel name.
-IS_PROTOTYPE="$(jq -r '.prototype // false' "$CONFIG")"         # Use prototype behavior only when explicitly enabled.
 BUILD="$ROOT/Builds/$PLATFORM"                                  # Existing GameMaker export to publish.
 [ -e "$BUILD" ] || fail "Export not found: $BUILD"              # Stop before release work when the export is missing.
 
-# Prototype versions are disposable; game versions advance the stored counter.
+# Generate version string
 if [ "$IS_PROTOTYPE" = true ]; then
-    VERSION="$(basename "$ROOT")-$(date -u +%Y%m%d-%H%M%S)" # Give disposable builds a unique UTC timestamp.
+    # For prototype versions, use a unique timestamp. eg. "mygame-20240606-123456".
+    VERSION="$(basename "$ROOT")-$(date -u +%Y%m%d-%H%M%S)"
 else
-    [ "$(git -C "$ROOT" branch --show-current)" = main ] || fail "Release requires main" # Release only from main.
-    [ -z "$(git -C "$ROOT" status --short)" ] || fail "Release requires a clean worktree" # Keep release commits isolated.
-    OPTIONS="$BUILD/options.ini"            # Generated GameMaker version metadata inside the export.
-    [ -f "$OPTIONS" ] || fail "Version file not found: $OPTIONS" # Require metadata before modifying the export.
     YEAR="$(date +%Y)"                      # Version major component.
     MONTH="$(date +%m)"                     # Version minor component.
     MONTH_KEY="$YEAR-$MONTH"                # Counter bucket for the current month.
     PLATFORM_NUMBER=$((PLATFORM_INDEX + 1)) # Stable one-based platform component.
-    COUNT=1                                  # First release when the state file has no matching counter.
-    if [ -f "$STATE" ]; then               # Advance the persisted platform/month counter when available.
+
+    COUNT=1                                 # First release when the state file has no matching counter.
+
+    # Advance the persisted platform/month counter when available.
+    if [ -f "$STATE" ]; then
         COUNT="$(jq -r --arg p "$PLATFORM" --arg m "$MONTH_KEY" \
             '(.build_counts[$p][$m] // 0) + 1' "$STATE")"
     fi
@@ -76,17 +82,12 @@ else
     [ -f "$SOURCE_OPTIONS" ] || fail "Source options not found: $SOURCE_OPTIONS" # Prevent a release that cannot be recorded.
 fi
 
-echo "Publish $BUILD to $USERNAME/$PROJECT:$PLATFORM as $VERSION" # Show the exact pending upload.
-read -r -p "Continue? [y/N]: " answer    # Require explicit confirmation.
-[ "$answer" = y ] || [ "$answer" = Y ] || exit 0 # Cancel without changing anything unless confirmed.
+echo "Publish $BUILD to $USERNAME/$PROJECT:$PLATFORM as $VERSION"   # Show the exact pending upload.
+read -r -p "Continue? [y/N]: " answer                               # Require explicit confirmation.
+[ "$answer" = y ] || [ "$answer" = Y ] || exit 0                    # Cancel without changing anything unless confirmed.
 
-# Stamp a game export with the version that itch.io will receive.
+# Add the runtime-readable version to a game export.
 if [ "$IS_PROTOTYPE" != true ]; then
-    sed -e "s/^MajorVersion=.*/MajorVersion=$YEAR/" \
-        -e "s/^MinorVersion=.*/MinorVersion=$((10#$MONTH))/" \
-        -e "s/^BuildVersion=.*/BuildVersion=$PLATFORM_NUMBER/" \
-        -e "s/^RevisionVersion=.*/RevisionVersion=$COUNT/" \
-        "$OPTIONS" > "$OPTIONS.tmp" && mv "$OPTIONS.tmp" "$OPTIONS"
     [ "$PLATFORM" = html ] && BUILD_NUMBER="$BUILD/html5game/buildnumber.txt" \
         || BUILD_NUMBER="$BUILD/buildnumber.txt"
     mkdir -p "$(dirname "$BUILD_NUMBER")" # Ensure the runtime metadata directory exists.
