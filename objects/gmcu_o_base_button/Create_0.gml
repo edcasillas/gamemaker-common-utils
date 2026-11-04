@@ -26,6 +26,7 @@ The button should only do its action after mouse released when it previously rec
 mouse pressed event. This flag tells us whether the button has received the pressed event.
 */
 is_pressed = false;
+is_hovered = false;
 
 created = true;
 
@@ -94,6 +95,7 @@ function on_hover_enter() {
 		gmcu_log_try_show_notification(_message);
 	}
 	if(!is_interactable) return;
+	is_hovered = true;
 	image_index = 1;
 }
 
@@ -106,7 +108,7 @@ function on_hover_leave() {
 		gmcu_log_debug(_message);
 		gmcu_log_try_show_notification(_message);
 	}
-	if(!is_interactable) return;
+	is_hovered = false;
 	is_pressed = false;
 	image_index = 0;
 }

@@ -15,6 +15,13 @@ The module does not decide what `play`, `resume`, or another button should do.
 A consumer controller listens for `GMCU_EVENT_BUTTON_PRESSED` and handles the
 received `button_id`.
 
+Use these objects before creating another interactable control. Consumer-specific
+text, sprites, styling, and actions do not justify reimplementing hover, press,
+release, cursor registration, draw registration, or cleanup. Create a child and
+keep only the behavior that the shared button does not provide. When a prototype
+reveals a generally useful missing capability, improve this module and exercise
+that capability through the prototype instead of adding a parallel button system.
+
 ## Which Object To Use
 
 The three objects form this inheritance hierarchy:
@@ -165,6 +172,9 @@ Cursor; callers that disable a currently hovered button may call
 - `localize_text`: When true and `text` is non-empty, localizes it once during
   Create.
 - `is_interactable`: Enables or suppresses inherited interaction behavior.
+- `is_hovered`: Runtime state set by the inherited Universal Cursor callbacks.
+  Read it when an extension must align browser or platform behavior with the
+  button currently under the cursor; do not maintain a second hover flag.
 - `debug_events`: Logs hover, press, and release callbacks and forwards them to
   the optional visual notification handler.
 
