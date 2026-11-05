@@ -6,14 +6,21 @@ area_width = 0; // Keyboard panel width derived from its sprite and Room Editor 
 area_height = 0; // Keyboard panel height derived from its sprite and Room Editor scale.
 paste_available = false; // Whether this keyboard execution exposes a usable PASTE key.
 
+/** Log an error with this keyboard's area ID.
+ * @param {Any} _message Error detail.
+ */
+function log_error(_message) {
+    gmcu_log_error("keyboard area_id=" + string(area_id) + ": " + string(_message));
+}
+
 if (sprite_index == noone) {
-    gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": assign a sprite to the keyboard object");
+    log_error("assign a sprite to the keyboard object");
     instance_destroy();
     return;
 }
 
 if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2) || sprite_get_yoffset(sprite_index) != floor(sprite_get_height(sprite_index) / 2)) {
-    gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": keyboard sprite origin must be centered");
+    log_error("keyboard sprite origin must be centered");
     instance_destroy();
     return;
 }
@@ -58,7 +65,7 @@ function open(_textbox) {
     paste_available = target.paste_mode != "none";
     if (paste_available && os_browser != browser_not_a_browser && gmcu_text_clipboard_can_read() != 1) {
         paste_available = false;
-        gmcu_log_error("keyboard area_id=" + string(area_id) + ", instance=" + string(id) + ": PASTE hidden: " + gmcu_text_clipboard_read_diagnostic());
+        log_error("PASTE hidden: " + gmcu_text_clipboard_read_diagnostic());
     }
 
     var rows = []; // Character rows for the active textbox.
@@ -159,7 +166,7 @@ function close() {
  * @param {Real} _direction Universal Cursor direction angle.
  */
 function navigate(_direction) {
-    // Key selected by Universal Cursor.
+    // Current cursor-selected key.
     var current = gmcu_o_universal_cursor.hovered_interactable;
     if (!instance_exists(current) || current.object_index != gmcu_o_text_key || current.keyboard_area != id) {
         gmcu_o_universal_cursor.gui_x = keys[0].x;
@@ -207,7 +214,7 @@ function navigate(_direction) {
 /** Flash a visible character or action without moving pointer or navigation focus.
  * @param {string} _character Normalized character or action name. */
 function flash_key(_character) {
-    // Action identifier used to flash a visible key.
+    // Map a typed space to its key action.
     var key_action = _character == " " ? "SPACE" : _character;
     for (var key_index = 0; key_index < array_length(keys); key_index++) {
         if (keys[key_index].action == key_action) {

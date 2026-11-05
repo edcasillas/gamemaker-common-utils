@@ -14,12 +14,12 @@ if (gmcu_ui_overlay_blocks_pointer_input()) {
     exit;
 }
 
-// Physical keyboard and clipboard events waiting for this textbox.
+// Process queued text input.
 var events = [];
 if (os_browser != browser_not_a_browser) {
     events = json_parse(gmcu_text_capture_poll());
 } else {
-    // GameMaker collects printable native keyboard input between Step events.
+    // Read native typed characters.
     var typed_text = keyboard_string;
     keyboard_string = "";
     for (var typed_index = 1; typed_index <= string_length(typed_text); typed_index++) {
@@ -61,7 +61,7 @@ for (var event_index = 0; event_index < array_length(events); event_index++) {
         edit_action(input_event.value);
     } else if (input_event.kind == "clipboard" && input_event.owner == string(id) && input_event.token == clipboard_token) {
         if (!input_event.ok) {
-            gmcu_log_error(diagnostic_id + ": HTML5 paste failed: " + input_event.error);
+            log_error("HTML5 paste failed: " + input_event.error);
         } else if (input_event.action == "copy") {
             feedback = "Copied";
         } else if (input_event.value == "") {
@@ -76,7 +76,7 @@ if (!editing || pending_close != -1) {
     exit;
 }
 
-// Physical key action to repeat or apply.
+// Repeat held caret and delete keys.
 var action = keyboard_check(vk_left) ? "LEFT" : (keyboard_check(vk_right) ? "RIGHT" : ((keyboard_check(vk_backspace) || keyboard_check(vk_delete)) ? "DEL" : ""));
 if (action == "") {
     repeat_key = "";
@@ -103,13 +103,12 @@ if (pending_close != -1) {
     exit;
 }
 
-// Only the actual canvas pointer can cause outside-click cancellation. HTML pad
-// touches are captured by its adapter and never reach the runner's mouse lane.
+// Cancel only from a canvas pointer outside the field and keyboard.
 if (editing && mouse_check_button_pressed(mb_left)) {
     var px = device_mouse_x_to_gui(0); // Canvas pointer's GUI x coordinate.
     var py = device_mouse_y_to_gui(0); // Canvas pointer's GUI y coordinate.
     if (!is_undefined(global.gmcu_gui_pointer_provider)) {
-        // Host-provided GUI pointer coordinates.
+        // Use host GUI coordinates when available.
         var pointer = global.gmcu_gui_pointer_provider();
         if (array_length(pointer) == 2) {
             px = pointer[0];

@@ -7,7 +7,8 @@ optional target output, and optional telemetry forwarding.
 
 Call `gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`, `gmcu_log_error`, or
 `gmcu_log_exception`. Without adapters, messages use
-`show_debug_message`.
+`show_debug_message`. Each entry identifies its room, object, and runtime
+instance when an active instance exists.
 
 ```gml
 // Basic severity-based logging.
@@ -37,7 +38,7 @@ if (os_browser != browser_not_a_browser) {
 
 - `scripts/gmcu_log_config`: Severity macros, adapters, recursion protection,
   and development buffer.
-- `scripts/gmcu_log_get_tags`: Builds room/object context tags.
+- `scripts/gmcu_log_get_tags`: Builds room/object/runtime-instance context tags.
 - `scripts/gmcu_log_debug`, `gmcu_log_info`, `gmcu_log_warn`,
   `gmcu_log_error`, and `gmcu_log_exception`: Public severity functions.
 
@@ -63,6 +64,7 @@ flowchart LR
 | `gmcu_log_warn(_message)` | Function | Writes warning output. |
 | `gmcu_log_error(_message, _show_notification = true)` | Function | Writes an error and optionally requests a visual notification. |
 | `gmcu_log_exception(_exception, _tag = "", _show_notification = true)` | Function | Formats and reports an exception. |
+| `gmcu_log_get_tags()` | Function | Returns `[room:object#instance]` context, omitting the instance outside an active instance context. |
 | `gmcu_log_set_output_handler(_handler)` | Function | Replaces target output. |
 | `gmcu_log_set_telemetry_handler(_handler)` | Function | Sets optional telemetry forwarding. |
 | `gmcu_log_buffer_get()` | Function | Returns the bounded Dev Menu log buffer. |

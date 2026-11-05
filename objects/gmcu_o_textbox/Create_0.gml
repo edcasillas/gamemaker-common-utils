@@ -16,18 +16,22 @@ repeat_due = 0;				// Next repeat time for held arrow/delete keys.
 opened_at = -1;				// Time editing opened; ignores input from the opening press.
 clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
 inputs_registered = false;	// Set after registering B/Start; Clean Up skips unregistering them if Create exited before registration.
-diagnostic_id = "textbox_id=" + string(textbox_id) + ", instance=" + string(id); // Stable field label and runtime instance for errors.
 
-// A concrete child object supplies the visible frame and its Room Editor bounds.
+/** Log an error with this field's ID.
+ * @param {Any} _message Error detail.
+ */
+function log_error(_message) { gmcu_log_error("textbox_id=" + string(textbox_id) + ": " + string(_message)); }
+
+// Require a visible Room Editor sprite.
 if (sprite_index == noone) {
-    gmcu_log_error(diagnostic_id + ": assign a sprite to the textbox object");
+    log_error("assign a sprite to the textbox object");
     instance_destroy();
     return;
 }
 
-// The field's x/y and cursor hit target both use the sprite center.
+// Require a centered sprite origin for drawing and hit detection.
 if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2) || sprite_get_yoffset(sprite_index) != floor(sprite_get_height(sprite_index) / 2)) {
-    gmcu_log_error(diagnostic_id + ": textbox sprite origin must be centered");
+    log_error("textbox sprite origin must be centered");
     instance_destroy();
     return;
 }
@@ -36,45 +40,40 @@ image_speed = 0;
 hit_width = sprite_get_width(sprite_index) * abs(image_xscale);
 hit_height = sprite_get_height(sprite_index) * abs(image_yscale);
 
-// gmcu_TextState validates the alphabet, length, and initial value in its constructor.
-// An error means its slots do not represent the requested field, so do not register input or draw it.
+// Reject invalid text-state configuration.
 if (state.config_error != "") {
-    gmcu_log_error(diagnostic_id + ": " + state.config_error);
+    log_error(state.config_error);
     instance_destroy();
     return;
 }
 
-// textbox_id identifies submit events; keyboard_area_id identifies the area that renders keys.
-// Without either ID, this instance cannot connect those interactions to the right host or keyboard.
+// Require IDs for host events and keyboard wiring.
 if (textbox_id == "" || keyboard_area_id == "") {
-    gmcu_log_error(diagnostic_id + ": textbox_id and keyboard_area_id are required");
+    log_error("textbox_id and keyboard_area_id are required");
     instance_destroy();
     return;
 }
 
-// Each X in the mask reads one state slot while drawing. A different count would
-// skip saved characters or read beyond the slot array.
+// Require one mask X per text position.
 if (mask != "" && string_count("X", mask) != text_length) {
-    gmcu_log_error(diagnostic_id + ": mask must have one X per position");
+    log_error("mask must have one X per position");
     instance_destroy();
     return;
 }
 
-// The keyboard builder implements only these two layouts. An unknown value would
-// silently enter its alphabetic branch, hiding a Room Editor configuration error.
+// Require a supported keyboard layout.
 if (keyboard_layout != "alphabetic" && keyboard_layout != "qwerty") {
-    gmcu_log_error(diagnostic_id + ": unsupported keyboard_layout=" + string(keyboard_layout));
+    log_error("unsupported keyboard_layout=" + string(keyboard_layout));
     instance_destroy();
     return;
 }
 
-// The QWERTY keyboard has fixed key rows. Check the supplied alphabet so every
-// accepted character also has a key the player can select.
+// Require every QWERTY character to have a visible key.
 if (keyboard_layout == "qwerty") {
     for (var alphabet_index = 1; alphabet_index <= string_length(alphabet); alphabet_index++) {
         var character = string_char_at(alphabet, alphabet_index); // Character that needs a selectable QWERTY key.
         if (string_pos(character, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ") == 0) {
-            gmcu_log_error(diagnostic_id + ": QWERTY layout supports uppercase ASCII letters, digits and space");
+            log_error("QWERTY layout supports uppercase ASCII letters, digits and space");
             instance_destroy();
             return;
         }
@@ -94,7 +93,7 @@ function activate() {
         return;
     }
 
-    // An absent or duplicated keyboard area cannot receive this field's editing actions.
+    // Require one matching keyboard area.
     var resolved_keyboard = gmcu_text_resolve_keyboard_area(keyboard_area_id); // Unique keyboard object, or noone on configuration error.
     if (resolved_keyboard == noone) {
         instance_destroy();
@@ -116,19 +115,19 @@ function activate() {
     
     keyboard_string = "";	// Native GameMaker input uses keyboard_string; clear text typed before this field took focus.
 
-    // HTML5 captures DOM key/paste events without focusing an input or opening the mobile OS keyboard.
+    // Capture browser input without opening the mobile keyboard.
     if (os_browser != browser_not_a_browser) {
         gmcu_text_capture_begin();
     }
 
-    // Universal Cursor limits selectable controls to this textbox and its keys while editing.
+    // Limit cursor targets to this editing session.
     gmcu_o_universal_cursor.text_input_owner = id;
 
-    // Input Hub routes gamepad presses to the text-input owner instead of gameplay.
+    // Route gamepad input to this field.
     gmcu_o_input_hub.focus_owner = id;
     gmcu_o_input_hub.focus_route = "text_input";
 
-    // Generate visible keys for this textbox's alphabet and layout.
+    // Open this field's keyboard.
     keyboard_area.open(id);
 }
 
@@ -222,7 +221,7 @@ function edit_action(_action) {
             break;
         case "DONE":
         case "CANCEL":
-            // Keep the pressed key visible for its feedback beat before closing.
+            // Show press feedback before closing.
             pending_close = (_action == "DONE");
             close_due = current_time + 150;
             break;
@@ -235,7 +234,7 @@ function edit_action(_action) {
                     try {
                         feedback = state.paste(clipboard_get_text(), paste_mode) ? "Pasted" : "Clipboard is empty or has no permitted characters";
                     } catch (_clipboard_error) {
-                        gmcu_log_error(diagnostic_id + ": native clipboard read failed: " + string(_clipboard_error));
+                        log_error("native clipboard read failed: " + string(_clipboard_error));
                         feedback = "Clipboard unavailable";
                     }
                 }
@@ -287,7 +286,7 @@ function on_draw_gui() {
         draw_rectangle(left, top, left + hit_width, top + hit_height, true);
     }
 
-    // Both skins render the same slots, separators, and caret state.
+    // Render slots, separators, and caret.
     for (var mask_position = 1; mask_position <= string_length(pattern); mask_position++) {
         var character = string_char_at(pattern, mask_position); // Mask separator or editable placeholder.
         var color = retro ? make_color_rgb(28, 88, 202) : placeholder_color; // Empty-slot color.

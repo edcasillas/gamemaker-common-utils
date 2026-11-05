@@ -3,11 +3,11 @@ if (!instance_exists(target) || gmcu_o_input_hub.current_input_owner() != "text_
     exit;
 }
 
-// D-pad buttons used for keyboard navigation.
+// D-pad navigation buttons.
 var buttons = [gp_padl, gp_padr, gp_padu, gp_padd];
-// Directions matching the D-pad buttons.
+// Matching cursor directions.
 var directions = [GMCU_DIRECTION_ANGLE.LEFT, GMCU_DIRECTION_ANGLE.RIGHT, GMCU_DIRECTION_ANGLE.UP, GMCU_DIRECTION_ANGLE.DOWN];
-// Index of the D-pad direction held this frame.
+// Held direction index.
 var held = -1;
 for (var direction_index = 0; direction_index < array_length(buttons); direction_index++) {
     if (gmcu_o_input_hub.input_state_down(gmcu_gamepad_input_state(buttons[direction_index]), "text_input")) {
