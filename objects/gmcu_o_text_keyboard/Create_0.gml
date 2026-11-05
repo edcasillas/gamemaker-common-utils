@@ -1,3 +1,5 @@
+#region State
+
 keys = []; // Generated key instances owned by this area.
 target = noone; // Textbox receiving key actions while open.
 nav_button = -1; // D-pad direction held for navigation repeat.
@@ -6,12 +8,20 @@ area_width = 0; // Keyboard panel width derived from its sprite and Room Editor 
 area_height = 0; // Keyboard panel height derived from its sprite and Room Editor scale.
 paste_available = false; // Whether this keyboard execution exposes a usable PASTE key.
 
+#endregion
+
+#region Diagnostics
+
 /** Log an error with this keyboard's area ID.
  * @param {Any} _message Error detail.
  */
 function log_error(_message) {
     gmcu_log_error("keyboard area_id=" + string(area_id) + ": " + string(_message));
 }
+
+#endregion
+
+#region Validation
 
 if (sprite_index == noone) {
     log_error("assign a sprite to the keyboard object");
@@ -25,6 +35,10 @@ if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2
     return;
 }
 
+#endregion
+
+#region Initialization
+
 image_speed = 0;
 area_width = sprite_get_width(sprite_index) * abs(image_xscale);
 area_height = sprite_get_height(sprite_index) * abs(image_yscale);
@@ -33,6 +47,10 @@ gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_TEXT_KEYBOARD, area_id);
 if (skin == "") {
     skin = "clean";
 }
+
+#endregion
+
+#region Rendering
 
 /** Draw the host sprite behind active keys in GUI coordinates. */
 function on_draw_gui() {
@@ -55,6 +73,10 @@ function on_draw_gui() {
         }
     }
 }
+
+#endregion
+
+#region Keyboard Lifecycle
 
 /** Build keys from the active textbox's alphabet and layout.
  * @param {Instance} _textbox Field receiving generated key actions.
@@ -162,6 +184,10 @@ function close() {
     paste_available = false;
 }
 
+#endregion
+
+#region Navigation and Feedback
+
 /** Move selection to the adjacent key in the requested direction.
  * @param {Real} _direction Universal Cursor direction angle.
  */
@@ -223,3 +249,5 @@ function flash_key(_character) {
         }
     }
 }
+
+#endregion

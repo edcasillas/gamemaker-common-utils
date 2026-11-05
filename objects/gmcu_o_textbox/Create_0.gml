@@ -1,3 +1,5 @@
+#region State
+
 state = new gmcu_TextState(alphabet, text_length, case_sensitive, wrap_caret, initial_value); // Fixed-position text and caret state.
 
 editing = false;			// True while this textbox owns the active editing session.
@@ -17,10 +19,18 @@ opened_at = -1;				// Time editing opened; ignores input from the opening press.
 clipboard_token = 0;		// Clipboard request ID; rejects responses from older requests.
 inputs_registered = false;	// Set after registering B/Start; Clean Up skips unregistering them if Create exited before registration.
 
+#endregion
+
+#region Diagnostics
+
 /** Log an error with this field's ID.
  * @param {Any} _message Error detail.
  */
 function log_error(_message) { gmcu_log_error("textbox_id=" + string(textbox_id) + ": " + string(_message)); }
+
+#endregion
+
+#region Validation
 
 // Require a visible Room Editor sprite.
 if (sprite_index == noone) {
@@ -35,10 +45,6 @@ if (sprite_get_xoffset(sprite_index) != floor(sprite_get_width(sprite_index) / 2
     instance_destroy();
     return;
 }
-
-image_speed = 0;
-hit_width = sprite_get_width(sprite_index) * abs(image_xscale);
-hit_height = sprite_get_height(sprite_index) * abs(image_yscale);
 
 // Reject invalid text-state configuration.
 if (state.config_error != "") {
@@ -80,12 +86,24 @@ if (keyboard_layout == "qwerty") {
     }
 }
 
+#endregion
+
+#region Initialization
+
+image_speed = 0;
+hit_width = sprite_get_width(sprite_index) * abs(image_xscale);
+hit_height = sprite_get_height(sprite_index) * abs(image_yscale);
+
 gmcu_register_gamepad_button(gp_face2); // B button will cancel
 gmcu_register_gamepad_button(gp_start);	// Start button will submit
 inputs_registered = true;
 
 gmcu_universal_cursor_subscribe(textbox_id);
 gmcu_layered_gui_subscribe(GMCU_GUI_PRIORITY_DEFAULT, textbox_id);
+
+#endregion
+
+#region Editing
 
 /** Activate this field and its configured keyboard area. */
 function activate() {
@@ -247,6 +265,10 @@ function edit_action(_action) {
     }
 }
 
+#endregion
+
+#region Interaction
+
 /** Receive pointer/controller focus. */
 function on_hover_enter() { hovered = true; }
 
@@ -258,6 +280,10 @@ function on_pressed() { activate();}
 
 /** Opening a field consumes its press, so release has no editing action. */
 function on_released() { }
+
+#endregion
+
+#region Rendering
 
 /** Draw the field, persistent mask, editing blink, and closed-field validation. */
 function on_draw_gui() {
@@ -313,6 +339,10 @@ function on_draw_gui() {
     saved.apply();
 }
 
+#endregion
+
+#region Cursor Filtering
+
 /** Limit active editing to text fields and keys.
  * @param {Instance} _target Cursor candidate.
  * @returns {Boolean} Whether the cursor may select it while editing.
@@ -320,3 +350,5 @@ function on_draw_gui() {
 function accepts_cursor_target(_target) {
     return _target.object_index == gmcu_o_textbox || _target.object_index == gmcu_o_text_key;
 }
+
+#endregion
