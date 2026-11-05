@@ -34,10 +34,6 @@ function on_released() {
 /** Render the same rectangle used by Universal Cursor hit testing. */
 function on_draw_gui() {
     if (!instance_exists(keyboard_area)) return;
-    if (keyboard_area.custom_draw != noone) {
-        method_call(keyboard_area.custom_draw, [id]);
-        return;
-    }
 
     // Drawing parameters restored after rendering.
     var saved = new gmcu_DrawingParameters();

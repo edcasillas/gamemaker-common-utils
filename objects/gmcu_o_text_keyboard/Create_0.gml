@@ -2,7 +2,6 @@ keys = []; // Generated key instances owned by this area.
 target = noone; // Textbox receiving key actions while open.
 nav_button = -1; // D-pad direction held for navigation repeat.
 nav_due = 0; // Time when held navigation repeats.
-custom_draw = noone; // Optional host renderer for generated keys.
 area_width = 0; // Keyboard panel width derived from its sprite and Room Editor scale.
 area_height = 0; // Keyboard panel height derived from its sprite and Room Editor scale.
 paste_available = false; // Whether this keyboard execution exposes a usable PASTE key.

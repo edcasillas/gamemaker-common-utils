@@ -157,9 +157,7 @@ empty positions; `state.text()` omits them and is not a lossless draft format.
   leaves PASTE available for retry, and writes the full browser diagnostic only
   to the logger. Native runners use GameMaker's clipboard functions.
 
-For custom presentation, assign a bound method to `custom_draw` on a textbox or
-keyboard area; its argument is the field or key instance and it owns that
-element's drawing. The built-in `clean` and `retro` skins provide defaults.
+The built-in `clean` and `retro` skins control textbox and keyboard presentation.
 
 ## Scope
 

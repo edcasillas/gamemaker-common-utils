@@ -4,14 +4,13 @@ editing = false;			// True while this textbox owns the active editing session.
 touched = false;			// True after the field closes at least once; enables validation feedback.
 hovered = false;			// Universal Cursor hover state for the field.
 feedback = "";				// Current status or clipboard feedback shown below the field.
-last_status = undefined; // Last published validation and feedback state; avoids duplicate events.
+last_status = undefined;	// Last published validation and feedback state; avoids duplicate events.
 pending_close = -1;			// Pending close result: -1 none, 0 cancel, 1 submit.
 close_due = 0;				// Time when the DONE/CANCEL feedback beat ends.
 keyboard_area = noone;		// Keyboard object that renders keys and receives editing actions.
 is_interactable = true;		// Lets Universal Cursor target this textbox.
 hit_width = 0;				// Updated from the assigned sprite width and Room Editor scale.
-hit_height = 0;			// Updated from the assigned sprite height and Room Editor scale.
-custom_draw = noone;		// Optional host-provided field renderer; noone uses the built-in skin.
+hit_height = 0;				// Updated from the assigned sprite height and Room Editor scale.
 repeat_key = "";			// Physical key currently repeating, or empty when released.
 repeat_due = 0;				// Next repeat time for held arrow/delete keys.
 opened_at = -1;				// Time editing opened; ignores input from the opening press.
@@ -263,11 +262,6 @@ function on_released() { }
 
 /** Draw the field, persistent mask, editing blink, and closed-field validation. */
 function on_draw_gui() {
-    if (custom_draw != noone) {
-        method_call(custom_draw, [id]);
-        return;
-    }
-
     var saved = new gmcu_DrawingParameters(); // Drawing state restored after this field renders.
     if (font != noone && font_exists(font)) {
         draw_set_font(font);
